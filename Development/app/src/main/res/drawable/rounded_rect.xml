@@ -9,6 +9,10 @@
         android:width="1dp"
         android:color="@color/colorPrimaryMain"/>
 
+    //To give the fill of the shape, use keyword "solid"
+    <solid
+        android:color="@color/colorPrimaryMain" />
+
     //To make the corners rounded
     <corners android:radius="25dp"/>
 
