@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<layer-list xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:ignore="ExtraText">
+
+    //This is good practice to creating my own custom views through xml,
+    but I realized I could've just exported the design I made in Adobe XD.
 
     <item
         android:bottom="-30dp"
