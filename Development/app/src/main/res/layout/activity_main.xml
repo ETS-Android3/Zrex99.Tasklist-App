@@ -48,13 +48,13 @@
         android:id="@+id/tv_currentDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Current Date"
         android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline_topMarginFrameContainer"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginFrameContainer"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

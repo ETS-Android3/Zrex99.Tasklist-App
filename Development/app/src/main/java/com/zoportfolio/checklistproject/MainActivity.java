@@ -28,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
 
         loadFragment();
 
+        //TODOS...
+        //TODO: I have to fix the nuemorphic container drawable. SOLVED: Couldn't fix the problem so I will move on for now.
+
         //TODO: Assign the FAB its on click listener, load the tasklist fragment, and load the date for the textview.
-        //TODO: I have to fix the nuemorphic container drawable.
     }
 
     /**
