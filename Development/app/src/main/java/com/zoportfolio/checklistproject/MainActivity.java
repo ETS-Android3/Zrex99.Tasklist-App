@@ -5,13 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG = "MainActivity.TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,19 @@ public class MainActivity extends AppCompatActivity {
         //TODO: I have to fix the nuemorphic container drawable. SOLVED: Couldn't fix the problem so I will move on for now.
 
         //TODO: Assign the FAB its on click listener, load the tasklist fragment, and load the date for the textview.
+
+        //Completed TODOS
+
+        FloatingActionButton fabAddTaskList = findViewById(R.id.fab_newTaskList);
+        fabAddTaskList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.i(TAG, "onClick: FAB clicked");
+
+
+            }
+        });
     }
 
     /**
