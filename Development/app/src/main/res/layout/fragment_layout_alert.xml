@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/alert_newTaskConfirm"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/colorPrimaryAction"
@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/alert_newTaskCancel"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
@@ -39,9 +39,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:text="@string/alert_newTaskTitle"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        android:text="@string/alert_newTaskTitle"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMargin"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
@@ -81,13 +81,57 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-    <TextView
-        android:id="@+id/et_NewTaskListName"
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_leftMarginEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.17" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_rightMarginEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.82" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_topMarginEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottomMarginEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65" />
+
+    <View
+        android:id="@+id/v_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/nuemorphic_container_et"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginEditText"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginEditText"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMarginEditText" />
+
+    <TextView
+        android:id="@+id/et_NewTaskListName"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="SPOiler"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
-        app:layout_constraintStart_toStartOf="@+id/guideline_leftMargin"
-        tools:layout_editor_absoluteY="131dp"
-        android:background="@drawable/nuemorphic_container_et"/>
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginEditText"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginEditText"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMarginEditText" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
