@@ -1,6 +1,7 @@
 package com.zoportfolio.checklistproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
@@ -11,11 +12,16 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.zoportfolio.checklistproject.Alerts.NewTaskListAlertFragment;
 import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NewTaskListAlertFragment.NewTaskListAlertFragmentListener {
 
     public static final String TAG = "MainActivity.TAG";
+
+    private static final String FRAGMENT_ALERT_NEWTASK_TAG = "FRAGMENT_ALERT_NEWTASK";
+
+    private static Boolean isAlertUp = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,21 +41,55 @@ public class MainActivity extends AppCompatActivity {
         //TODOS...
         //TODO: I have to fix the nuemorphic container drawable. SOLVED: Couldn't fix the problem so I will move on for now.
 
-        //TODO: Assign the FAB its on click listener, load the tasklist fragment, and load the date for the textview.
-
-        //Completed TODOS
 
         FloatingActionButton fabAddTaskList = findViewById(R.id.fab_newTaskList);
         fabAddTaskList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Log.i(TAG, "onClick: FAB clicked");
-
-
+                if(!isAlertUp) {
+                    //When the fab is clicked the new task list alert should pop up.
+                    loadAlertFragment();
+                    isAlertUp = true;
+                }
             }
         });
     }
+
+    /**
+     * Interface methods
+     */
+
+    //NewTaskListAlertFragment Callbacks
+
+    @Override
+    public void cancelTapped() {
+        //TODO: Revert the background views to being touchable.
+
+        //Get the fragment by its tag, and null check it.
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
+        if(fragment != null) {
+            //Hide the frame layout.
+            FrameLayout frameLayout = findViewById(R.id.fragment_Container_Alert);
+            frameLayout.setVisibility(View.GONE);
+
+            //Remove the fragment.
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragment)
+                    .commit();
+
+            //Set the bool to false, so a new alert can appear.
+            isAlertUp = false;
+        }
+    }
+
+    @Override
+    public void saveTapped() {
+
+        //TODO: Refer to the onActivityCreated method for what todo for this callback.
+        Log.i(TAG, "saveTapped: ");
+    }
+
 
     /**
      * Custom methods
@@ -78,5 +118,17 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance())
                 .commit();
     }
+
+    //This method will load the NewTaskListAlert Fragment.
+    //TODO: I might need to setup back button support for this fragment, will also need to make sure no other taps on background views are possible.
+    private void loadAlertFragment() {
+        FrameLayout frameLayout = findViewById(R.id.fragment_Container_Alert);
+        frameLayout.setVisibility(View.VISIBLE);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_Container_Alert, NewTaskListAlertFragment.newInstance(), FRAGMENT_ALERT_NEWTASK_TAG)
+                .commit();
+    }
+
 
 }

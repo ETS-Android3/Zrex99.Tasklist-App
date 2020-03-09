@@ -80,4 +80,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
+
+    <TextView
+        android:id="@+id/et_NewTaskListName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SPOiler"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMargin"
+        tools:layout_editor_absoluteY="131dp"
+        android:background="@drawable/nuemorphic_container_et"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
