@@ -46,6 +46,8 @@ public class NewTaskListAlertFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //TODO: Will need to finish the alert layout.
+
         View view = getLayoutInflater().inflate(R.layout.fragment_layout_alert, container, false);
         mTvConfirmAction = view.findViewById(R.id.tv_AlertConfirmText);
         mTvCancelAction = view.findViewById(R.id.tv_AlertCancelText);

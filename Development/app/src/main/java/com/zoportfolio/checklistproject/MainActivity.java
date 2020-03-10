@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     @Override
     public void saveTapped() {
 
-        //TODO: Refer to the onActivityCreated method for what todo for this callback.
+        //TODO: Refer to the onActivityCreated method in the NewTaskListAlertFragment for what todo for this callback.
         Log.i(TAG, "saveTapped: ");
     }
 
