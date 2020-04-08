@@ -13,7 +13,11 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.checklistproject.Alerts.NewTaskListAlertFragment;
+import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
+import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
 import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NewTaskListAlertFragment.NewTaskListAlertFragmentListener {
 
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         if(getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
+        
         //Grab the current date text view to get the date.
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
         loadCurrentDate(tvCurrentDate);

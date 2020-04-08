@@ -140,7 +140,6 @@ public class UserTask {
                 return new UserTask(taskName, taskNotificationTime, taskDescription, taskChecked);
             }else {
                 //Construct without description.
-                Log.i(TAG, "fromJSONString: Creating UserTask from JSON WITHOUT description");
                 return new UserTask(taskName, taskNotificationTime, taskChecked);
             }
 
