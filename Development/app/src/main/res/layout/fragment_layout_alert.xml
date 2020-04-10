@@ -120,11 +120,13 @@
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
         app:layout_constraintTop_toTopOf="@+id/guideline_topMarginEditText" />
 
-    <TextView
+    <EditText
         android:id="@+id/et_NewTaskListName"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="SPOiler"
+        android:enabled="true"
+        android:hint="@string/alert_newTaskNameHint"
+        android:inputType="text"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"

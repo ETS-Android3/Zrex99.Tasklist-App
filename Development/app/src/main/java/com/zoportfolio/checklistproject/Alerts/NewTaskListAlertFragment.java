@@ -2,6 +2,8 @@ package com.zoportfolio.checklistproject.Alerts;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,9 @@ import com.zoportfolio.checklistproject.R;
 
 public class NewTaskListAlertFragment extends Fragment {
 
+    private static final String TAG = "TLAlertFragment.TAG";
+
+    private EditText mEtNameField;
     private TextView mTvConfirmAction;
     private TextView mTvCancelAction;
 
@@ -30,9 +35,8 @@ public class NewTaskListAlertFragment extends Fragment {
 
     private NewTaskListAlertFragmentListener mListener;
     public interface NewTaskListAlertFragmentListener {
-        //TODO: Work on these callbacks next.
         void cancelTapped();
-        void saveTapped();
+        void saveTapped(String taskListName);
     }
 
     @Override
@@ -49,6 +53,7 @@ public class NewTaskListAlertFragment extends Fragment {
         //TODO: Will need to finish the alert layout.
 
         View view = getLayoutInflater().inflate(R.layout.fragment_layout_alert, container, false);
+        mEtNameField = view.findViewById(R.id.et_NewTaskListName);
         mTvConfirmAction = view.findViewById(R.id.tv_AlertConfirmText);
         mTvCancelAction = view.findViewById(R.id.tv_AlertCancelText);
         return view;
@@ -60,13 +65,26 @@ public class NewTaskListAlertFragment extends Fragment {
 
         if(getActivity() != null) {
 
+            mEtNameField.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if((event.getAction() == KeyEvent.ACTION_UP) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                        if(ValidateField(mEtNameField)) {
+                            mListener.saveTapped(mEtNameField.getText().toString());
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+            });
+
             //Assign the click listeners to the confirm and cancel actions.
             mTvConfirmAction.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO: Will have to verify the text data in the edit text,
-                    // and then capture the name when the other components are done.
-                    mListener.saveTapped();
+                    if(ValidateField(mEtNameField)) {
+                        mListener.saveTapped(mEtNameField.getText().toString());
+                    }
                 }
             });
 
@@ -80,4 +98,26 @@ public class NewTaskListAlertFragment extends Fragment {
 
         }
     }
+
+    /**
+     * Custom Methods
+     */
+
+    //TODO: Fix the comments here later.
+    //Will return a bool based on if the text is valid or not.
+    private boolean ValidateField(EditText editText) {
+        //Get the text and trim whitespace from it.
+        String text = editText.getText().toString().trim();
+        //If there is no text after trimming whitespace, return false.
+        if(text.isEmpty()) {
+            Log.i(TAG, "ValidateField: text is not valid.");
+            return false;
+        }else {
+            //Return true for valid text.
+            Log.i(TAG, "ValidateField: text is valid.");
+            return true;
+        }
+
+    }
+
 }

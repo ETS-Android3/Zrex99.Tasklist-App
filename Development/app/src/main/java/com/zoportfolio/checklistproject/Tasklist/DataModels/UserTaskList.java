@@ -11,7 +11,6 @@ import java.util.ArrayList;
 public class UserTaskList {
 
     //TODO: Would like to take a day to write unit tests for the two classes.
-    //TODO: Get rid of the get/set comments after testing this class.
 
     private static final String TAG = "UserTaskList.TAG";
 

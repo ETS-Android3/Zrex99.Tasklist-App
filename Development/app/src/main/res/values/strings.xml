@@ -4,5 +4,6 @@
     <string name="alert_newTaskTitle">Enter new task list name</string>
     <string name="alert_newTaskConfirm">Save</string>
     <string name="alert_newTaskCancel">Cancel</string>
+    <string name="alert_newTaskNameHint">Name:</string>
 
 </resources>

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         if(getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-        
+
         //Grab the current date text view to get the date.
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
         loadCurrentDate(tvCurrentDate);
@@ -69,29 +69,26 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     @Override
     public void cancelTapped() {
         //TODO: Revert the background views to being touchable.
-
-        //Get the fragment by its tag, and null check it.
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
-        if(fragment != null) {
-            //Hide the frame layout.
-            FrameLayout frameLayout = findViewById(R.id.fragment_Container_Alert);
-            frameLayout.setVisibility(View.GONE);
-
-            //Remove the fragment.
-            getSupportFragmentManager().beginTransaction()
-                    .remove(fragment)
-                    .commit();
-
-            //Set the bool to false, so a new alert can appear.
-            isAlertUp = false;
-        }
+        closeAlertFragment();
     }
 
     @Override
-    public void saveTapped() {
+    public void saveTapped(String taskListName) {
 
-        //TODO: Refer to the onActivityCreated method in the NewTaskListAlertFragment for what todo for this callback.
-        Log.i(TAG, "saveTapped: ");
+        if(taskListName != null) {
+            Log.i(TAG, "saveTapped: New taskList name: " + taskListName);
+            //Create a new taskList
+            UserTaskList newTaskList = new UserTaskList(taskListName);
+            //Have to reset the views in the back, and then load the fragment that holds the ListView.
+
+            closeAlertFragment();
+
+
+        }else {
+            //If this happens I need to display to the user that something went wrong.
+            Log.i(TAG, "saveTapped: taskListName is null");
+        }
+
     }
 
 
@@ -132,6 +129,24 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_Container_Alert, NewTaskListAlertFragment.newInstance(), FRAGMENT_ALERT_NEWTASK_TAG)
                 .commit();
+    }
+
+    private void closeAlertFragment() {
+        //Get the fragment by its tag, and null check it.
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
+        if(fragment != null) {
+            //Hide the frame layout.
+            FrameLayout frameLayout = findViewById(R.id.fragment_Container_Alert);
+            frameLayout.setVisibility(View.GONE);
+
+            //Remove the fragment.
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragment)
+                    .commit();
+
+            //Set the bool to false, so a new alert can appear.
+            isAlertUp = false;
+        }
     }
 
 
