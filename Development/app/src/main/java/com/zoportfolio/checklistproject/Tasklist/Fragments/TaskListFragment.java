@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -92,7 +93,12 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
             if(mTaskList.getTasks() != null) {
                 TasksAdapter ta = new TasksAdapter(getActivity(), mTaskList.getTasks(), this);
                 mLvTasks.setAdapter(ta);
-
+                mLvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Log.i(TAG, "onItemClick: Row:" + position + " Task: " + mTaskList.getTasks().get(position).getTaskName());
+                    }
+                });
             }
 
             //Set up the editing and edit button AFTER listView is setup.
@@ -132,6 +138,23 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     @Override
     public void taskTapped(UserTask userTask, int position) {
         //TODO: Open the next activity that is a task info screen... [LATER]
+    }
+
+    @Override
+    public void addTaskTapped() {
+        //TODO: Fill out what happens when the add task is checked.
+
+        //TODO: For testing purposes, going to add 3 tasks to fill out the list and see what happens.
+        UserTask newTask1 = new UserTask("Code daily","333", true);
+        UserTask newTask2 = new UserTask("ayayaya","222", true);
+        UserTask newTask3 = new UserTask("last task","222", true);
+
+        mTaskList.addTaskToList(newTask1);
+        mTaskList.addTaskToList(newTask2);
+        mTaskList.addTaskToList(newTask3);
+
+        TasksAdapter ta = new TasksAdapter(getActivity(), mTaskList.getTasks(), this);
+        mLvTasks.setAdapter(ta);
     }
 
 }

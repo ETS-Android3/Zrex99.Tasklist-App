@@ -27,6 +27,8 @@ public class TasksAdapter extends BaseAdapter {
     public interface TasksAdapterListener {
         void actionTapped(UserTask userTask, int position);
         void taskTapped(UserTask userTask, int position);
+        void addTaskTapped();
+
     }
 
     public TasksAdapter(Context _context, ArrayList<UserTask> _tasks, TasksAdapterListener _listener) {
@@ -38,7 +40,8 @@ public class TasksAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         if(mTasks != null) {
-            return mTasks.size();
+            //Adding 1 for the last row
+            return mTasks.size() + 1;
         }
         return 0;
     }
@@ -60,56 +63,81 @@ public class TasksAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         ViewHolder vh;
-        final UserTask task = (UserTask) getItem(position);
+
+        int totalTask = getCount() - 1;
         int viewType = getItemViewType(position);
 
-        if(convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            if(viewType == 0) {
-                //Regular row
-                convertView = layoutInflater.inflate(R.layout.tasklist_adapter_layout, parent, false);
-
-            }else if(viewType == 1) {
-                //Last row
-                convertView = layoutInflater.inflate(R.layout.tasklist_adapter_layout, parent, false);
-            }
-
-
-            vh = new ViewHolder(convertView);
-            convertView.setTag(vh);
-        }else {
-            vh = (ViewHolder) convertView.getTag();
-        }
-
-        if(task != null) {
-
-            //Set all of the dataModel info to the views.
-            vh.tv_task.setText(task.getTaskName());
-
-            //Check the state of the task and set it accordingly in the image button.
-            if(task.getTaskChecked()) {
-                //True, set the image to checked
-                vh.ib_action.setImageResource(R.drawable.ic_action_check);
+        //Check for the last row.
+        //TODO: Need to check the logic of this if statement
+        // Only want this last row to create if the position is the last position AND is not bigger than 5.
+        if(position >= totalTask && position <= 6) {
+            if(convertView == null) {
+                if(viewType == 0) {
+                    //Last row
+                    convertView = layoutInflater.inflate(R.layout.tasklist_adapter_add_task_layout, parent, false);
+                }
+                vh = new ViewHolder(convertView);
+                convertView.setTag(vh);
             }else {
-                vh.ib_action.setImageResource(R.drawable.unchecked_circle);
+                vh = (ViewHolder) convertView.getTag();
             }
 
             //Set the click listeners to the views, and interface back to the fragment.
             vh.ib_action.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mListener.actionTapped(task, position);
+                    mListener.addTaskTapped();
                 }
             });
-
             vh.tv_task.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mListener.taskTapped(task, position);
+                    mListener.addTaskTapped();
                 }
             });
 
+        }else {
+            //Get the task and fill the row with the regular information.
+            final UserTask task = (UserTask) getItem(position);
+
+            if(convertView == null) {
+                convertView = layoutInflater.inflate(R.layout.tasklist_adapter_layout, parent, false);
+                vh = new ViewHolder(convertView);
+                convertView.setTag(vh);
+            }else {
+                vh = (ViewHolder) convertView.getTag();
+            }
+
+            if(task != null) {
+
+                //Set all of the dataModel info to the views.
+                vh.tv_task.setText(task.getTaskName());
+
+                //Check the state of the task and set it accordingly in the image button.
+                if(task.getTaskChecked()) {
+                    //True, set the image to checked
+                    vh.ib_action.setImageResource(R.drawable.ic_action_check);
+                }else {
+                    vh.ib_action.setImageResource(R.drawable.unchecked_circle);
+                }
+
+                //Set the click listeners to the views, and interface back to the fragment.
+                vh.ib_action.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.actionTapped(task, position);
+                    }
+                });
+
+                vh.tv_task.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.taskTapped(task, position);
+                    }
+                });
+            }
         }
 
         return convertView;
@@ -123,7 +151,11 @@ public class TasksAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return (position == this.getCount() - 1) ? 1 : 0;
+        int lastPos = this.getCount()-1;
+        if(position == lastPos && position != 6) {
+            return 0;
+        }
+        return 1;
     }
 
     static class ViewHolder {
