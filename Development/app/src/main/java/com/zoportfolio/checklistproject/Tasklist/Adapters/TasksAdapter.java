@@ -22,7 +22,8 @@ public class TasksAdapter extends BaseAdapter {
 
     private TasksAdapterListener mListener;
     public interface TasksAdapterListener {
-        void actionTapped();
+        void actionTapped(UserTask userTask, int position);
+        void taskTapped(UserTask userTask, int position);
     }
 
     public TasksAdapter(Context _context, ArrayList<UserTask> _tasks, TasksAdapterListener _listener) {
@@ -53,10 +54,10 @@ public class TasksAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         ViewHolder vh;
-        UserTask task = (UserTask) getItem(position);
+        final UserTask task = (UserTask) getItem(position);
 
         if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.tasklist_adapter_layout, parent, false);
@@ -68,6 +69,8 @@ public class TasksAdapter extends BaseAdapter {
 
 
         if(task != null) {
+
+            //Set all of the dataModel info to the views.
             vh.tv_task.setText(task.getTaskName());
 
             //Check the state of the task and set it accordingly in the image button.
@@ -77,6 +80,22 @@ public class TasksAdapter extends BaseAdapter {
             }else {
                 vh.ib_action.setImageResource(R.drawable.unchecked_circle);
             }
+
+            //Set the click listeners to the views, and interface back to the fragment.
+            vh.ib_action.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.actionTapped(task, position);
+                }
+            });
+
+            vh.tv_task.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.taskTapped(task, position);
+                }
+            });
+
         }
 
         return convertView;

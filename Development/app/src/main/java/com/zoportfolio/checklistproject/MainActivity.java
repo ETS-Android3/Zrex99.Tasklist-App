@@ -3,6 +3,7 @@ package com.zoportfolio.checklistproject;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.content.pm.ActivityInfo;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -89,9 +90,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //Close the Alert fragment before showing the taskList fragment.
             closeAlertFragment();
 
+
+            //TODO: THIS IS WHERE TO COME BACK TOO.
             UserTask newTask1 = new UserTask("Code daily","333", false);
             UserTask newTask2 = new UserTask("ayayaya","222", true);
 
+            //TODO: Need to give the listview the functionality to be tapped and the action to be touched.
             newTaskList.addTaskToList(newTask1);
             newTaskList.addTaskToList(newTask2);
 
