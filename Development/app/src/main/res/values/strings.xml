@@ -8,4 +8,6 @@
 
     <string name="taskList_titlePlaceholder">No TaskLists Found.</string>
 
+    <string name="taskList_addTask">Add Task</string>
+
 </resources>

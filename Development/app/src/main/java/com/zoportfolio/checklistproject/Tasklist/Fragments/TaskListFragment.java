@@ -122,7 +122,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         tasks.set(position, userTask);
         mTaskList.setTasks(tasks);
 
-        //TODO: Need to update the tasklist in terms of storage.
+        //TODO: Need to update the tasklist in terms of local storage.
 
         //Set the adapter.
         TasksAdapter ta = new TasksAdapter(getActivity(), mTaskList.getTasks(), this);
@@ -131,7 +131,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     @Override
     public void taskTapped(UserTask userTask, int position) {
-        Log.i(TAG, "taskTapped: Task: " + userTask.getTaskName() + " \nNotification Time: " + userTask.getTaskNotificationTime() + " \nPosition in tasklist: " + position);
         //TODO: Open the next activity that is a task info screen... [LATER]
     }
 

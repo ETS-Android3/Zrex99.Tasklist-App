@@ -84,6 +84,7 @@ public class NewTaskListAlertFragment extends Fragment {
                 public void onClick(View v) {
                     if(ValidateField(mEtNameField)) {
                         mListener.saveTapped(mEtNameField.getText().toString());
+                        //TODO: Need to check the new name against all current tasklist names here.
                     }
                 }
             });
@@ -111,11 +112,9 @@ public class NewTaskListAlertFragment extends Fragment {
         //If there is no text after trimming whitespace, return false.
         if(text.isEmpty()) {
             //TODO: Toast here that the field is not valid and needs text.
-            Log.i(TAG, "ValidateField: text is not valid.");
             return false;
         }else {
             //Return true for valid text.
-            Log.i(TAG, "ValidateField: text is valid.");
             return true;
         }
 

@@ -1,6 +1,7 @@
 package com.zoportfolio.checklistproject.Tasklist.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,8 @@ import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
 import java.util.ArrayList;
 
 public class TasksAdapter extends BaseAdapter {
+
+    private static final String TAG = "TasksAdapter.TAG";
 
     private static final long BASE_ID = 0x104;
 
@@ -58,15 +61,26 @@ public class TasksAdapter extends BaseAdapter {
 
         ViewHolder vh;
         final UserTask task = (UserTask) getItem(position);
+        int viewType = getItemViewType(position);
 
         if(convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.tasklist_adapter_layout, parent, false);
+            LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            if(viewType == 0) {
+                //Regular row
+                convertView = layoutInflater.inflate(R.layout.tasklist_adapter_layout, parent, false);
+
+            }else if(viewType == 1) {
+                //Last row
+                convertView = layoutInflater.inflate(R.layout.tasklist_adapter_layout, parent, false);
+            }
+
+
             vh = new ViewHolder(convertView);
             convertView.setTag(vh);
         }else {
             vh = (ViewHolder) convertView.getTag();
         }
-
 
         if(task != null) {
 
@@ -99,6 +113,17 @@ public class TasksAdapter extends BaseAdapter {
         }
 
         return convertView;
+    }
+
+    //Below two methods are for setting a custom last row.
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position == this.getCount() - 1) ? 1 : 0;
     }
 
     static class ViewHolder {
