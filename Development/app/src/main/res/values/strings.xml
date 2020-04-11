@@ -6,4 +6,6 @@
     <string name="alert_newTaskCancel">Cancel</string>
     <string name="alert_newTaskNameHint">Name:</string>
 
+    <string name="taskList_titlePlaceholder">No TaskLists Found.</string>
+
 </resources>

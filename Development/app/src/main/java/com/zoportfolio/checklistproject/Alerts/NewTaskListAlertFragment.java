@@ -110,6 +110,7 @@ public class NewTaskListAlertFragment extends Fragment {
         String text = editText.getText().toString().trim();
         //If there is no text after trimming whitespace, return false.
         if(text.isEmpty()) {
+            //TODO: Toast here that the field is not valid and needs text.
             Log.i(TAG, "ValidateField: text is not valid.");
             return false;
         }else {

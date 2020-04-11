@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     private static final String FRAGMENT_ALERT_NEWTASK_TAG = "FRAGMENT_ALERT_NEWTASK";
 
+    //TODO: This variable is the main way for the main activity to keep track of the task lists.
+    private ArrayList<UserTaskList> mTaskLists;
+
     private static Boolean isAlertUp = false;
 
     @Override
@@ -40,7 +43,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
         loadCurrentDate(tvCurrentDate);
 
-        loadFragment();
+
+        loadTaskListFragment(null);
+
 
         //TODOS...
         //TODO: I have to fix the nuemorphic container drawable. SOLVED: Couldn't fix the problem so I will move on for now.
@@ -81,11 +86,22 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             UserTaskList newTaskList = new UserTaskList(taskListName);
             //Have to reset the views in the back, and then load the fragment that holds the ListView.
 
+            //Close the Alert fragment before showing the taskList fragment.
             closeAlertFragment();
+
+            UserTask newTask1 = new UserTask("Code daily","333", false);
+            UserTask newTask2 = new UserTask("ayayaya","222", true);
+
+            newTaskList.addTaskToList(newTask1);
+            newTaskList.addTaskToList(newTask2);
+
+            loadTaskListFragment(newTaskList);
+            //TODO: Need to save the taskList to storage here.
 
 
         }else {
             //If this happens I need to display to the user that something went wrong.
+            //A toast that the saving went wrong.
             Log.i(TAG, "saveTapped: taskListName is null");
         }
 
@@ -111,12 +127,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     }
 
     //This method will load the TaskList Fragment.
-    private void loadFragment() {
+    private void loadTaskListFragment(UserTaskList _userTaskList) {
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_Tasklist);
         frameLayout.setVisibility(View.VISIBLE);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance())
+                //TODO: Remove the null argument when cleaning code.
+                .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance(_userTaskList))
                 .commit();
     }
 
