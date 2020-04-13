@@ -40,8 +40,13 @@ public class TasksAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         if(mTasks != null) {
-            //Adding 1 for the last row
-            return mTasks.size() + 1;
+            //NOTE: This is part of the fix to the problem of only having the last row be custom when the total tasks was less than 5.
+            // Since I only want the last row when there is 4 or less tasks, I return .size() + 1. Otherwise if there are 5 tasks then it returns just 5.
+            if(mTasks.size() == 5) {
+                return mTasks.size();
+            }else {//Adding 1 for the last row, only if there is space (less than 5 tasks.)
+                return mTasks.size() + 1;
+            }
         }
         return 0;
     }
@@ -64,41 +69,24 @@ public class TasksAdapter extends BaseAdapter {
 
         ViewHolder vh;
 
-        int totalTask = getCount() - 1;
+        int totalTasks;
+
+        //NOTE: this was part of the fix to the problem of only having the last row be custom when the total tasks was less than 5.
+        // Basically I've created a scenario where the add row will only be built if the totalTasks variable = 4 or less.
+        // Since position variable indexes from 0 onward, 4 is technically the last row, so if totalTasks = 5 the add row won't appear.
+        // But if I subtract 1 from totalTasks, I allow for position to equal totalTasks, and when that happens the add row is built and appears.
+        if(mTasks.size() == 5) {
+            totalTasks = 5;
+        }else {
+            totalTasks = getCount() - 1;
+        }
+
         int viewType = getItemViewType(position);
 
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        //Check for the last row.
-        //TODO: Need to check the logic of this if statement
-        // Only want this last row to create if the position is the last position AND is not bigger than 5.
-        if(position >= totalTask && position <= 6) {
-            if(convertView == null) {
-                if(viewType == 0) {
-                    //Last row
-                    convertView = layoutInflater.inflate(R.layout.tasklist_adapter_add_task_layout, parent, false);
-                }
-                vh = new ViewHolder(convertView);
-                convertView.setTag(vh);
-            }else {
-                vh = (ViewHolder) convertView.getTag();
-            }
-
-            //Set the click listeners to the views, and interface back to the fragment.
-            vh.ib_action.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mListener.addTaskTapped();
-                }
-            });
-            vh.tv_task.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mListener.addTaskTapped();
-                }
-            });
-
-        }else {
+        //If the position is less than the number of total tasks, create a regular row.
+        if(position < totalTasks) {
             //Get the task and fill the row with the regular information.
             final UserTask task = (UserTask) getItem(position);
 
@@ -138,6 +126,33 @@ public class TasksAdapter extends BaseAdapter {
                     }
                 });
             }
+        }else if(position == totalTasks) { //When the position has reached the last row.
+
+            Log.i(TAG, "getView: last row");
+            if(convertView == null) {
+                if(viewType == 0) {
+                    //Last row
+                    convertView = layoutInflater.inflate(R.layout.tasklist_adapter_add_task_layout, parent, false);
+                }
+                vh = new ViewHolder(convertView);
+                convertView.setTag(vh);
+            }else {
+                vh = (ViewHolder) convertView.getTag();
+            }
+
+            //Set the click listeners to the views, and interface back to the fragment.
+            vh.ib_action.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.addTaskTapped();
+                }
+            });
+            vh.tv_task.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.addTaskTapped();
+                }
+            });
         }
 
         return convertView;
