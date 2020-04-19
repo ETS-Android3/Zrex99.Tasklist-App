@@ -3,7 +3,6 @@ package com.zoportfolio.checklistproject;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import android.content.pm.ActivityInfo;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -24,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     public static final String TAG = "MainActivity.TAG";
 
-    private static final String FRAGMENT_ALERT_NEWTASK_TAG = "FRAGMENT_ALERT_NEWTASK";
+    private static final String FRAGMENT_ALERT_NEWTASKLIST_TAG = "FRAGMENT_ALERT_NEWTASKLIST";
 
     //TODO: This variable is the main way for the main activity to keep track of the task lists.
     private ArrayList<UserTaskList> mTaskLists;
@@ -90,12 +89,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //Close the Alert fragment before showing the taskList fragment.
             closeAlertFragment();
 
-
-            //TODO: THIS IS WHERE TO COME BACK TOO.
+            //TODO: Delete this testing stuff after. lines 94 -> 99
             UserTask newTask1 = new UserTask("Code daily","333", false);
             UserTask newTask2 = new UserTask("ayayaya","222", true);
 
-            //TODO: Need to give the listview the functionality to be tapped and the action to be touched.
+
             newTaskList.addTaskToList(newTask1);
             newTaskList.addTaskToList(newTask2);
 
@@ -136,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         frameLayout.setVisibility(View.VISIBLE);
 
         getSupportFragmentManager().beginTransaction()
-                //TODO: Remove the null argument when cleaning code.
                 .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance(_userTaskList))
                 .commit();
     }
@@ -144,20 +141,20 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     //This method will load the NewTaskListAlert Fragment.
     //TODO: I might need to setup back button support for this fragment, will also need to make sure no other taps on background views are possible.
     private void loadAlertFragment() {
-        FrameLayout frameLayout = findViewById(R.id.fragment_Container_Alert);
+        FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTaskList);
         frameLayout.setVisibility(View.VISIBLE);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_Alert, NewTaskListAlertFragment.newInstance(), FRAGMENT_ALERT_NEWTASK_TAG)
+                .replace(R.id.fragment_Container_AlertNewTaskList, NewTaskListAlertFragment.newInstance(), FRAGMENT_ALERT_NEWTASKLIST_TAG)
                 .commit();
     }
 
     private void closeAlertFragment() {
         //Get the fragment by its tag, and null check it.
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASKLIST_TAG);
         if(fragment != null) {
             //Hide the frame layout.
-            FrameLayout frameLayout = findViewById(R.id.fragment_Container_Alert);
+            FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTaskList);
             frameLayout.setVisibility(View.GONE);
 
             //Remove the fragment.

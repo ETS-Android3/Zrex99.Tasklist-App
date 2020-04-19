@@ -1,5 +1,6 @@
 package com.zoportfolio.checklistproject.Tasklist.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -14,7 +16,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
+import com.zoportfolio.checklistproject.Alerts.NewTaskAlertFragment;
+import com.zoportfolio.checklistproject.Alerts.NewTaskListAlertFragment;
 import com.zoportfolio.checklistproject.R;
 import com.zoportfolio.checklistproject.Tasklist.Adapters.TasksAdapter;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
@@ -22,13 +27,17 @@ import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
 
 import java.util.ArrayList;
 
-public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdapterListener {
+public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdapterListener, NewTaskAlertFragment.NewTaskAlertFragmentListener {
 
     private static final String TAG = "TaskListFragment.TAG";
+
+    private static final String FRAGMENT_ALERT_NEWTASK_TAG = "FRAGMENT_ALERT_NEWTASK";
     
     //TODO: Implementing the rest of the logic, see TODOs below.
 
     private static final String ARG_USERTASKLIST = "userTaskList";
+
+    private FragmentActivity mContext;
 
     //Views
     private ListView mLvTasks;
@@ -38,6 +47,8 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     //DataModel
     private UserTaskList mTaskList;
+
+    private static Boolean isAlertUp = false;
 
     public static TaskListFragment newInstance(UserTaskList _userTaskList) {
         
@@ -50,6 +61,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     }
 
     private TaskListFragmentListener mListener;
+
     public interface TaskListFragmentListener {
         //TODO: rename these callbacks accordingly.
         void taskTapped();
@@ -63,6 +75,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     @Override
     public void onAttach(Context context) {
+        mContext = (FragmentActivity) context;
         super.onAttach(context);
         if(context instanceof TaskListFragmentListener) {
             mListener = (TaskListFragmentListener)context;
@@ -101,7 +114,9 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                 });
             }
 
-            //Set up the editing and edit button AFTER listView is setup.
+            //TODO: Set up the editing and edit button AFTER:
+            // (listView is setup) DONE
+            // (adding tasks) WORKING ON
 
         }else {
             Log.i(TAG, "onActivityCreated: Tasklist is null.");
@@ -142,19 +157,66 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     @Override
     public void addTaskTapped() {
-        //TODO: Fill out what happens when the add task is checked.
+        Log.i(TAG, "addTaskTapped: adding task");
 
-        //TODO: For testing purposes, going to add 3 tasks to fill out the list and see what happens.
-        UserTask newTask1 = new UserTask("Code daily","333", true);
-        UserTask newTask2 = new UserTask("ayayaya","222", true);
-        UserTask newTask3 = new UserTask("last task","222", true);
+        //TODO: So far this method works perfectly, flaws are with the NewTaskAlertFragment Class.
+        if(!isAlertUp) {
+            Activity a = getActivity();
 
-        mTaskList.addTaskToList(newTask1);
-        mTaskList.addTaskToList(newTask2);
-        mTaskList.addTaskToList(newTask3);
+            if(a != null) {
+                FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
+                frameLayout.setVisibility(View.VISIBLE);
 
-        TasksAdapter ta = new TasksAdapter(getActivity(), mTaskList.getTasks(), this);
-        mLvTasks.setAdapter(ta);
+                mContext.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_Container_AlertNewTask, NewTaskAlertFragment.newInstance(), FRAGMENT_ALERT_NEWTASK_TAG)
+                        .commit();
+                Log.i(TAG, "addTaskTapped: Showing new task alert.");
+
+                isAlertUp = true;
+            }
+        }
+
     }
+
+    @Override
+    public void cancelTapped() {
+        closeAlertFragment();
+    }
+
+    @Override
+    public void saveTapped(String taskListName, String taskNotificationTime) {
+
+        //TODO: Do what needs to be done with the new task information and then close the alert.
+
+        closeAlertFragment();
+
+    }
+
+    private void closeAlertFragment() {
+        
+        Activity a = getActivity();
+        if(a != null) {
+            //Get the fragment by its tag, and null check it.
+            Fragment fragment = mContext.getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
+            if(fragment != null) {
+                //Hide the frame layout.
+                FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
+                frameLayout.setVisibility(View.GONE);
+
+                //Remove the fragment.
+                mContext.getSupportFragmentManager().beginTransaction()
+                        .remove(fragment)
+                        .commit();
+                Log.i(TAG, "closeAlertFragment: closing new task alert.");
+
+                //Set the bool to false, so a new alert can appear.
+                isAlertUp = false;
+            }
+        }
+        
+
+    }
+
+
 
 }

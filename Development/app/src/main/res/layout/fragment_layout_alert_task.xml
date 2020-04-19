@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="@string/alert_newTaskTitle"
+        android:text="@string/alert_newTaskListTitle"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
@@ -101,14 +101,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.45" />
+        app:layout_constraintGuide_percent="0.35" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_bottomMarginEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65" />
+        app:layout_constraintGuide_percent="0.55" />
 
     <View
         android:id="@+id/v_container"
@@ -135,5 +135,26 @@
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
         app:layout_constraintTop_toTopOf="@+id/guideline_topMarginEditText" />
 
+    <TimePicker
+        android:id="@+id/tp_NotificationTime"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/colorPrimaryMain"
+        android:timePickerMode="spinner"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginTimePicker"
+        app:layout_constraintEnd_toStartOf="@id/guideline_rightMarginEditText"
+        app:layout_constraintStart_toEndOf="@id/guideline_leftMarginEditText"
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottomMarginEditText" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottomMarginTimePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

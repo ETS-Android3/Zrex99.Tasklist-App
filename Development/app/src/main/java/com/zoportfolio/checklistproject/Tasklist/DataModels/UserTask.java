@@ -102,6 +102,11 @@ public class UserTask {
      * Custom Methods
      */
 
+    public static String formatNotificationTime(int hour, int minute, String meridies) {
+        return hour + "/" + minute + "/" + meridies;
+    }
+
+
     public String toJSONString() {
         JSONObject object = new JSONObject();
 

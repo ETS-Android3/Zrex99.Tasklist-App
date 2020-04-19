@@ -7,6 +7,8 @@
     android:background="@color/colorPrimaryMain"
     tools:context=".MainActivity">
 
+
+
     <FrameLayout
         android:id="@+id/fragment_Container_Tasklist"
         android:layout_width="0dp"
@@ -95,7 +97,7 @@
         app:layout_constraintGuide_percent="0.4" />
 
     <FrameLayout
-        android:id="@+id/fragment_Container_Alert"
+        android:id="@+id/fragment_Container_AlertNewTaskList"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginFrameContainerAlert"
@@ -105,5 +107,22 @@
 
     </FrameLayout>
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottomMarginFrameContainerAlertNewTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <FrameLayout
+        android:id="@+id/fragment_Container_AlertNewTask"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginFrameContainerAlertNewTask"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginFrameContainerAlert"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginFrameContainerAlert"
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMarginFrameContainerAlert">
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
