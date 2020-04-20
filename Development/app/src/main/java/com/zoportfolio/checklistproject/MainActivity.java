@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.zoportfolio.checklistproject.Alerts.NewTaskAlertFragment;
 import com.zoportfolio.checklistproject.Alerts.NewTaskListAlertFragment;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
@@ -19,11 +20,12 @@ import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NewTaskListAlertFragment.NewTaskListAlertFragmentListener {
+public class MainActivity extends AppCompatActivity implements NewTaskListAlertFragment.NewTaskListAlertFragmentListener, TaskListFragment.TaskListFragmentListener, NewTaskAlertFragment.NewTaskAlertFragmentListener {
 
     public static final String TAG = "MainActivity.TAG";
 
     private static final String FRAGMENT_ALERT_NEWTASKLIST_TAG = "FRAGMENT_ALERT_NEWTASKLIST";
+    private static final String FRAGMENT_TASKLIST_TAG = "FRAGMENT_TASKLIST";
 
     //TODO: This variable is the main way for the main activity to keep track of the task lists.
     private ArrayList<UserTaskList> mTaskLists;
@@ -109,6 +111,58 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     }
 
+    //TaskListFragment Callbacks
+
+    @Override
+    public void taskTapped() {
+
+    }
+
+    @Override
+    public void editTapped() {
+
+    }
+
+    @Override
+    public void taskListUpdated(UserTaskList updatedTaskList) {
+
+    }
+
+    //NewTaskAlertFragment Callbacks
+
+    @Override
+    public void cancelTappedNewTaskAlert() {
+
+        //TODO: MAJOR IMPORTANT,
+        // realistically i should not be doing this at all,
+        // and while it does work, it would be much better to handle all fragments ONLY in this activity
+        // The fix would be to have the TaskListFragment interface the add task tapped all the way to the activity,
+        // and then the activity will handle showing the new alert fragment, and then send the new data back to the TaskListFragment.
+
+        //Tell the TaskListFragment to close the NewTaskAlertFragment
+        TaskListFragment fragment = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TASKLIST_TAG);
+        if(fragment != null) {
+            fragment.closeAlertFragment();
+        }
+
+
+    }
+
+    @Override
+    public void saveTappedNewTaskAlert(String taskListName, String taskNotificationTime) {
+
+        //TODO: Do what needs to be done with the new task information and then close the alert.
+        TaskListFragment fragment = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TASKLIST_TAG);
+        if(fragment != null) {
+            fragment.closeAlertFragment();
+
+            UserTask newTask = new UserTask(taskListName, taskNotificationTime);
+            //Update the taskList when i start tracking it on the main activity, and update the fragments tasklist.
+            fragment.addNewTaskToTaskList(newTask);
+        }
+
+    }
+
 
     /**
      * Custom methods
@@ -134,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         frameLayout.setVisibility(View.VISIBLE);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance(_userTaskList))
+                .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance(_userTaskList), FRAGMENT_TASKLIST_TAG)
                 .commit();
     }
 
@@ -166,6 +220,5 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             isAlertUp = false;
         }
     }
-
 
 }

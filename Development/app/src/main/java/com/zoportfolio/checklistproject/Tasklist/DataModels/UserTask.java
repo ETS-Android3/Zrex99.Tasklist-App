@@ -27,7 +27,7 @@ public class UserTask {
 
     private String mTaskName;
     private String mTaskDescription;
-    private String mTaskNotificationTime;
+    private String mTaskNotificationTime;//IMPORTANT NOTE: Hour in the notification time will be stored and transferred around as 24 hour notation ie. 2pm = 14
     private Boolean mTaskChecked;
 
     /**

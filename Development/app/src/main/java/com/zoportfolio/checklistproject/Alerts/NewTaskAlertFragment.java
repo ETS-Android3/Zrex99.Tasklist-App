@@ -41,8 +41,8 @@ public class NewTaskAlertFragment extends Fragment {
 
     private NewTaskAlertFragmentListener mListener;
     public interface NewTaskAlertFragmentListener {
-        void cancelTapped();
-        void saveTapped(String taskListName, String taskNotificationTime);
+        void cancelTappedNewTaskAlert();
+        void saveTappedNewTaskAlert(String taskListName, String taskNotificationTime);
     }
 
     @Override
@@ -50,6 +50,7 @@ public class NewTaskAlertFragment extends Fragment {
         super.onAttach(context);
         if(context instanceof NewTaskAlertFragmentListener) {
             mListener = (NewTaskAlertFragmentListener) context;
+            Log.i(TAG, "onAttach: Listener attached");
         }
     }
 
@@ -60,8 +61,8 @@ public class NewTaskAlertFragment extends Fragment {
         View view = getLayoutInflater().inflate(R.layout.fragment_layout_alert_task, container, false);
         mEtNameField = view.findViewById(R.id.et_NewTaskListName);
         mTpNotificationTime = view.findViewById(R.id.tp_NotificationTime);
-        //TODO: Mess around with this as the meridies is not showing.
-        //mTpNotificationTime.setIs24HourView(false);
+        //Meridies options were not showing due to constraints being too small.
+        mTpNotificationTime.setIs24HourView(false);
         mTvConfirmAction = view.findViewById(R.id.tv_AlertConfirmText);
         mTvCancelAction = view.findViewById(R.id.tv_AlertCancelText);
         return view;
@@ -73,14 +74,19 @@ public class NewTaskAlertFragment extends Fragment {
 
         if(getActivity() != null) {
 
-
+            //mTpNotificationTime.setIs24HourView(false);
             mTpNotificationTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
                 @Override
                 public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                    Log.i(TAG, "onTimeChanged: Hour: " + hourOfDay + " Minute: " + minute);
+                    String meridies;
+                    if(hourOfDay < 12) {
+                        meridies = "AM";
+                    } else {
+                        meridies = "PM";
+                    }
 
-                    //String notificationTime = UserTask.formatNotificationTime(notificationHour, notificationMinute, "");
-
+                    Log.i(TAG, "onTimeChanged: Hour: " + hourOfDay + " Minute: " + minute + " Meridies: " + meridies);
+                    mNotificationTime = UserTask.formatNotificationTime(hourOfDay, minute, meridies);
                 }
             });
 
@@ -92,7 +98,7 @@ public class NewTaskAlertFragment extends Fragment {
                 public void onClick(View v) {
                     if(ValidateField(mEtNameField)) {
 
-                        //mListener.saveTapped(mEtNameField.getText().toString());
+                        mListener.saveTappedNewTaskAlert(mEtNameField.getText().toString(), mNotificationTime);
                         //TODO: Need to check the new name against all current tasklist names here.
                     }
                 }
@@ -101,8 +107,7 @@ public class NewTaskAlertFragment extends Fragment {
             mTvCancelAction.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO: This is saying a null object reference when being activated.
-                    mListener.cancelTapped();
+                    mListener.cancelTappedNewTaskAlert();
                 }
             });
 

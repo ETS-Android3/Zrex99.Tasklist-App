@@ -23,18 +23,20 @@ public class TasksAdapter extends BaseAdapter {
     private final Context mContext;
     private final ArrayList<UserTask> mTasks;
 
+    private boolean mViewsEnabled;
+
     private TasksAdapterListener mListener;
     public interface TasksAdapterListener {
         void actionTapped(UserTask userTask, int position);
         void taskTapped(UserTask userTask, int position);
         void addTaskTapped();
-
     }
 
-    public TasksAdapter(Context _context, ArrayList<UserTask> _tasks, TasksAdapterListener _listener) {
+    public TasksAdapter(Context _context, ArrayList<UserTask> _tasks, TasksAdapterListener _listener, boolean _viewsEnabled) {
         mContext = _context;
         mTasks = _tasks;
         mListener = _listener;
+        mViewsEnabled = _viewsEnabled;
     }
 
     @Override
@@ -111,24 +113,32 @@ public class TasksAdapter extends BaseAdapter {
                     vh.ib_action.setImageResource(R.drawable.unchecked_circle);
                 }
 
-                //Set the click listeners to the views, and interface back to the fragment.
-                vh.ib_action.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mListener.actionTapped(task, position);
-                    }
-                });
+                //When setting the listeners check to see if the views should be enabled or not.
+                if(mViewsEnabled) {
+                    //Set the click listeners to the views, and interface back to the fragment.
+                    vh.ib_action.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mListener.actionTapped(task, position);
+                        }
+                    });
 
-                vh.tv_task.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mListener.taskTapped(task, position);
-                    }
-                });
+                    vh.tv_task.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mListener.taskTapped(task, position);
+                        }
+                    });
+                } else {
+                    //Set the views to be not clickable or focused.
+                    vh.ib_action.setClickable(false);
+                    vh.tv_task.setClickable(false);
+                }
+
+
             }
         }else if(position == totalTasks) { //When the position has reached the last row.
 
-            Log.i(TAG, "getView: last row");
             if(convertView == null) {
                 if(viewType == 0) {
                     //Last row
@@ -140,19 +150,27 @@ public class TasksAdapter extends BaseAdapter {
                 vh = (ViewHolder) convertView.getTag();
             }
 
-            //Set the click listeners to the views, and interface back to the fragment.
-            vh.ib_action.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mListener.addTaskTapped();
-                }
-            });
-            vh.tv_task.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mListener.addTaskTapped();
-                }
-            });
+            if(mViewsEnabled) {
+                //Set the click listeners to the views, and interface back to the fragment.
+                vh.ib_action.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.addTaskTapped();
+                    }
+                });
+                vh.tv_task.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.addTaskTapped();
+                    }
+                });
+            }else {
+                //Set the views to be not clickable or focused.
+                vh.ib_action.setClickable(false);
+                vh.tv_task.setClickable(false);
+            }
+
+
         }
 
         return convertView;
