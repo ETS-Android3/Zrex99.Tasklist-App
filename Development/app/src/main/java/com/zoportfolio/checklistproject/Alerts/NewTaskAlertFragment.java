@@ -1,10 +1,8 @@
 package com.zoportfolio.checklistproject.Alerts;
 
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +17,13 @@ import androidx.fragment.app.Fragment;
 import com.zoportfolio.checklistproject.R;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
 
+import java.util.ArrayList;
+
 public class NewTaskAlertFragment extends Fragment {
 
     private static final String TAG = "TAlertFragment.TAG";
+
+    private static final String ARG_TASKNAMES = "taskNames";
 
     private EditText mEtNameField;
     private TimePicker mTpNotificationTime;
@@ -30,9 +32,10 @@ public class NewTaskAlertFragment extends Fragment {
 
     private String mNotificationTime;
 
-    public static NewTaskAlertFragment newInstance() {
+    public static NewTaskAlertFragment newInstance(ArrayList<String> _taskNames) {
 
         Bundle args = new Bundle();
+        args.putStringArrayList(ARG_TASKNAMES, _taskNames);
 
         NewTaskAlertFragment fragment = new NewTaskAlertFragment();
         fragment.setArguments(args);
@@ -98,8 +101,26 @@ public class NewTaskAlertFragment extends Fragment {
                 public void onClick(View v) {
                     if(ValidateField(mEtNameField)) {
 
-                        mListener.saveTappedNewTaskAlert(mEtNameField.getText().toString(), mNotificationTime);
-                        //TODO: Need to check the new name against all current tasklist names here.
+                        //Check that the entered task name is not already used for this task list.
+                        String newTaskName = mEtNameField.getText().toString();
+
+                        //TODO: I could see this being problematic potentially if there are no tasks, need to see later.
+                        ArrayList<String> taskNames = (getArguments() != null ? getArguments().getStringArrayList(ARG_TASKNAMES) : null);
+                        boolean nameTaken = false;
+                        if(taskNames != null) {
+                            for (int i = 0; i < taskNames.size(); i++) {
+                                if(newTaskName.equals(taskNames.get(i))) {
+                                    nameTaken = true;
+                                }
+                            }
+                        }
+
+                        if(!nameTaken) {
+                            mListener.saveTappedNewTaskAlert(mEtNameField.getText().toString(), mNotificationTime);
+                        }else {
+                            //TODO: Toast for name taken.
+                        }
+
                     }
                 }
             });

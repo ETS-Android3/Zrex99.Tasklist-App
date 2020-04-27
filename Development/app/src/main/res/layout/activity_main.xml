@@ -5,11 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryMain"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/mainLayout">
 
 
+    <TextView
+        android:id="@+id/tv_noData"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/noData"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginFrameContainer"
+        app:layout_constraintLeft_toRightOf="@id/guideline_leftMarginFrameContainer"
+        app:layout_constraintRight_toLeftOf="@id/guideline_rightMarginFrameContainer"
+        app:layout_constraintTop_toBottomOf="@id/guideline_topMarginFrameContainer" />
 
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/vp_Tasklist"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginFrameContainer"
+        app:layout_constraintLeft_toRightOf="@id/guideline_leftMarginFrameContainer"
+        app:layout_constraintRight_toLeftOf="@id/guideline_rightMarginFrameContainer"
+        app:layout_constraintTop_toBottomOf="@id/guideline_topMarginFrameContainer"/>
+    
     <FrameLayout
+        android:visibility="gone"
         android:id="@+id/fragment_Container_Tasklist"
         android:layout_width="0dp"
         android:layout_height="0dp"

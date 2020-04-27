@@ -1,7 +1,12 @@
 package com.zoportfolio.checklistproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
@@ -14,6 +19,7 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.checklistproject.Alerts.NewTaskAlertFragment;
 import com.zoportfolio.checklistproject.Alerts.NewTaskListAlertFragment;
+import com.zoportfolio.checklistproject.Tasklist.Adapters.TaskListFragmentPagerAdapter;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
 import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
@@ -27,10 +33,17 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     private static final String FRAGMENT_ALERT_NEWTASKLIST_TAG = "FRAGMENT_ALERT_NEWTASKLIST";
     private static final String FRAGMENT_TASKLIST_TAG = "FRAGMENT_TASKLIST";
 
+    private ViewPager mPager;
+    private PagerAdapter pagerAdapter;
+
     //TODO: This variable is the main way for the main activity to keep track of the task lists.
     private ArrayList<UserTaskList> mTaskLists;
 
     private static Boolean isAlertUp = false;
+
+    /**
+     * Lifecycle methods
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +58,27 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
         loadCurrentDate(tvCurrentDate);
 
+        //TODO: Will need to null check the mTaskList at crucial points through the app.
+        // Coming back to this stuff after I handle the other features.
+//        mPager = findViewById(R.id.vp_Tasklist);
+//
+//        if(mTaskLists == null || mTaskLists.isEmpty()) {
+//            //Hide the view pager to display a textview to tell the user to input a new tasklist.
+//            mPager.setVisibility(View.INVISIBLE);
+//        }else {
+//            //TODO: Test this out, alot.
+//            mPager.setVisibility(View.VISIBLE);
+//            pagerAdapter = new TaskListFragmentPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTaskLists);
+//            mPager.setAdapter(pagerAdapter);
+//        }
 
+        //Utilizing this method for now until I get the other features done and can focus more on the viewpager.
+        TextView textView = findViewById(R.id.tv_noData);
+        textView.setVisibility(View.GONE);
         loadTaskListFragment(null);
-
 
         //TODOS...
         //TODO: I have to fix the nuemorphic container drawable. SOLVED: Couldn't fix the problem so I will move on for now.
-
 
         FloatingActionButton fabAddTaskList = findViewById(R.id.fab_newTaskList);
         fabAddTaskList.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +92,19 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        //To handle the back event,
+        // go back a tasklist if the first tasklist is not shown,
+        // otherwise handle the back according to the system.
+        if(mPager.getCurrentItem() == 0) {
+            super.onBackPressed();
+        } else {
+            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+        }
+
     }
 
     /**
@@ -91,13 +131,18 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //Close the Alert fragment before showing the taskList fragment.
             closeAlertFragment();
 
-            //TODO: Delete this testing stuff after. lines 94 -> 99
+            //TODO: Delete this testing stuff after.
             UserTask newTask1 = new UserTask("Code daily","333", false);
             UserTask newTask2 = new UserTask("ayayaya","222", true);
-
-
             newTaskList.addTaskToList(newTask1);
             newTaskList.addTaskToList(newTask2);
+
+
+//            if(mTaskLists == null) {
+//                mTaskLists = new ArrayList<UserTaskList>();
+//                mTaskLists.add(newTaskList);
+//            }
+            //loadViewPager();
 
             loadTaskListFragment(newTaskList);
             //TODO: Need to save the taskList to storage here.
@@ -219,6 +264,14 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //Set the bool to false, so a new alert can appear.
             isAlertUp = false;
         }
+    }
+
+    private void loadViewPager() {
+        TextView textView = findViewById(R.id.tv_noData);
+        textView.setVisibility(View.GONE);
+        mPager.setVisibility(View.VISIBLE);
+        pagerAdapter = new TaskListFragmentPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTaskLists);
+        mPager.setAdapter(pagerAdapter);
     }
 
 }

@@ -164,12 +164,18 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
             Activity a = getActivity();
 
+            ArrayList<String> taskNames = new ArrayList<>();
+            for (int i = 0; i < mTaskList.getTasks().size(); i++) {
+                taskNames.add(mTaskList.getTasks().get(i).getTaskName());
+                Log.i(TAG, "addTaskTapped: taskNames: " + taskNames.get(i));
+            }
+
             if(a != null) {
                 FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
                 frameLayout.setVisibility(View.VISIBLE);
 
                 mContext.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_Container_AlertNewTask, NewTaskAlertFragment.newInstance(), FRAGMENT_ALERT_NEWTASK_TAG)
+                        .replace(R.id.fragment_Container_AlertNewTask, NewTaskAlertFragment.newInstance(taskNames), FRAGMENT_ALERT_NEWTASK_TAG)
                         .commit();
 
                 isAlertUp = true;
