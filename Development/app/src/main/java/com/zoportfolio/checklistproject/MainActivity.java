@@ -2,12 +2,16 @@ package com.zoportfolio.checklistproject;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -32,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     private static final String FRAGMENT_ALERT_NEWTASKLIST_TAG = "FRAGMENT_ALERT_NEWTASKLIST";
     private static final String FRAGMENT_TASKLIST_TAG = "FRAGMENT_TASKLIST";
+
+    public static final String FILE_TASKLIST_FOLDER = "TasklistFolder";
+    public static final String FILE_TASKLIST_ = "TasklistChecklist";
 
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
@@ -141,6 +148,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 //            if(mTaskLists == null) {
 //                mTaskLists = new ArrayList<UserTaskList>();
 //                mTaskLists.add(newTaskList);
+            //TODO: make it so that the new tasklist can be added,
+            // only if the mTaskLists is not null,
+            // if it is null then intiliaze a new array list.
+            // Do this after handling local storage.
 //            }
             //loadViewPager();
 
