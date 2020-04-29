@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.checklistproject.Alerts.NewTaskAlertFragment;
@@ -165,8 +166,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void saveTapped(String taskListName) {
-        //TODO: Still need to handle adding a taskList with a name that is already taken "Potentially"
-
+        Log.i(TAG, "saveTapped: New taskList name: " + taskListName);
         if(taskListName != null) {
             Log.i(TAG, "saveTapped: New taskList name: " + taskListName);
             //Create a new taskList
@@ -174,11 +174,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
             //Close the Alert fragment before showing the taskList fragment.
             closeAlertFragment();
-
-            //            TODO: make it so that the new tasklist can be added,
-//             only if the mTaskLists is not null,
-//             if it is null then intiliaze a new array list.
-//             Do this after handling local storage.
 
             if(mTaskLists == null) {
                 //For the first time adding a tasklist.
@@ -191,13 +186,14 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //Save the tasklists to storage.
             saveTasklistsToStorage();
 
-            //loadViewPager();
-            loadTaskListFragment(newTaskList);
 
+            loadTaskListFragment(newTaskList);
+            //Testing loadViewPager();
         }else {
             //If this happens I need to display to the user that something went wrong.
             //A toast that the saving went wrong.
-            Log.i(TAG, "saveTapped: taskListName is null");
+            Toast toastSaveNewTasklistFailed = Toast.makeText(this, R.string.toast_TaskListSavingFailed, Toast.LENGTH_LONG);
+            toastSaveNewTasklistFailed.show();
         }
 
     }

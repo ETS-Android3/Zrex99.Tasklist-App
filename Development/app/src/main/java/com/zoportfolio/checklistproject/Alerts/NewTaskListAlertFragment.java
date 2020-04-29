@@ -89,17 +89,22 @@ public class NewTaskListAlertFragment extends Fragment {
                 public void onClick(View v) {
                     if(ValidateField(mEtNameField)) {
                         String newTaskListName = mEtNameField.getText().toString();
+                        boolean nameTaken = false;
 
                         //Check all the names taken and then toast if the new name is already taken.
                         ArrayList<String> taskListNames = (getArguments() != null ? getArguments().getStringArrayList(ARG_TASKLISTNAMES) : null);
                         if(taskListNames != null && !taskListNames.isEmpty()) {
                             for (int i = 0; i < taskListNames.size(); i++) {
                                 if(taskListNames.get(i).equals(newTaskListName)) {
+                                    nameTaken = true;
                                     String toastString = getResources().getString(R.string.toast_NameTaken1) + " \"" + newTaskListName + "\" " + getResources().getString(R.string.toast_NameTaken2);
 
                                     Toast toastNameTaken = Toast.makeText(getActivity(),toastString,Toast.LENGTH_LONG);
                                     toastNameTaken.show();
                                 }
+                            }
+                            if(!nameTaken) {
+                                mListener.saveTapped(newTaskListName);
                             }
                         }else {
                             mListener.saveTapped(newTaskListName);
@@ -130,7 +135,11 @@ public class NewTaskListAlertFragment extends Fragment {
         String text = editText.getText().toString().trim();
         //If there is no text after trimming whitespace, return false.
         if(text.isEmpty()) {
-            //TODO: Toast here that the field is not valid and needs text.
+            Activity a = getActivity();
+            if(a != null) {
+                Toast toastInvalidText = Toast.makeText(a, R.string.toast_TextInvalid, Toast.LENGTH_LONG);
+                toastInvalidText.show();
+            }
             return false;
         }else {
             //Return true for valid text.

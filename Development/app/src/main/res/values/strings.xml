@@ -1,21 +1,27 @@
 <resources>
     <string name="app_name">ChecklistProject</string>
 
-    <string name="alert_newTaskListTitle">Enter new task list name</string>
+    <string name="alert_newTaskListTitle">Enter new tasklist name</string>
     <string name="alert_newTaskTitle">Enter new task name and time for notification</string>
     <string name="alert_newTaskConfirm">Save</string>
     <string name="alert_newTaskCancel">Cancel</string>
     <string name="alert_newTaskNameHint">Name:</string>
 
 
-    <string name="taskList_titlePlaceholder">No TaskLists Found.</string>
+    <string name="taskList_titlePlaceholder">No Tasklists Found.</string>
 
     <string name="taskList_addTask">Add Task</string>
 
     <string name="noData">No Tasklists found, please add your first tasklist.</string>
 
 
-    <string name="toast_NameTaken1">TaskList with the name</string>
+    <string name="toast_Template">Blank</string>
+
+    <string name="toast_NameTaken1">Tasklist with the name</string>
     <string name="toast_NameTaken2">has been found, please use a different name.</string>
+
+    <string name="toast_TaskListSavingFailed">Oops, something bad happened on our end and the tasklist wasn\'t saved, please try again.</string>
+
+    <string name="toast_TextInvalid">Please do not leave the text field blank, enter a valid name.</string>
 
 </resources>
