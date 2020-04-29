@@ -1,20 +1,15 @@
 package com.zoportfolio.checklistproject;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -29,7 +24,6 @@ import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
 import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
 import com.zoportfolio.checklistproject.Utility.FileUtility;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NewTaskListAlertFragment.NewTaskListAlertFragmentListener,
@@ -44,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     //I think I need to .gitignore this or hide this, not sure.
     public static final String FILE_TASKLIST_FOLDER = "TasklistFolder";
     public static final String FILE_TASKLIST_NAME = "TasklistChecklist";
+
+    public static final String KEY_TASKLISTS = "KEY_TASKLISTS";
 
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
@@ -119,7 +115,40 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 //        } else {
 //            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 //        }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        //TODO: Will have to check if their is other stuff that i need to save,
+        // Example: which fragment is up/what is that fragment looking at.. etc..
+
+        //Get the tasklists as an arraylist of strings, and then save it to the outState.
+        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
+        outState.putStringArrayList(KEY_TASKLISTS,taskListsJSON);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState) {
+        super.onRestoreInstanceState(savedInstanceState, persistentState);
+        ArrayList<String> taskListsJSON = savedInstanceState.getStringArrayList(KEY_TASKLISTS);
+
+        if(taskListsJSON != null && !taskListsJSON.isEmpty()) {
+            if(mTaskLists == null) {
+                mTaskLists = new ArrayList<>();
+            }else {
+                mTaskLists.clear();
+            }
+            mTaskLists = convertTasklistsFromLoading(taskListsJSON);
+            loadTaskListFragment(mTaskLists.get(0));
+        }
+
+        //Load the UI.
     }
 
     /**
@@ -188,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     @Override
     public void taskListUpdated(UserTaskList updatedTaskList) {
         //TODO: Need to know which tasklist was updated in order to update the proper tasklist.
-        
+
     }
 
     //NewTaskAlertFragment Callbacks
@@ -264,8 +293,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTaskList);
         frameLayout.setVisibility(View.VISIBLE);
 
+        ArrayList<String> taskListNames = new ArrayList<>();
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            taskListNames.add(mTaskLists.get(i).getTaskListName());
+        }
+        
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_AlertNewTaskList, NewTaskListAlertFragment.newInstance(), FRAGMENT_ALERT_NEWTASKLIST_TAG)
+                .replace(R.id.fragment_Container_AlertNewTaskList, NewTaskListAlertFragment.newInstance(taskListNames), FRAGMENT_ALERT_NEWTASKLIST_TAG)
                 .commit();
     }
 
@@ -300,16 +334,33 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
      * Custom methods - FILE I/O
      */
 
-    private void saveTasklistsToStorage() {
-        //Convert all the tasklists to JSON for saving.
-
+    private ArrayList<String> convertTasklistsForSaving() {
         ArrayList<String> taskListsJSON = new ArrayList<>();
-
         for (int i = 0; i < mTaskLists.size(); i++) {
             UserTaskList taskList = mTaskLists.get(i);
             //Add the JSON tasklist to the arrayList.
             taskListsJSON.add(taskList.toJSONString());
         }
+        return taskListsJSON;
+    }
+
+    private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> taskListJSONList) {
+        ArrayList<UserTaskList> taskLists = new ArrayList<>();
+        if(!taskListJSONList.isEmpty()) {
+            for (int i = 0; i < taskListJSONList.size(); i++) {
+                String taskListJSONString = taskListJSONList.get(i);
+                UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
+                if(userTaskList != null) {
+                    taskLists.add(userTaskList);
+                }
+            }
+        }
+        return taskLists;
+    }
+
+    private void saveTasklistsToStorage() {
+        //Convert all the tasklists to JSON for saving.
+        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
 
         //Once all tasklists have been added to the string array, save them to storage.
         FileUtility.saveToProtectedStorage(this, FILE_TASKLIST_NAME, FILE_TASKLIST_FOLDER, taskListsJSON);
@@ -345,20 +396,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             }
         }
 
-
-        //Tested and works successfully.
-        if(!taskListJSONList.isEmpty()) {
-            for (int i = 0; i < taskListJSONList.size(); i++) {
-                String taskListJSONString = taskListJSONList.get(i);
-                UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
-                if(userTaskList != null) {
-                    mTaskLists.add(userTaskList);
-                }
-            }
-        }
+        //Convert the tasklists from ArrayList<String> JSON
+        mTaskLists = convertTasklistsFromLoading(taskListJSONList);
 
         if(!mTaskLists.isEmpty()) {
-            Log.i(TAG, "loadTasklistsFromStorage: " + mTaskLists.get(0).getTaskListName());
             loadTaskListFragment(mTaskLists.get(0));
         }
 

@@ -14,4 +14,8 @@
 
     <string name="noData">No Tasklists found, please add your first tasklist.</string>
 
+
+    <string name="toast_NameTaken1">TaskList with the name</string>
+    <string name="toast_NameTaken2">has been found, please use a different name.</string>
+
 </resources>

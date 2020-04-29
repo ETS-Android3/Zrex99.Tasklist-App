@@ -1,5 +1,6 @@
 package com.zoportfolio.checklistproject.Alerts;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,17 +17,22 @@ import androidx.fragment.app.Fragment;
 
 import com.zoportfolio.checklistproject.R;
 
+import java.util.ArrayList;
+
 public class NewTaskListAlertFragment extends Fragment {
 
     private static final String TAG = "TLAlertFragment.TAG";
+
+    private static final String ARG_TASKLISTNAMES = "taskListNames";
 
     private EditText mEtNameField;
     private TextView mTvConfirmAction;
     private TextView mTvCancelAction;
 
-    public static NewTaskListAlertFragment newInstance() {
+    public static NewTaskListAlertFragment newInstance(ArrayList<String> _taskListNames) {
 
         Bundle args = new Bundle();
+        args.putStringArrayList(ARG_TASKLISTNAMES, _taskListNames);
 
         NewTaskListAlertFragment fragment = new NewTaskListAlertFragment();
         fragment.setArguments(args);
@@ -81,8 +88,22 @@ public class NewTaskListAlertFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     if(ValidateField(mEtNameField)) {
-                        mListener.saveTapped(mEtNameField.getText().toString());
-                        //TODO: Need to check the new name against all current tasklist names here.
+                        String newTaskListName = mEtNameField.getText().toString();
+
+                        //Check all the names taken and then toast if the new name is already taken.
+                        ArrayList<String> taskListNames = (getArguments() != null ? getArguments().getStringArrayList(ARG_TASKLISTNAMES) : null);
+                        if(taskListNames != null && !taskListNames.isEmpty()) {
+                            for (int i = 0; i < taskListNames.size(); i++) {
+                                if(taskListNames.get(i).equals(newTaskListName)) {
+                                    String toastString = getResources().getString(R.string.toast_NameTaken1) + " \"" + newTaskListName + "\" " + getResources().getString(R.string.toast_NameTaken2);
+
+                                    Toast toastNameTaken = Toast.makeText(getActivity(),toastString,Toast.LENGTH_LONG);
+                                    toastNameTaken.show();
+                                }
+                            }
+                        }else {
+                            mListener.saveTapped(newTaskListName);
+                        }
                     }
                 }
             });
