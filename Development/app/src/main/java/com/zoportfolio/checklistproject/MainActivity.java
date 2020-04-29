@@ -27,18 +27,23 @@ import com.zoportfolio.checklistproject.Tasklist.Adapters.TaskListFragmentPagerA
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
 import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
+import com.zoportfolio.checklistproject.Utility.FileUtility;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NewTaskListAlertFragment.NewTaskListAlertFragmentListener, TaskListFragment.TaskListFragmentListener, NewTaskAlertFragment.NewTaskAlertFragmentListener {
+public class MainActivity extends AppCompatActivity implements NewTaskListAlertFragment.NewTaskListAlertFragmentListener,
+        TaskListFragment.TaskListFragmentListener,
+        NewTaskAlertFragment.NewTaskAlertFragmentListener {
 
     public static final String TAG = "MainActivity.TAG";
 
     private static final String FRAGMENT_ALERT_NEWTASKLIST_TAG = "FRAGMENT_ALERT_NEWTASKLIST";
     private static final String FRAGMENT_TASKLIST_TAG = "FRAGMENT_TASKLIST";
 
+    //I think I need to .gitignore this or hide this, not sure.
     public static final String FILE_TASKLIST_FOLDER = "TasklistFolder";
-    public static final String FILE_TASKLIST_ = "TasklistChecklist";
+    public static final String FILE_TASKLIST_NAME = "TasklistChecklist";
 
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
@@ -61,6 +66,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             getSupportActionBar().hide();
         }
 
+        //testStorageFeatures();
+
+        loadOnFreshAppOpen();
+
+
         //Grab the current date text view to get the date.
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
         loadCurrentDate(tvCurrentDate);
@@ -79,10 +89,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 //            mPager.setAdapter(pagerAdapter);
 //        }
 
-        //Utilizing this method for now until I get the other features done and can focus more on the viewpager.
-        TextView textView = findViewById(R.id.tv_noData);
-        textView.setVisibility(View.GONE);
-        loadTaskListFragment(null);
+//        loadTaskListFragment(null);
 
         //TODOS...
         //TODO: I have to fix the nuemorphic container drawable. SOLVED: Couldn't fix the problem so I will move on for now.
@@ -106,11 +113,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         //To handle the back event,
         // go back a tasklist if the first tasklist is not shown,
         // otherwise handle the back according to the system.
-        if(mPager.getCurrentItem() == 0) {
-            super.onBackPressed();
-        } else {
-            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-        }
+
+//        if(mPager.getCurrentItem() == 0) {
+//            super.onBackPressed();
+//        } else {
+//            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+//        }
 
     }
 
@@ -128,36 +136,34 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void saveTapped(String taskListName) {
+        //TODO: Still need to handle adding a taskList with a name that is already taken "Potentially"
 
         if(taskListName != null) {
             Log.i(TAG, "saveTapped: New taskList name: " + taskListName);
             //Create a new taskList
             UserTaskList newTaskList = new UserTaskList(taskListName);
-            //Have to reset the views in the back, and then load the fragment that holds the ListView.
 
             //Close the Alert fragment before showing the taskList fragment.
             closeAlertFragment();
 
-            //TODO: Delete this testing stuff after.
-            UserTask newTask1 = new UserTask("Code daily","333", false);
-            UserTask newTask2 = new UserTask("ayayaya","222", true);
-            newTaskList.addTaskToList(newTask1);
-            newTaskList.addTaskToList(newTask2);
+            //            TODO: make it so that the new tasklist can be added,
+//             only if the mTaskLists is not null,
+//             if it is null then intiliaze a new array list.
+//             Do this after handling local storage.
 
+            if(mTaskLists == null) {
+                //For the first time adding a tasklist.
+                mTaskLists = new ArrayList<UserTaskList>();
+                mTaskLists.add(newTaskList);
+            }else {
+                mTaskLists.add(newTaskList);
+            }
 
-//            if(mTaskLists == null) {
-//                mTaskLists = new ArrayList<UserTaskList>();
-//                mTaskLists.add(newTaskList);
-            //TODO: make it so that the new tasklist can be added,
-            // only if the mTaskLists is not null,
-            // if it is null then intiliaze a new array list.
-            // Do this after handling local storage.
-//            }
+            //Save the tasklists to storage.
+            saveTasklistsToStorage();
+
             //loadViewPager();
-
             loadTaskListFragment(newTaskList);
-            //TODO: Need to save the taskList to storage here.
-
 
         }else {
             //If this happens I need to display to the user that something went wrong.
@@ -181,7 +187,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void taskListUpdated(UserTaskList updatedTaskList) {
-
+        //TODO: Need to know which tasklist was updated in order to update the proper tasklist.
+        
     }
 
     //NewTaskAlertFragment Callbacks
@@ -240,6 +247,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     //This method will load the TaskList Fragment.
     private void loadTaskListFragment(UserTaskList _userTaskList) {
+        TextView textView = findViewById(R.id.tv_noData);
+        textView.setVisibility(View.GONE);
+
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_Tasklist);
         frameLayout.setVisibility(View.VISIBLE);
 
@@ -284,5 +294,107 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         pagerAdapter = new TaskListFragmentPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTaskLists);
         mPager.setAdapter(pagerAdapter);
     }
+
+
+    /**
+     * Custom methods - FILE I/O
+     */
+
+    private void saveTasklistsToStorage() {
+        //Convert all the tasklists to JSON for saving.
+
+        ArrayList<String> taskListsJSON = new ArrayList<>();
+
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            UserTaskList taskList = mTaskLists.get(i);
+            //Add the JSON tasklist to the arrayList.
+            taskListsJSON.add(taskList.toJSONString());
+        }
+
+        //Once all tasklists have been added to the string array, save them to storage.
+        FileUtility.saveToProtectedStorage(this, FILE_TASKLIST_NAME, FILE_TASKLIST_FOLDER, taskListsJSON);
+    }
+
+    private boolean checkForTasklistsInStorage() {
+        //If this returns 0, that means there are no files
+        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, FILE_TASKLIST_FOLDER);
+        return fileCount > 0;
+    }
+
+    //NOTE: I can make this method better by having it return the taskLists, and not handling the loading of the tasklist fragment.
+    private void loadTasklistsFromStorage() {
+        //Check that the mTaskList is not null,
+        // and if it isn't clear it so that the stored data can overwrite it.
+        if(mTaskLists == null) {
+            mTaskLists = new ArrayList<>();
+        }else {
+            mTaskLists.clear();
+        }
+
+        ArrayList<String> taskListJSONList = new ArrayList<>();
+        Object obj = FileUtility.retrieveFromStorage(this, FILE_TASKLIST_NAME);
+        if(obj instanceof ArrayList<?>) {
+            ArrayList<?> arrayList = (ArrayList<?>) obj;
+            if(arrayList.size() > 0) {
+                for (int i = 0; i < arrayList.size(); i++) {
+                    Object o = arrayList.get(i);
+                    if(o instanceof String) {
+                        taskListJSONList.add((String) o);
+                    }
+                }
+            }
+        }
+
+
+        //Tested and works successfully.
+        if(!taskListJSONList.isEmpty()) {
+            for (int i = 0; i < taskListJSONList.size(); i++) {
+                String taskListJSONString = taskListJSONList.get(i);
+                UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
+                if(userTaskList != null) {
+                    mTaskLists.add(userTaskList);
+                }
+            }
+        }
+
+        if(!mTaskLists.isEmpty()) {
+            Log.i(TAG, "loadTasklistsFromStorage: " + mTaskLists.get(0).getTaskListName());
+            loadTaskListFragment(mTaskLists.get(0));
+        }
+
+
+    }
+
+    private void loadOnFreshAppOpen() {
+        if(checkForTasklistsInStorage()) {
+            loadTasklistsFromStorage();
+        }else {
+            //If there are no files saved, display the no data text view.
+            TextView textView = findViewById(R.id.tv_noData);
+            textView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void testStorageFeatures() {
+        UserTaskList newTaskList = new UserTaskList("Test");
+        UserTask newTask1 = new UserTask("Code daily","333", false);
+        UserTask newTask2 = new UserTask("ayayaya","222", true);
+        newTaskList.addTaskToList(newTask1);
+        newTaskList.addTaskToList(newTask2);
+
+        mTaskLists = new ArrayList<UserTaskList>();
+        mTaskLists.add(newTaskList);
+
+        boolean tasklistStored = checkForTasklistsInStorage();
+        Log.i(TAG, "onCreate: Tasklist in storage: " + tasklistStored);
+
+        saveTasklistsToStorage();
+
+        tasklistStored = checkForTasklistsInStorage();
+        Log.i(TAG, "onCreate: Tasklist in storage: " + tasklistStored);
+
+        loadTasklistsFromStorage();
+    }
+
 
 }
