@@ -10,6 +10,7 @@ import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.os.UserHandle;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -211,6 +212,23 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     }
 
     @Override
+    public void trashTapped() {
+
+    }
+
+    @Override
+    public void deleteTask(UserTaskList taskList, UserTask task, int position) {
+        int taskListPosition = -1;
+        //Get the tasklist and task to delete, and then delete it from the tasklist and make sure the tasklist is up to date.
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            if(mTaskLists.get(i).equals(taskList)) {
+                taskListPosition = i;
+                deleteTaskFromTaskList(taskListPosition, position);
+            }
+        }
+    }
+
+    @Override
     public void taskListUpdated(UserTaskList updatedTaskList) {
         //TODO: Need to know which tasklist was updated in order to update the proper tasklist.
 
@@ -293,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         for (int i = 0; i < mTaskLists.size(); i++) {
             taskListNames.add(mTaskLists.get(i).getTaskListName());
         }
-        
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_Container_AlertNewTaskList, NewTaskListAlertFragment.newInstance(taskListNames), FRAGMENT_ALERT_NEWTASKLIST_TAG)
                 .commit();
@@ -431,6 +449,15 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         Log.i(TAG, "onCreate: Tasklist in storage: " + tasklistStored);
 
         loadTasklistsFromStorage();
+    }
+
+    private void deleteTaskFromTaskList(int taskListPosition, int taskPosition) {
+        //The tasklist fragment needs to update itself independently for now.
+        //Ideally i could just reload the tasklist fragment.
+        mTaskLists.get(taskListPosition).getTasks().remove(taskPosition);
+        //TODO: Save the updated tasklists to storage.
+        saveTasklistsToStorage();
+        //Potential toast to declare tasks as deleted.
     }
 
 

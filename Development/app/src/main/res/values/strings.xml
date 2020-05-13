@@ -24,4 +24,8 @@
 
     <string name="toast_TextInvalid">Please do not leave the text field blank, enter a valid name.</string>
 
+    <string name="contentDescription_ImageButtonUnchecked">Unchecked circle, that can be checked by tapping.</string>
+    <string name="contentDescription_ImageButtonChecked">Check mark, that can be unchecked by tapping.</string>
+    <string name="contentDescription_ImageButtonDelete">Delete symbol to delete the task.</string>
+
 </resources>

@@ -18,8 +18,8 @@
             android:adjustViewBounds="true"
             android:background="@color/colorPrimaryMain"
             android:scaleType="fitCenter"
-            android:src="@drawable/unchecked_circle"
-            android:contentDescription="Unchecked Circle that can be tapped."/>
+            android:src="@drawable/red_cross"
+            android:contentDescription="@string/contentDescription_ImageButtonDelete"/>
 
     </LinearLayout>
 
@@ -51,7 +51,7 @@
                 android:layout_weight="0.1"
                 android:paddingStart="2dp"
                 android:paddingEnd="2dp"
-                android:src="@drawable/rounded_divider_normal"/>
+                android:src="@drawable/rounded_divider_delete"/>
 
         </LinearLayout>
 

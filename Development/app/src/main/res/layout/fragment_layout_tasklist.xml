@@ -50,6 +50,18 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_topMargin"
         app:srcCompat="@drawable/ic_action_edit" />
 
+    <ImageButton
+        android:id="@+id/ib_trash"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorPrimaryMain"
+        android:contentDescription='"Trash Button"'
+        app:layout_constraintStart_toEndOf="@id/guideline_leftMargin"
+        app:layout_constraintTop_toTopOf="@id/guideline_topMargin"
+        app:srcCompat="@drawable/ic_action_trash"
+        android:visibility="gone"/>
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_bottomMargin"
         android:layout_width="wrap_content"

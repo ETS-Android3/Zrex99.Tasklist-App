@@ -1,7 +1,6 @@
 package com.zoportfolio.checklistproject.Tasklist.Adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,7 @@ public class TasksAdapter extends BaseAdapter {
 
     private TasksAdapterListener mListener;
     public interface TasksAdapterListener {
-        void actionTapped(UserTask userTask, int position);
+        void checkActionTapped(UserTask userTask, int position);
         void taskTapped(UserTask userTask, int position);
         void addTaskTapped();
     }
@@ -119,7 +118,7 @@ public class TasksAdapter extends BaseAdapter {
                     vh.ib_action.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            mListener.actionTapped(task, position);
+                            mListener.checkActionTapped(task, position);
                         }
                     });
 

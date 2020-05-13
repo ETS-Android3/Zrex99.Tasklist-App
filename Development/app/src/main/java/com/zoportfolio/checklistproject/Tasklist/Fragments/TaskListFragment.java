@@ -20,13 +20,14 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.zoportfolio.checklistproject.Alerts.NewTaskAlertFragment;
 import com.zoportfolio.checklistproject.R;
+import com.zoportfolio.checklistproject.Tasklist.Adapters.EditingTasksAdapter;
 import com.zoportfolio.checklistproject.Tasklist.Adapters.TasksAdapter;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
 import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
 
 import java.util.ArrayList;
 
-public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdapterListener {
+public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdapterListener, EditingTasksAdapter.EditingTasksAdapterListener {
 
     private static final String TAG = "TaskListFragment.TAG";
 
@@ -42,6 +43,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     private ListView mLvTasks;
     private TextView mTvName;
     private ImageButton mIbEdit;
+    private ImageButton mIbTrash;
     private boolean mEditing = false;
 
     //DataModel
@@ -66,6 +68,10 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
         void editTapped();
 
+        void trashTapped();
+
+        void deleteTask(UserTaskList taskList, UserTask task, int position);
+
         //TODO: Will need a tasklist ID,
         // potential solution = use tasklist name, prevent user from entering duplicate names.
         void taskListUpdated(UserTaskList updatedTaskList);
@@ -88,6 +94,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         View view = getLayoutInflater().inflate(R.layout.fragment_layout_tasklist, container, false);
         mTvName = view.findViewById(R.id.tv_TaskListTitle);
         mIbEdit = view.findViewById(R.id.ib_Edit);
+        mIbTrash = view.findViewById(R.id.ib_trash);
         mLvTasks = view.findViewById(R.id.lv_tasks);
         return view;
     }
@@ -111,20 +118,54 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                         Log.i(TAG, "onItemClick: Row:" + position + " Task: " + mTaskList.getTasks().get(position).getTaskName());
                     }
                 });
-            }
 
-            //TODO: Set up the editing and edit button AFTER:
-            // (listView is setup) DONE
-            // (adding tasks) WORKING ON
+                //TODO: Test the editing of the list view, specifically the transition from natural -> editing
+                // Then work on deleting individual tasks.
+
+                mIbEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Check the editing state, control flow from there
+                        if(!mEditing) { //The list view is not being edited.
+                            //Set the fragment to be editing the list view.
+                            mEditing = true;
+                            //Load the editing adapter.
+                            editTaskListView(true);
+
+                            mIbTrash.setVisibility(View.VISIBLE);
+                            mIbTrash.setEnabled(true);
+                            mIbTrash.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    //TODO: The functionality for deleting a tasklist will need to be completed.
+                                    mListener.trashTapped();
+                                }
+                            });
+
+                        }else {//The list view is in the edit state.
+                            //Set the fragment back to its natural state.
+                            mEditing = false;
+
+                            updateTaskListView(true);
+                            mIbTrash.setVisibility(View.GONE);
+                            mIbTrash.setEnabled(false);
+                        }
+                    }
+                });
+
+            }
 
         }else {
             Log.i(TAG, "onActivityCreated: Tasklist is null.");
         }
     }
 
+    /**
+     * Interface methods
+     */
 
     @Override
-    public void actionTapped(UserTask userTask, int position) {
+    public void checkActionTapped(UserTask userTask, int position) {
         Log.i(TAG, "actionTapped: Task: " + userTask.getTaskName()
                 + " \nNotification Time: " + userTask.getTaskNotificationTime()
                 + " \nPosition in tasklist: " + position
@@ -147,6 +188,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         //Set the adapter.
         updateTaskListView(true);
     }
+
 
     @Override
     public void taskTapped(UserTask userTask, int position) {
@@ -184,6 +226,19 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     }
 
+    @Override
+    public void deleteActionTapped(UserTask userTask, int position) {
+        //Delete the task from the tasklist variable on the fragment, and reload the editing list view.
+        mListener.deleteTask(mTaskList, userTask, position);
+
+        //After testing, it seems that using the interface to delete the task is all that is needed. Just need to reload the listview.
+        editTaskListView(true);
+    }
+
+    /**
+     * Custom methods
+     */
+
     public void closeAlertFragment() {
 
         Activity a = getActivity();
@@ -218,6 +273,12 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         TasksAdapter ta = new TasksAdapter(getActivity(), mTaskList.getTasks(), this, _listViewEnabled);
         mLvTasks.setAdapter(ta);
     }
+
+    private void editTaskListView(boolean _listViewEnabled) {
+        EditingTasksAdapter eta = new EditingTasksAdapter(getActivity(), mTaskList.getTasks(), this, _listViewEnabled);
+        mLvTasks.setAdapter(eta);
+    }
+
 
 
 

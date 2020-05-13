@@ -51,7 +51,7 @@
                 android:layout_weight="0.1"
                 android:paddingStart="2dp"
                 android:paddingEnd="2dp"
-                android:src="@drawable/rounded_divider"/>
+                android:src="@drawable/rounded_divider_normal"/>
 
         </LinearLayout>
 
