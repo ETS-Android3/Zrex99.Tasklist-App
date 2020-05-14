@@ -212,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void trashTapped(UserTaskList taskList) {
+        Log.i(TAG, "trashTapped: running");
         int taskListPosition = -1;
         //Two ways to do this, declare an alert before deleting or just delete the tasklist, for now i will just delete tasklist.
         //Get the tasklist to delete.

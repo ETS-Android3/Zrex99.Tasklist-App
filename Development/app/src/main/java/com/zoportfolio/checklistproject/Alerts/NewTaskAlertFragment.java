@@ -117,9 +117,11 @@ public class NewTaskAlertFragment extends Fragment {
                                 }
                             }
                         }
-                        //TODO: Need to the check why the notification time is null when being saved.
                         String taskListName = (getArguments() != null ? getArguments().getString(ARG_TASKLISTNAME) : null);
                         if(!nameTaken && taskListName != null) {
+                            if(mNotificationTime == null) {
+                                mNotificationTime = "8/00/AM";
+                            }
                             mListener.saveTappedNewTaskAlert(mEtNameField.getText().toString(), mNotificationTime, taskListName);
                         }else {
                             String toastString = getResources().getString(R.string.toast_Task_NameTaken1) + " \"" + newTaskName + "\" " + getResources().getString(R.string.toast_Task_NameTaken2);
