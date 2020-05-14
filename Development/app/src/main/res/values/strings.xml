@@ -14,16 +14,26 @@
 
     <string name="noData">No Tasklists found, please add your first tasklist.</string>
 
-
+    <!--  Toast strings.  -->
     <string name="toast_Template">Blank</string>
 
-    <string name="toast_NameTaken1">Tasklist with the name</string>
-    <string name="toast_NameTaken2">has been found, please use a different name.</string>
+    <string name="toast_TaskList_NameTaken1">Tasklist with the name</string>
+    <string name="toast_TaskList_NameTaken2">has been found, please use a different name.</string>
 
+    <string name="toast_Task_NameTaken1">Task with the name</string>
+    <string name="toast_Task_NameTaken2">has been found, please use a different name.</string>
+
+    <string name="toast_TaskSavingSuccesful">Task added to tasklist successfully.</string>
+
+    <string name="toast_TaskDeletingSuccesful">Task deleted.</string>
+    <string name="toast_TaskDeletingFailed">Task deleting failed, please try again.</string>
+
+    <string name="toast_TaskListSavingSuccesful">Tasklist updated successfully.</string>
     <string name="toast_TaskListSavingFailed">Oops, something bad happened on our end and the tasklist wasn\'t saved, please try again.</string>
 
     <string name="toast_TextInvalid">Please do not leave the text field blank, enter a valid name.</string>
 
+    <!--  Content description strings.  -->
     <string name="contentDescription_ImageButtonUnchecked">Unchecked circle, that can be checked by tapping.</string>
     <string name="contentDescription_ImageButtonChecked">Check mark, that can be unchecked by tapping.</string>
     <string name="contentDescription_ImageButtonDelete">Delete symbol to delete the task.</string>

@@ -10,7 +10,6 @@ import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.os.UserHandle;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -206,14 +205,22 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     }
 
+//    @Override
+////    public void editTapped() {
+////
+////    }
+
     @Override
-    public void editTapped() {
-
-    }
-
-    @Override
-    public void trashTapped() {
-
+    public void trashTapped(UserTaskList taskList) {
+        int taskListPosition = -1;
+        //Two ways to do this, declare an alert before deleting or just delete the tasklist, for now i will just delete tasklist.
+        //Get the tasklist to delete.
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            if(mTaskLists.get(i).equals(taskList)) {
+                taskListPosition = i;
+                deleteTaskList(taskListPosition);
+            }
+        }
     }
 
     @Override
@@ -231,7 +238,21 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     @Override
     public void taskListUpdated(UserTaskList updatedTaskList) {
         //TODO: Need to know which tasklist was updated in order to update the proper tasklist.
+        int indexPositionForTasklist = -1;
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            if(mTaskLists.get(i).getTaskListName().equals(updatedTaskList.getTaskListName())) {
+                Log.i(TAG, "taskListUpdated: Found the tasklist to update");
+                indexPositionForTasklist = i;
+            }
+        }
 
+        if(indexPositionForTasklist != -1) {
+            //Set the updated tasklist and save it.
+            mTaskLists.set(indexPositionForTasklist, updatedTaskList);
+            saveTasklistsToStorage();
+            Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskListSavingSuccesful), Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
     //NewTaskAlertFragment Callbacks
@@ -245,28 +266,33 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         // The fix would be to have the TaskListFragment interface the add task tapped all the way to the activity,
         // and then the activity will handle showing the new alert fragment, and then send the new data back to the TaskListFragment.
 
-        //Tell the TaskListFragment to close the NewTaskAlertFragment
-        TaskListFragment fragment = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TASKLIST_TAG);
-        if(fragment != null) {
-            fragment.closeAlertFragment();
-        }
-
-
+        closeAlertFragmentFromTaskListFragment();
     }
 
     @Override
-    public void saveTappedNewTaskAlert(String taskListName, String taskNotificationTime) {
+    public void saveTappedNewTaskAlert(String taskName, String taskNotificationTime, String taskListName) {
 
-        //TODO: Do what needs to be done with the new task information and then close the alert.
-        TaskListFragment fragment = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TASKLIST_TAG);
-        if(fragment != null) {
-            fragment.closeAlertFragment();
-
-            UserTask newTask = new UserTask(taskListName, taskNotificationTime);
-            //Update the taskList when i start tracking it on the main activity, and update the fragments tasklist.
-            fragment.addNewTaskToTaskList(newTask);
+        UserTask newTask = new UserTask(taskName, taskNotificationTime);
+        //TODO: The task here is not being saved, and this is due to the way i am trying to interface through the main activty and then to the tasklist fragment.
+        // I need to update the way I handle this alert communicating to the tasklist and main activity.
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            if(mTaskLists.get(i).getTaskListName().equals(taskListName)) {
+                Log.i(TAG, "saveTappedNewTaskAlert: tasklist found.");
+                //Add the new task.
+                mTaskLists.get(i).getTasks().add(newTask);
+                //Save the updated tasklists
+                saveTasklistsToStorage();
+                //Reload the taskListFragment.
+                loadTaskListFragment(mTaskLists.get(i));
+                break;
+            }
         }
 
+        Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskSavingSuccesful), Toast.LENGTH_LONG);
+        toast.show();
+
+        //Have to close out the alert.
+        closeAlertFragmentFromTaskListFragment();
     }
 
 
@@ -308,8 +334,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         frameLayout.setVisibility(View.VISIBLE);
 
         ArrayList<String> taskListNames = new ArrayList<>();
-        for (int i = 0; i < mTaskLists.size(); i++) {
-            taskListNames.add(mTaskLists.get(i).getTaskListName());
+        //Check that mTaskLists is available and instantiated.
+        if(mTaskLists != null && !mTaskLists.isEmpty()) {
+            for (int i = 0; i < mTaskLists.size(); i++) {
+                taskListNames.add(mTaskLists.get(i).getTaskListName());
+            }
         }
 
         getSupportFragmentManager().beginTransaction()
@@ -332,6 +361,14 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
             //Set the bool to false, so a new alert can appear.
             isAlertUp = false;
+        }
+    }
+
+    private void closeAlertFragmentFromTaskListFragment() {
+        //Tell the TaskListFragment to close the NewTaskAlertFragment
+        TaskListFragment fragment = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TASKLIST_TAG);
+        if(fragment != null) {
+            fragment.closeAlertFragment();
         }
     }
 
@@ -386,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         return fileCount > 0;
     }
 
+    //TODO: Need to check what is causing the null task name to be returned here.
     //NOTE: I can make this method better by having it return the taskLists, and not handling the loading of the tasklist fragment.
     private void loadTasklistsFromStorage() {
         //Check that the mTaskList is not null,
@@ -452,12 +490,37 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     }
 
     private void deleteTaskFromTaskList(int taskListPosition, int taskPosition) {
-        //The tasklist fragment needs to update itself independently for now.
-        //Ideally i could just reload the tasklist fragment.
-        mTaskLists.get(taskListPosition).getTasks().remove(taskPosition);
-        //TODO: Save the updated tasklists to storage.
-        saveTasklistsToStorage();
-        //Potential toast to declare tasks as deleted.
+        if(taskListPosition == -1) {
+            //Toast for an error deleting.
+            Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskDeletingFailed), Toast.LENGTH_LONG);
+            toast.show();
+        }else {
+            //The tasklist fragment needs to update itself independently for now.
+            //Ideally i could just reload the tasklist fragment.
+            mTaskLists.get(taskListPosition).getTasks().remove(taskPosition);
+            saveTasklistsToStorage();
+
+            Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskDeletingSuccesful), Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    private void deleteTaskList(int taskListPosition) {
+        if(taskListPosition == -1) {
+            //Toast for an error deleting.
+        }else {
+            mTaskLists.remove(taskListPosition);
+            //Save the updated tasklists.
+            saveTasklistsToStorage();
+            //Check for any remaining tasklists, if not then load the no data text view.
+            if(mTaskLists.isEmpty()) {
+                loadOnFreshAppOpen();
+            }else {
+                //Reload the taskListFragment.
+                loadTaskListFragment(mTaskLists.get(0));
+            }
+
+        }
     }
 
 

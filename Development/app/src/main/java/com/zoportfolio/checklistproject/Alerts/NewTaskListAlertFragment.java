@@ -97,7 +97,7 @@ public class NewTaskListAlertFragment extends Fragment {
                             for (int i = 0; i < taskListNames.size(); i++) {
                                 if(taskListNames.get(i).equals(newTaskListName)) {
                                     nameTaken = true;
-                                    String toastString = getResources().getString(R.string.toast_NameTaken1) + " \"" + newTaskListName + "\" " + getResources().getString(R.string.toast_NameTaken2);
+                                    String toastString = getResources().getString(R.string.toast_TaskList_NameTaken1) + " \"" + newTaskListName + "\" " + getResources().getString(R.string.toast_TaskList_NameTaken2);
 
                                     Toast toastNameTaken = Toast.makeText(getActivity(),toastString,Toast.LENGTH_LONG);
                                     toastNameTaken.show();

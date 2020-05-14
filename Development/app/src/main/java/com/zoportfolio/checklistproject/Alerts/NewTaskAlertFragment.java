@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +25,7 @@ public class NewTaskAlertFragment extends Fragment {
     private static final String TAG = "TAlertFragment.TAG";
 
     private static final String ARG_TASKNAMES = "taskNames";
+    private static final String ARG_TASKLISTNAME = "taskListName";
 
     private EditText mEtNameField;
     private TimePicker mTpNotificationTime;
@@ -32,10 +34,11 @@ public class NewTaskAlertFragment extends Fragment {
 
     private String mNotificationTime;
 
-    public static NewTaskAlertFragment newInstance(ArrayList<String> _taskNames) {
+    public static NewTaskAlertFragment newInstance(ArrayList<String> _taskNames, String _taskListName) {
 
         Bundle args = new Bundle();
         args.putStringArrayList(ARG_TASKNAMES, _taskNames);
+        args.putString(ARG_TASKLISTNAME, _taskListName);
 
         NewTaskAlertFragment fragment = new NewTaskAlertFragment();
         fragment.setArguments(args);
@@ -45,7 +48,7 @@ public class NewTaskAlertFragment extends Fragment {
     private NewTaskAlertFragmentListener mListener;
     public interface NewTaskAlertFragmentListener {
         void cancelTappedNewTaskAlert();
-        void saveTappedNewTaskAlert(String taskListName, String taskNotificationTime);
+        void saveTappedNewTaskAlert(String taskName, String taskNotificationTime, String taskListName);
     }
 
     @Override
@@ -114,11 +117,15 @@ public class NewTaskAlertFragment extends Fragment {
                                 }
                             }
                         }
-
-                        if(!nameTaken) {
-                            mListener.saveTappedNewTaskAlert(mEtNameField.getText().toString(), mNotificationTime);
+                        //TODO: Need to the check why the notification time is null when being saved.
+                        String taskListName = (getArguments() != null ? getArguments().getString(ARG_TASKLISTNAME) : null);
+                        if(!nameTaken && taskListName != null) {
+                            mListener.saveTappedNewTaskAlert(mEtNameField.getText().toString(), mNotificationTime, taskListName);
                         }else {
-                            //TODO: Toast for name taken.
+                            String toastString = getResources().getString(R.string.toast_Task_NameTaken1) + " \"" + newTaskName + "\" " + getResources().getString(R.string.toast_Task_NameTaken2);
+
+                            Toast toastNameTaken = Toast.makeText(getActivity(),toastString,Toast.LENGTH_LONG);
+                            toastNameTaken.show();
                         }
 
                     }
@@ -148,7 +155,8 @@ public class NewTaskAlertFragment extends Fragment {
         String text = editText.getText().toString().trim();
         //If there is no text after trimming whitespace, return false.
         if(text.isEmpty()) {
-            //TODO: Toast here that the field is not valid and needs text.
+            Toast toastNameTaken = Toast.makeText(getActivity(),getResources().getString(R.string.toast_TextInvalid),Toast.LENGTH_LONG);
+            toastNameTaken.show();
             return false;
         }else {
             //Return true for valid text.

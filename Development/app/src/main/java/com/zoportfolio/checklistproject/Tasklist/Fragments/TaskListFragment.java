@@ -66,9 +66,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         //TODO: rename these callbacks accordingly.
         void taskTapped();
 
-        void editTapped();
-
-        void trashTapped();
+        void trashTapped(UserTaskList taskList);
 
         void deleteTask(UserTaskList taskList, UserTask task, int position);
 
@@ -103,7 +101,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //TODO: main logic for the fragment.
         mTaskList = (UserTaskList) (getArguments() != null ? getArguments().getSerializable(ARG_USERTASKLIST) : null);
 
         if(getActivity() != null && mTaskList != null) {
@@ -118,9 +115,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                         Log.i(TAG, "onItemClick: Row:" + position + " Task: " + mTaskList.getTasks().get(position).getTaskName());
                     }
                 });
-
-                //TODO: Test the editing of the list view, specifically the transition from natural -> editing
-                // Then work on deleting individual tasks.
 
                 mIbEdit.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -137,8 +131,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                             mIbTrash.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    //TODO: The functionality for deleting a tasklist will need to be completed.
-                                    mListener.trashTapped();
+                                    mListener.trashTapped(mTaskList);
                                 }
                             });
 
@@ -170,7 +163,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                 + " \nNotification Time: " + userTask.getTaskNotificationTime()
                 + " \nPosition in tasklist: " + position
                 + " \nChecked: " + userTask.getTaskChecked());
-        //TODO: Update the task that was changed, and then update the tasklist.
 
         //If true set to false, if false set to true.
         //I have a feeling this may give some problems, will have to keep in mind for later.
@@ -183,7 +175,8 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         tasks.set(position, userTask);
         mTaskList.setTasks(tasks);
 
-        //TODO: Need to update the tasklist in terms of local storage.
+        //Interface to the main activity to save the task.
+        mListener.taskListUpdated(mTaskList);
 
         //Set the adapter.
         updateTaskListView(true);
@@ -207,17 +200,22 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
             Activity a = getActivity();
 
             ArrayList<String> taskNames = new ArrayList<>();
-            for (int i = 0; i < mTaskList.getTasks().size(); i++) {
-                taskNames.add(mTaskList.getTasks().get(i).getTaskName());
-                Log.i(TAG, "addTaskTapped: taskNames: " + taskNames.get(i));
+
+            if(mTaskList != null && !mTaskList.getTasks().isEmpty()) {
+                for (int i = 0; i < mTaskList.getTasks().size(); i++) {
+                    if(mTaskList.getTasks().get(i) != null) {
+                        taskNames.add(mTaskList.getTasks().get(i).getTaskName());
+                    }
+                }
             }
+
 
             if(a != null) {
                 FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
                 frameLayout.setVisibility(View.VISIBLE);
 
                 mContext.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_Container_AlertNewTask, NewTaskAlertFragment.newInstance(taskNames), FRAGMENT_ALERT_NEWTASK_TAG)
+                        .replace(R.id.fragment_Container_AlertNewTask, NewTaskAlertFragment.newInstance(taskNames, mTaskList.getTaskListName()), FRAGMENT_ALERT_NEWTASK_TAG)
                         .commit();
 
                 isAlertUp = true;
@@ -268,6 +266,8 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         mTaskList.addTaskToList(_newTask);
         updateTaskListView(true);
     }
+
+
 
     private void updateTaskListView(boolean _listViewEnabled) {
         TasksAdapter ta = new TasksAdapter(getActivity(), mTaskList.getTasks(), this, _listViewEnabled);
