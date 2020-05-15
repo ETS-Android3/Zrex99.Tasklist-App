@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.Tasklist.Adapters;
+package com.zoportfolio.checklistproject.tasklist.adapters;
 
 import android.util.Log;
 
@@ -7,8 +7,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
-import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
+import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
+import com.zoportfolio.checklistproject.tasklist.fragments.TaskListFragment;
 
 import java.util.ArrayList;
 

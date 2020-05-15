@@ -1,8 +1,6 @@
 package com.zoportfolio.checklistproject;
 
-import android.util.Log;
-
-import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
+import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
 
 import org.junit.Test;
 

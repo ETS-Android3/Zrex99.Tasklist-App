@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.Alerts;
+package com.zoportfolio.checklistproject.alerts;
 
 import android.app.Activity;
 import android.content.Context;

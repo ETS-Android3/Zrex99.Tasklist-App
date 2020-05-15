@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.Utility;
+package com.zoportfolio.checklistproject.utility;
 
 import android.content.Context;
 import android.util.Log;

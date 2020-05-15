@@ -17,13 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.zoportfolio.checklistproject.Alerts.NewTaskAlertFragment;
-import com.zoportfolio.checklistproject.Alerts.NewTaskListAlertFragment;
-import com.zoportfolio.checklistproject.Tasklist.Adapters.TaskListFragmentPagerAdapter;
-import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTask;
-import com.zoportfolio.checklistproject.Tasklist.DataModels.UserTaskList;
-import com.zoportfolio.checklistproject.Tasklist.Fragments.TaskListFragment;
-import com.zoportfolio.checklistproject.Utility.FileUtility;
+import com.zoportfolio.checklistproject.alerts.NewTaskAlertFragment;
+import com.zoportfolio.checklistproject.alerts.NewTaskListAlertFragment;
+import com.zoportfolio.checklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
+import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
+import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
+import com.zoportfolio.checklistproject.tasklist.fragments.TaskListFragment;
+import com.zoportfolio.checklistproject.utility.FileUtility;
 
 import java.util.ArrayList;
 
@@ -274,8 +274,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     public void saveTappedNewTaskAlert(String taskName, String taskNotificationTime, String taskListName) {
 
         UserTask newTask = new UserTask(taskName, taskNotificationTime);
-        //TODO: The task here is not being saved, and this is due to the way i am trying to interface through the main activty and then to the tasklist fragment.
-        // I need to update the way I handle this alert communicating to the tasklist and main activity.
         for (int i = 0; i < mTaskLists.size(); i++) {
             if(mTaskLists.get(i).getTaskListName().equals(taskListName)) {
                 Log.i(TAG, "saveTappedNewTaskAlert: tasklist found.");
@@ -424,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         return fileCount > 0;
     }
 
-    //TODO: Need to check what is causing the null task name to be returned here.
+    //No null task names anymore, so the tasks are saving fine. I think I fixed this unintentionally when I was adding in null checks elsewhere.
     //NOTE: I can make this method better by having it return the taskLists, and not handling the loading of the tasklist fragment.
     private void loadTasklistsFromStorage() {
         //Check that the mTaskList is not null,
