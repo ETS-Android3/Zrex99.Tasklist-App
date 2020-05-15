@@ -64,7 +64,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     private TaskListFragmentListener mListener;
     public interface TaskListFragmentListener {
         //TODO: rename these callbacks accordingly.
-        void taskTapped();
+        void taskTapped(UserTaskList taskList, UserTask task, int position);
 
         void trashTapped(UserTaskList taskList);
 
@@ -185,7 +185,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     @Override
     public void taskTapped(UserTask userTask, int position) {
-        //TODO: Interface back to the main activity and open the next activity that is a task info screen... [LATER]
+        mListener.taskTapped(mTaskList, userTask, position);
     }
 
     @Override

@@ -1,11 +1,13 @@
 package com.zoportfolio.checklistproject;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.checklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.checklistproject.alerts.NewTaskListAlertFragment;
+import com.zoportfolio.checklistproject.task.TaskInfoActivity;
 import com.zoportfolio.checklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
@@ -41,6 +44,14 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     public static final String FILE_TASKLIST_NAME = "TasklistChecklist";
 
     public static final String KEY_TASKLISTS = "KEY_TASKLISTS";
+
+    public static final String EXTRA_TASK = "EXTRA_TASK";
+    public static final String EXTRA_TASKLISTPOSITION = "EXTRA_TASKLISTPOSITION";
+    public static final String EXTRA_TASKLISTS = "EXTRA_TASKLISTS";
+
+    public static final int RESULT_CODE_TASK_CHANGED = 10;
+    public static final int RESULT_CODE_TASK_UNCHANGED = 20;
+    public static final int REQUEST_CODE_TASK_VIEWING = 3;
 
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
@@ -152,6 +163,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         //Load the UI.
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //TODO: Handle the changed task data and save the updated tasklists.
+    }
+
     /**
      * Interface methods
      */
@@ -201,14 +218,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     //TaskListFragment Callbacks
 
     @Override
-    public void taskTapped() {
-
+    public void taskTapped(UserTaskList taskList, UserTask task, int taskPosition) {
+        //Call method to load the taskInfoActivity.
+        loadTaskInfoActivity(task, taskList.getTaskListName());
     }
-
-//    @Override
-////    public void editTapped() {
-////
-////    }
 
     @Override
     public void trashTapped(UserTaskList taskList) {
@@ -379,6 +392,25 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         mPager.setAdapter(pagerAdapter);
     }
 
+    private void loadTaskInfoActivity(UserTask selectedTask, String taskListName) {//The tasklist name will be how we identify the tasklist that holds the selected task.
+
+        //Find the tasklist position.
+        int taskListPosition = -1;
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            if(mTaskLists.get(i).getTaskListName().equals(taskListName)) {
+                //Position found.
+                taskListPosition = i;
+                Log.i(TAG, "loadTaskInfoActivity: position of tasklist found.");
+            }
+        }
+        Log.i(TAG, "loadTaskInfoActivity: preparing intent.");
+        Intent intent = new Intent(this, TaskInfoActivity.class);
+        intent.putExtra(EXTRA_TASK, selectedTask);
+        intent.putExtra(EXTRA_TASKLISTPOSITION, taskListPosition);
+        intent.putExtra(EXTRA_TASKLISTS, mTaskLists);
+        startActivityForResult(intent, REQUEST_CODE_TASK_VIEWING);
+        Log.i(TAG, "loadTaskInfoActivity: activity started.");
+    }
 
     /**
      * Custom methods - FILE I/O
