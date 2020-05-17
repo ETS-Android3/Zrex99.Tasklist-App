@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/nuemorphic_container">
+
+    <TextView
+        android:id="@+id/tv_TaskTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/task_titlePlaceholder"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMargin"
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMargin" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_leftMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05109489" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_rightMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_topMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.019151846" />
+
+    <ImageButton
+        android:id="@+id/ib_Edit"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorPrimaryMain"
+        android:contentDescription='"Edit Button"'
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMargin"
+        app:srcCompat="@drawable/ic_action_edit" />
+
+    <ImageButton
+        android:id="@+id/ib_trash"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorPrimaryMain"
+        android:contentDescription='"Trash Button"'
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/guideline_leftMargin"
+        app:layout_constraintTop_toTopOf="@id/guideline_topMargin"
+        app:srcCompat="@drawable/ic_action_trash" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottomMargin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9822161" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_topMarginListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.10259918" />
+
+    <TextView
+        android:id="@+id/tv_TaskNotificationTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/task_notificationPlaceholder"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
+        app:layout_constraintTop_toBottomOf="@id/guideline_topMarginTextViews"/>
+
+    <TextView
+        android:id="@+id/tv_TaskDescription"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/task_descriptionPlaceholder"
+        android:textAlignment="viewStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginTextViews"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
+        app:layout_constraintTop_toBottomOf="@+id/tv_TaskNotificationTime" />
+
+    <EditText
+        android:id="@+id/et_TaskDescription"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/task_descriptionPlaceholder"
+        android:textAlignment="viewStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginTextViews"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
+        app:layout_constraintTop_toBottomOf="@+id/tv_TaskNotificationTime"
+        android:visibility="gone"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_topMarginTextViews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_rightMarginTextViews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_leftMarginTextViews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottomMarginTextViews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7" />
+
+    <Button
+        android:id="@+id/btn_NotificationTimeChange"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/nuemorph_button_ripple"
+        android:text="@string/task_NotificationButton"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottomMarginTextViews"
+        android:visibility="gone"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

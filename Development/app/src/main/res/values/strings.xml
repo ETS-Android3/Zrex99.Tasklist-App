@@ -14,6 +14,14 @@
 
     <string name="noData">No Tasklists found, please add your first tasklist.</string>
 
+    <string name="task_titlePlaceholder">Task Title</string>
+
+    <string name="task_notificationPlaceholder">Notify you at:</string>
+
+    <string name="task_descriptionPlaceholder">Task Description</string>
+
+    <string name="task_NotificationButton">Change notification time</string>
+
     <!--  Toast strings.  -->
     <string name="toast_Template">Blank</string>
 
