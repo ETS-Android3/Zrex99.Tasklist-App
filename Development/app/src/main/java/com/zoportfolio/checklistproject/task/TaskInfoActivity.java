@@ -18,7 +18,7 @@ import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
 
 import java.util.ArrayList;
 
-public class TaskInfoActivity extends AppCompatActivity {
+public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragment.TaskInfoFragmentListener {
 
     private static final String TAG = "TaskInfoActivity.TAG";
 
@@ -99,6 +99,21 @@ public class TaskInfoActivity extends AppCompatActivity {
      * Interface methods
      */
 
+    @Override
+    public void taskUpdated(UserTask updatedTask) {
+
+    }
+
+    @Override
+    public void editNotificationTime(String notificationTime) {
+
+    }
+
+    @Override
+    public void editTitle(String taskTitle) {
+
+    }
+
     /**
      * Custom methods
      */
@@ -145,5 +160,6 @@ public class TaskInfoActivity extends AppCompatActivity {
                 .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskOriginal), FRAGMENT_TASKINFO_TAG)
                 .commit();
     }
+
 
 }

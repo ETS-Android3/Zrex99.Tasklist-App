@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,11 +55,7 @@ public class TaskInfoFragment extends Fragment {
 
     private TaskInfoFragmentListener mListener;
     public interface TaskInfoFragmentListener {
-        //TODO: What callbacks are needed?
-        // Edit tapped?
-
         void taskUpdated(UserTask updatedTask); //Used to update the variable editedTask in the Activity.
-
         void editNotificationTime(String notificationTime);
         void editTitle(String taskTitle);
     }
@@ -130,8 +127,9 @@ public class TaskInfoFragment extends Fragment {
 
                         //TODO: For the rest of the editing I will do the following:
                         // Title = make title text view clickable and then show an alert for a new name.
-                        // Notification time = show the change notification time button and show an alert with time picker.
                         setUpNotificationEditing(mUserTask.getTaskNotificationTime());
+
+                        setUpTitleEditing();
 
                     }else {//The task info is in edit state.
                         //Set the fragment back to its natural state.
@@ -153,6 +151,17 @@ public class TaskInfoFragment extends Fragment {
     /**
      * Custom methods
      */
+
+    private void setUpTitleEditing() {
+        mTvTitle.setEnabled(true);
+        mTvTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Interface to the activity to display the title change alert.
+                mListener.editTitle(mUserTask.getTaskName());
+            }
+        });
+    }
 
     private void setUpDescriptionEditing() {
         //Hide the tv description and show the et description
@@ -180,13 +189,16 @@ public class TaskInfoFragment extends Fragment {
     }
 
     private void takeDownEditingState() {
-        String editiedDescription = mEtDescription.getText().toString();
+        String editedDescription = mEtDescription.getText().toString();
+        mUserTask.setTaskDescription(editedDescription);//Set the changed data to the UserTask.
         mEtDescription.setVisibility(View.GONE);
 
         mBtnChangeNotificationTime.setVisibility(View.GONE);
         mBtnChangeNotificationTime.setEnabled(false);
 
-        mTvDescription.setText(editiedDescription);
+        mTvTitle.setEnabled(false);
+
+        mTvDescription.setText(editedDescription);
         mTvDescription.setVisibility(View.VISIBLE);
     }
 
@@ -204,7 +216,9 @@ public class TaskInfoFragment extends Fragment {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if(count==250) {
                 Log.i(TAG, "onTextChanged: character limit hit");
-                //TODO: Need to test this, after testing, put a toast here to signify the character limit is hit.
+                //TODO: Need to test this
+                Toast toast = Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
 

@@ -111,6 +111,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="20sp"
         android:maxLength="250"
+        android:inputType="textNoSuggestions"
         app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginTextViews"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
