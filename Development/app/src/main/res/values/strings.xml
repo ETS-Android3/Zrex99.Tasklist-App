@@ -19,6 +19,7 @@
     <string name="task_notificationPlaceholder">Notify you at:</string>
 
     <string name="task_descriptionPlaceholder">Task Description</string>
+    <string name="task_descriptionNoData">No description.</string>
 
     <string name="task_NotificationButton">Change notification time</string>
 

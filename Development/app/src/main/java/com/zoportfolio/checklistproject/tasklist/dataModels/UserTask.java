@@ -88,6 +88,16 @@ public class UserTask implements Serializable {
     public String getTaskNotificationTime() {
         return mTaskNotificationTime;
     }
+    public String getTaskNotificationTimeAsReadable() {
+        String notificationTimeFormatted = getTaskNotificationTime();
+        String[] notificationTimeSplit = notificationTimeFormatted.split("/");
+
+        String hour = notificationTimeSplit[0];
+        String minute = notificationTimeSplit[1];
+        String meridies = notificationTimeSplit[2];
+
+        return  hour + ":" + minute + " " + meridies;
+    }
     public void setTaskNotificationTime(String taskNotificationTime) {
         mTaskNotificationTime = taskNotificationTime;
     }

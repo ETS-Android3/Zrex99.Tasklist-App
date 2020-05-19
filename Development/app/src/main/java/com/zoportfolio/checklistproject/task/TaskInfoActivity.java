@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zoportfolio.checklistproject.MainActivity;
 import com.zoportfolio.checklistproject.R;
+import com.zoportfolio.checklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
 
@@ -19,6 +21,8 @@ import java.util.ArrayList;
 public class TaskInfoActivity extends AppCompatActivity {
 
     private static final String TAG = "TaskInfoActivity.TAG";
+
+    private static final String FRAGMENT_TASKINFO_TAG = "FRAGMENT_TASKINFO";
 
     //TODO: Need to change the position of the backbutton in the xml slightly.
     // Trying to acheive a more user friendly and less cluttered look.
@@ -88,6 +92,7 @@ public class TaskInfoActivity extends AppCompatActivity {
         });
 
         //Once all the data is gotten, load the taskInfoFragment.
+        loadTaskInfoFragment();
     }
 
     /**
@@ -133,7 +138,12 @@ public class TaskInfoActivity extends AppCompatActivity {
     }
 
     private void loadTaskInfoFragment() {
+        FrameLayout frameLayout = findViewById(R.id.fragment_Container_Task);
+        frameLayout.setVisibility(View.VISIBLE);
 
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskOriginal), FRAGMENT_TASKINFO_TAG)
+                .commit();
     }
 
 }
