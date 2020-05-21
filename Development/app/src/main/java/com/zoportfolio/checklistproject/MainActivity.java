@@ -403,11 +403,16 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 Log.i(TAG, "loadTaskInfoActivity: position of tasklist found.");
             }
         }
+
+        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
+
         Log.i(TAG, "loadTaskInfoActivity: preparing intent.");
         Intent intent = new Intent(this, TaskInfoActivity.class);
         intent.putExtra(EXTRA_TASK, selectedTask);
         intent.putExtra(EXTRA_TASKLISTPOSITION, taskListPosition);
-        intent.putExtra(EXTRA_TASKLISTS, mTaskLists);
+
+        intent.putExtra(EXTRA_TASKLISTS, taskListsJSON);
+
         startActivityForResult(intent, REQUEST_CODE_TASK_VIEWING);
         Log.i(TAG, "loadTaskInfoActivity: activity started.");
     }

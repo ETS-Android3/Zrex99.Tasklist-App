@@ -12,17 +12,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.zoportfolio.checklistproject.MainActivity;
 import com.zoportfolio.checklistproject.R;
+import com.zoportfolio.checklistproject.alerts.EditTaskTitleAlertFragment;
 import com.zoportfolio.checklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
 
 import java.util.ArrayList;
 
-public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragment.TaskInfoFragmentListener {
+public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragment.TaskInfoFragmentListener, EditTaskTitleAlertFragment.EditTaskTitleAlertFragmentListener {
 
     private static final String TAG = "TaskInfoActivity.TAG";
 
     private static final String FRAGMENT_TASKINFO_TAG = "FRAGMENT_TASKINFO";
+    private static final String FRAGMENT_EDIT_TASK_TITLE_TAG = "FRAGMENT_EDIT_TASK_TITLE";
+    private static final String FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG = "FRAGMENT_EDIT_TASK_TITLE";
 
     //TODO: Need to change the position of the backbutton in the xml slightly.
     // Trying to acheive a more user friendly and less cluttered look.
@@ -32,6 +35,8 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private UserTask mTaskEdited;
     private int mTaskListPosition;
     private ArrayList<UserTaskList> mTaskLists;
+
+    private boolean mEdited = false;
 
     /**
      * Lifecycle methods
@@ -111,7 +116,26 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void editTitle(String taskTitle) {
+        loadEditTaskTitleAlertFragment(taskTitle);
+    }
 
+    //Edit Title Alert Interface
+
+    @Override
+    public void cancelTappedEditTitle() {
+        // TODO: Need to close and get rid of the alert fragment.
+    }
+
+    @Override
+    public void saveTappedEditTitle(String taskNameEdited) {
+        if(!mEdited) {
+            mEdited = true;
+            //TODO: Need to save and get rid of the alert fragment.
+        }else {
+            //Not sure why i am checking, will look for reasons in the morning.
+            //TODO: Need to save and get rid of the alert fragment.
+        }
+        
     }
 
     /**
@@ -158,6 +182,25 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskOriginal), FRAGMENT_TASKINFO_TAG)
+                .commit();
+    }
+
+    private void loadEditTaskTitleAlertFragment(String _taskName) {
+        //TODO: Need to add the fragment container for this fragment and the other edit fragment.
+        ArrayList<String> taskNames = new ArrayList<>();
+        //Check that mTaskLists is available and instantiated.
+        if(mTaskLists != null && !mTaskLists.isEmpty()) {
+            for (int i = 0; i < mTaskLists.get(mTaskListPosition).getTasks().size(); i++) {
+                taskNames.add(mTaskLists.get(mTaskListPosition).getTasks().get(i).getTaskName());
+                Log.i(TAG, "loadEditTaskTitleAlertFragment: TaskNames Array: " + taskNames.get(i).toString());
+            }
+        }
+
+        FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskTitle);
+        frameLayout.setVisibility(View.VISIBLE);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_Container_AlertEditTaskTitle, EditTaskTitleAlertFragment.newInstance(taskNames, mTaskLists.get(mTaskListPosition).getTaskListName(), _taskName), FRAGMENT_EDIT_TASK_TITLE_TAG)
                 .commit();
     }
 

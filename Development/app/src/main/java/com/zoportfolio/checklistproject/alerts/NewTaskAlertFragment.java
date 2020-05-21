@@ -63,7 +63,6 @@ public class NewTaskAlertFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         View view = getLayoutInflater().inflate(R.layout.fragment_layout_alert_task, container, false);
         mEtNameField = view.findViewById(R.id.et_NewTaskListName);
         mTpNotificationTime = view.findViewById(R.id.tp_NotificationTime);

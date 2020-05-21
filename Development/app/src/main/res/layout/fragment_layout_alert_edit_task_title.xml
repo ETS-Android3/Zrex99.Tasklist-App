@@ -119,7 +119,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_topMarginEditText" />
 
     <EditText
-        android:id="@+id/et_NewTaskListName"
+        android:id="@+id/et_NewTaskName"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:enabled="true"
