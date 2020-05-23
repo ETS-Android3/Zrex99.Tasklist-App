@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.zoportfolio.checklistproject.MainActivity;
 import com.zoportfolio.checklistproject.R;
@@ -37,6 +38,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private ArrayList<UserTaskList> mTaskLists;
 
     private boolean mEdited = false;
+    private boolean mIsAlertUp = false;//TODO: NOTE: Since i have this variable i can use this as a way to disable buttons or views while the alert is up. Just check against this bool.
 
     /**
      * Lifecycle methods
@@ -54,7 +56,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         //Need to grab the data from the intent.
         Intent intent = getIntent();
         mTaskOriginal = (UserTask) intent.getSerializableExtra(MainActivity.EXTRA_TASK);
-        mTaskEdited = mTaskOriginal;
+        mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
         mTaskListPosition = intent.getIntExtra(MainActivity.EXTRA_TASKLISTPOSITION, -1);
 
         ArrayList<String> taskListJSONList = new ArrayList<>();
@@ -106,7 +108,16 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void taskUpdated(UserTask updatedTask) {
+        if(!mEdited) {
+            mEdited = true;//If this was the first edit of the task, then set the edited bool to true.
+        }
+        mTaskEdited.setTaskName(updatedTask.getTaskName());
+        mTaskEdited.setTaskDescription(updatedTask.getTaskDescription());
+        mTaskEdited.setTaskNotificationTime(updatedTask.getTaskNotificationTime());
 
+        //May not need to reload the task info fragment in this . Will need to see.
+        //loadTaskInfoFragment();
+        //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
     }
 
     @Override
@@ -119,28 +130,55 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         loadEditTaskTitleAlertFragment(taskTitle);
     }
 
-    //Edit Title Alert Interface
+    //--- Edit Title Alert Interface ---
 
     @Override
     public void cancelTappedEditTitle() {
         // TODO: Need to close and get rid of the alert fragment.
+        Log.i(TAG, "cancelTappedEditTitle: closing alert");
+        closeEditTaskTitleAlertFragment();
     }
 
     @Override
     public void saveTappedEditTitle(String taskNameEdited) {
         if(!mEdited) {
-            mEdited = true;
-            //TODO: Need to save and get rid of the alert fragment.
+            mEdited = true;//If this was the first edit of the task, then set the edited bool to true.
+            mTaskEdited.setTaskName(taskNameEdited);
+            if(!mTaskEdited.getTaskName().equals(mTaskOriginal.getTaskName())) {
+                Log.i(TAG, "saveTappedEditTitle: Task name has been edited and is different.");
+            }
+            closeEditTaskTitleAlertFragment();
+            loadTaskInfoFragment();
         }else {
             //Not sure why i am checking, will look for reasons in the morning.
             //TODO: Need to save and get rid of the alert fragment.
+            mTaskEdited.setTaskName(taskNameEdited);
+            if(!mTaskEdited.getTaskName().equals(mTaskOriginal.getTaskName())) {
+                Log.i(TAG, "saveTappedEditTitle: Task name has been edited and is different.");
+            }
+            closeEditTaskTitleAlertFragment();
+            loadTaskInfoFragment();
         }
-        
+        //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
     }
 
     /**
      * Custom methods
      */
+
+    private UserTask createNewUserTaskForEditing(UserTask _userTaskOriginal) {
+        if(_userTaskOriginal.getTaskDescription() != null) {//Create new task with description.
+            return new UserTask(_userTaskOriginal.getTaskName(),
+                    _userTaskOriginal.getTaskNotificationTime(),
+                    _userTaskOriginal.getTaskDescription(),
+                    _userTaskOriginal.getTaskChecked());
+        }else {//Create new task without description.
+            return new UserTask(_userTaskOriginal.getTaskName(),
+                    _userTaskOriginal.getTaskNotificationTime(),
+                    _userTaskOriginal.getTaskChecked());
+        }
+    }
+
 
     //TODO: Would be good to turn this into a static method on UserTaskList class.
     private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> taskListJSONList) {
@@ -176,13 +214,26 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     }
 
+    /**
+     * Custom methods - Loading and Closing Fragments.
+     */
+
     private void loadTaskInfoFragment() {
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_Task);
         frameLayout.setVisibility(View.VISIBLE);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskOriginal), FRAGMENT_TASKINFO_TAG)
-                .commit();
+
+        if(mEdited) {//This is a good spot to use the edited bool, and load the fragment with the right instance of the task object.
+            Log.i(TAG, "loadTaskInfoFragment: Loading with edited task");
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskEdited), FRAGMENT_TASKINFO_TAG)
+                    .commit();
+        }else {
+            Log.i(TAG, "loadTaskInfoFragment: Loading with original task");
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskOriginal), FRAGMENT_TASKINFO_TAG)
+                    .commit();
+        }
     }
 
     private void loadEditTaskTitleAlertFragment(String _taskName) {
@@ -202,6 +253,27 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_Container_AlertEditTaskTitle, EditTaskTitleAlertFragment.newInstance(taskNames, mTaskLists.get(mTaskListPosition).getTaskListName(), _taskName), FRAGMENT_EDIT_TASK_TITLE_TAG)
                 .commit();
+
+        mIsAlertUp = true;
+    }
+
+    private void closeEditTaskTitleAlertFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_EDIT_TASK_TITLE_TAG);
+        if(fragment != null) {
+            //Hide the frame layout
+            FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskTitle);
+            frameLayout.setVisibility(View.GONE);
+
+            //Remove the fragment
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragment)
+                    .commit();
+
+            //Notify the alertUp variable.
+            mIsAlertUp = false;
+        }
+
+
     }
 
 

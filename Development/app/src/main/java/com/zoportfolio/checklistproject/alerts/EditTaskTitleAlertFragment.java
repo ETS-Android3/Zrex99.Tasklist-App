@@ -26,8 +26,7 @@ public class EditTaskTitleAlertFragment extends Fragment {
     private static final String ARG_TASKNAMETOEDIT = "taskNameToEdit";
     private static final String ARG_TASKLISTNAME = "taskListName";//Don't think i need this variable or arg in this fragment.
 
-    //TODO: fill out the functionality in here WORKING HERE.
-    // Test this class out.
+    //TODO: ALl that needs to be done here is just layout fixes and instanced state saves.
 
     private TextView mTvPrompt;
     private EditText mEtNameField;
