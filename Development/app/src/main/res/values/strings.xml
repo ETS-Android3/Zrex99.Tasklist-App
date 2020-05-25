@@ -10,6 +10,7 @@
 
     <string name="alert_newTaskTitleEdit">Enter new task name</string>
     <string name="alert_newTaskNotificationTimeEdit">Enter new task notification time</string>
+    <string name="alert_TaskNotificationTimeEdited">New notification time:</string>
 
     <!-- Tasklist fragment strings-->
     <string name="taskList_titlePlaceholder">No Tasklists Found.</string>

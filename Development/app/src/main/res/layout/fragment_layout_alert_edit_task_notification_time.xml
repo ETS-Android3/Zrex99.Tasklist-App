@@ -40,9 +40,23 @@
         android:text="@string/alert_newTaskNotificationTimeEdit"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
-        app:layout_constraintStart_toStartOf="@+id/guideline_leftMargin"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginEditText"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
+
+    <TextView
+        android:id="@+id/tv_AlertNewNotificationTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/alert_TaskNotificationTimeEdited"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline_topMarginTimePicker"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginEditText"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
+        app:layout_constraintTop_toBottomOf="@+id/tv_AlertTitleText" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_leftMargin"

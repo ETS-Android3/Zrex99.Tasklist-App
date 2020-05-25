@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.zoportfolio.checklistproject.MainActivity;
 import com.zoportfolio.checklistproject.R;
+import com.zoportfolio.checklistproject.alerts.EditTaskNotificationTimeAlertFragment;
 import com.zoportfolio.checklistproject.alerts.EditTaskTitleAlertFragment;
 import com.zoportfolio.checklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
@@ -122,7 +123,8 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void editNotificationTime(String notificationTime) {
-
+        Log.i(TAG, "editNotificationTime: Notification time: " + notificationTime);
+        //TODO: Test here and then working in the notificationtime fragment.
     }
 
     @Override
@@ -237,7 +239,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     }
 
     private void loadEditTaskTitleAlertFragment(String _taskName) {
-        //TODO: Need to add the fragment container for this fragment and the other edit fragment.
         ArrayList<String> taskNames = new ArrayList<>();
         //Check that mTaskLists is available and instantiated.
         if(mTaskLists != null && !mTaskLists.isEmpty()) {
@@ -272,8 +273,34 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             //Notify the alertUp variable.
             mIsAlertUp = false;
         }
+    }
 
+    private void loadEditTaskNotificationTimeAlertFragment(String _taskNotificationTime) {
+        FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskNotificationTime);
+        frameLayout.setVisibility(View.GONE);
 
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_Container_AlertEditTaskNotificationTime, EditTaskNotificationTimeAlertFragment.newInstance(_taskNotificationTime), FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG)
+                .commit();
+
+        mIsAlertUp = true;
+    }
+
+    private void closeEditTaskNotificationTimeAlertFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG);
+        if(fragment != null) {
+            //Hide the frame layout
+            FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskNotificationTime);
+            frameLayout.setVisibility(View.GONE);
+
+            //Remove the fragment
+            getSupportFragmentManager().beginTransaction()
+                    .remove(fragment)
+                    .commit();
+
+            //Notify the alertUp variable.
+            mIsAlertUp = false;
+        }
     }
 
 
