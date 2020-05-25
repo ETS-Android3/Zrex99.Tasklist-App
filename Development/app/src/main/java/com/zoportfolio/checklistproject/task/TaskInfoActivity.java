@@ -18,6 +18,7 @@ import com.zoportfolio.checklistproject.alerts.EditTaskTitleAlertFragment;
 import com.zoportfolio.checklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
+import com.zoportfolio.checklistproject.utility.TimeConversionUtility;
 
 import java.util.ArrayList;
 
@@ -123,7 +124,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void editNotificationTime(String notificationTime) {
-        Log.i(TAG, "editNotificationTime: Notification time: " + notificationTime);
         //TODO: Test here and then working in the notificationtime fragment.
     }
 

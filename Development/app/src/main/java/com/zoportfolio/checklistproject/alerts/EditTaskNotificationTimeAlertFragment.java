@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.zoportfolio.checklistproject.R;
+import com.zoportfolio.checklistproject.utility.TimeConversionUtility;
 
 public class EditTaskNotificationTimeAlertFragment extends Fragment {
 
@@ -79,9 +80,9 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
             String minute = notificationTimeSplit[1];
             String meridies = notificationTimeSplit[2];
 
+            int convertedHour = TimeConversionUtility.convertStandardHourFormatToMilitaryHourFormat(hour, meridies);
 
-
-            mTpNotificationTime.setHour();
+            mTpNotificationTime.setHour(convertedHour);
             mTpNotificationTime.setMinute(Integer.parseInt(minute));
 
         }
