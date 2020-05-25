@@ -118,6 +118,10 @@ public class UserTask implements Serializable {
         return hour + "/" + minute + "/" + meridies;
     }
 
+    public static String formatNotificationTimeAsReadable(String hour, String minute, String meridies) {
+        return  hour + ":" + minute + " " + meridies;
+    }
+
 
     public String toJSONString() {
         JSONObject object = new JSONObject();

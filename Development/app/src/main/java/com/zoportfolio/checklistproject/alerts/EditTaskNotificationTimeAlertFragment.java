@@ -2,6 +2,7 @@ package com.zoportfolio.checklistproject.alerts;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.zoportfolio.checklistproject.R;
+import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.checklistproject.utility.TimeConversionUtility;
 
 public class EditTaskNotificationTimeAlertFragment extends Fragment {
@@ -28,6 +30,8 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
     private TimePicker mTpNotificationTime;
     private TextView mTvConfirmAction;
     private TextView mTvCancelAction;
+
+    private String mNotificationTime;
 
     public static EditTaskNotificationTimeAlertFragment newInstance(String _notificationTimeEdit) {
 
@@ -75,7 +79,6 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
             //TODO: Set the time to the timepicker, so it opens at the time that was already set.
 
             String[] notificationTimeSplit = notificationTimeToEdit.split("/");
-
             String hour = notificationTimeSplit[0];
             String minute = notificationTimeSplit[1];
             String meridies = notificationTimeSplit[2];
@@ -85,7 +88,28 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
             mTpNotificationTime.setHour(convertedHour);
             mTpNotificationTime.setMinute(Integer.parseInt(minute));
 
+            mTpNotificationTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+                @Override
+                public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+                    String meridies;
+                    if(hourOfDay < 12) {
+                        meridies = "AM";
+                    } else {
+                        meridies = "PM";
+                    }
+
+                    Log.i(TAG, "onTimeChanged: Hour: " + hourOfDay + " Minute: " + minute + " Meridies: " + meridies);
+                    mNotificationTime = UserTask.formatNotificationTime(hourOfDay, minute, meridies);
+
+                    //This will update the text view, as the user is changing the time.
+                    //TODO: Test tomorrow.
+                    String tvString = getResources().getString(R.string.alert_TaskNotificationTimeEdited) + UserTask.formatNotificationTimeAsReadable(String.valueOf(hourOfDay), String.valueOf(minute), meridies);
+                    mTvNotificationTimeEdited.setText(tvString);
+                }
+            });
         }
+
+
 
         mTvCancelAction.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +121,7 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
         mTvConfirmAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //TODO: Need to fill this out tomorrow as well.
             }
         });
     }

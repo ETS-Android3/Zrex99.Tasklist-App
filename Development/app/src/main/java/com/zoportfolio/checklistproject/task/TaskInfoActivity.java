@@ -22,7 +22,9 @@ import com.zoportfolio.checklistproject.utility.TimeConversionUtility;
 
 import java.util.ArrayList;
 
-public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragment.TaskInfoFragmentListener, EditTaskTitleAlertFragment.EditTaskTitleAlertFragmentListener {
+public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragment.TaskInfoFragmentListener,
+        EditTaskTitleAlertFragment.EditTaskTitleAlertFragmentListener,
+        EditTaskNotificationTimeAlertFragment.EditTaskNotificationTimeAlertFragmentListener {
 
     private static final String TAG = "TaskInfoActivity.TAG";
 
@@ -124,7 +126,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void editNotificationTime(String notificationTime) {
-        //TODO: Test here and then working in the notificationtime fragment.
+        loadEditTaskNotificationTimeAlertFragment(notificationTime);
     }
 
     @Override
@@ -162,6 +164,20 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             loadTaskInfoFragment();
         }
         //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
+    }
+
+    //--- Edit Notification Time Alert Interface ---
+
+    @Override
+    public void cancelTappedEditNotificationTime() {
+        closeEditTaskNotificationTimeAlertFragment();
+    }
+
+    @Override
+    public void saveTappedEditNotificationTime(String taskNotificationTimeEdited) {
+        //TODO: will need to copy parts from the saveTappedEditTitle method,
+        // tomorrow when I come back to work on this.
+        Log.i(TAG, "saveTappedEditNotificationTime: new notification time: " + taskNotificationTimeEdited);
     }
 
     /**
@@ -277,7 +293,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     private void loadEditTaskNotificationTimeAlertFragment(String _taskNotificationTime) {
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskNotificationTime);
-        frameLayout.setVisibility(View.GONE);
+        frameLayout.setVisibility(View.VISIBLE);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_Container_AlertEditTaskNotificationTime, EditTaskNotificationTimeAlertFragment.newInstance(_taskNotificationTime), FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG)
@@ -302,6 +318,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             mIsAlertUp = false;
         }
     }
+
 
 
 }
