@@ -1,2 +1,2 @@
-# Checklist-App
-Repo for a simple Checklist app
+# Tasklist-App
+Repo for a simple Tasklist app
