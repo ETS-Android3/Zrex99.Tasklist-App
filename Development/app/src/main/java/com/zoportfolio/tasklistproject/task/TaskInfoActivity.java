@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.task;
+package com.zoportfolio.tasklistproject.task;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,14 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.zoportfolio.checklistproject.MainActivity;
-import com.zoportfolio.checklistproject.R;
-import com.zoportfolio.checklistproject.alerts.EditTaskNotificationTimeAlertFragment;
-import com.zoportfolio.checklistproject.alerts.EditTaskTitleAlertFragment;
-import com.zoportfolio.checklistproject.task.fragments.TaskInfoFragment;
-import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
-import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
-import com.zoportfolio.checklistproject.utility.TimeConversionUtility;
+import com.zoportfolio.tasklistproject.MainActivity;
+import com.zoportfolio.tasklistproject.R;
+import com.zoportfolio.tasklistproject.alerts.EditTaskNotificationTimeAlertFragment;
+import com.zoportfolio.tasklistproject.alerts.EditTaskTitleAlertFragment;
+import com.zoportfolio.tasklistproject.task.fragments.TaskInfoFragment;
+import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
+import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.tasklist.dataModels;
+package com.zoportfolio.tasklistproject.tasklist.dataModels;
 
 import android.util.Log;
 

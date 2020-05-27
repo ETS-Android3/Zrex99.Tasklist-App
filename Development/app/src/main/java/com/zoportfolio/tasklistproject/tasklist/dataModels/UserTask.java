@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.tasklist.dataModels;
+package com.zoportfolio.tasklistproject.tasklist.dataModels;
 
 import android.util.Log;
 
@@ -119,6 +119,8 @@ public class UserTask implements Serializable {
     }
 
     public static String formatNotificationTimeAsReadable(String hour, String minute, String meridies) {
+
+
         return  hour + ":" + minute + " " + meridies;
     }
 

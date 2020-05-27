@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.tasklist.adapters;
+package com.zoportfolio.tasklistproject.tasklist.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,8 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.zoportfolio.checklistproject.R;
-import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
+import com.zoportfolio.tasklistproject.R;
+import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 
 import java.util.ArrayList;
 

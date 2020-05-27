@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.utility;
+package com.zoportfolio.tasklistproject.utility;
 
 import android.util.Log;
 
@@ -17,7 +17,20 @@ public class TimeConversionUtility {
         }else {//If the meridies is PM, add 12 to the hour.
             convertedHour = 12 + Integer.parseInt(_hour);
         }
-        Log.i(TAG, "convertStandardHourFormatToMilitaryHourFormat: converted hour: " + convertedHour);
         return convertedHour;
     }
+
+    //I may need to return the meridies with this, not sure yet, need to test.
+    public static int convertMilitaryHourFormatToStandardHourFormat(String _hour, String _meridies) {
+        int convertedHour = 0;
+        if(_hour.equals("24")) {//If the hour is 24, then set the converted hour to 12 AM.
+            convertedHour = 12;
+        }else if(Integer.parseInt(_hour) > 12 && Integer.parseInt(_hour) < 24) {//If the hour is greater than 12 but less than 24, minus 12 from the hour.
+            convertedHour = Integer.parseInt(_hour) - 12;
+        }else if(Integer.parseInt(_hour) <= 12 ) {//Nothing needs to be done here.
+            convertedHour = Integer.parseInt(_hour);
+        }
+        return convertedHour;
+    }
+
 }

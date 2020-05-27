@@ -1,6 +1,6 @@
-package com.zoportfolio.checklistproject;
+package com.zoportfolio.tasklistproject;
 
-import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
+import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 
 import org.junit.Test;
 

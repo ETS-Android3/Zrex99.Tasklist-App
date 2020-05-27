@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject;
+package com.zoportfolio.tasklistproject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,14 +19,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.zoportfolio.checklistproject.alerts.NewTaskAlertFragment;
-import com.zoportfolio.checklistproject.alerts.NewTaskListAlertFragment;
-import com.zoportfolio.checklistproject.task.TaskInfoActivity;
-import com.zoportfolio.checklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
-import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
-import com.zoportfolio.checklistproject.tasklist.dataModels.UserTaskList;
-import com.zoportfolio.checklistproject.tasklist.fragments.TaskListFragment;
-import com.zoportfolio.checklistproject.utility.FileUtility;
+import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
+import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
+import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
+import com.zoportfolio.tasklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
+import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
+import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
+import com.zoportfolio.tasklistproject.tasklist.fragments.TaskListFragment;
+import com.zoportfolio.tasklistproject.utility.FileUtility;
 
 import java.util.ArrayList;
 
@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         //Check for action bar and hide it if it is up.
         if(getSupportActionBar() != null) {
             getSupportActionBar().hide();

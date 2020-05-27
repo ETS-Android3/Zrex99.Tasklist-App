@@ -1,4 +1,4 @@
-package com.zoportfolio.checklistproject.alerts;
+package com.zoportfolio.tasklistproject.alerts;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,8 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.zoportfolio.checklistproject.R;
-import com.zoportfolio.checklistproject.tasklist.dataModels.UserTask;
+import com.zoportfolio.tasklistproject.R;
+import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 
 import java.util.ArrayList;
 
