@@ -167,6 +167,14 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //TODO: Handle the changed task data and save the updated tasklists.
+        if(requestCode == REQUEST_CODE_TASK_VIEWING) {
+            if(resultCode == RESULT_CODE_TASK_UNCHANGED) {
+                //Do nothing as the task was not changed.
+            }else if(resultCode == RESULT_CODE_TASK_CHANGED) {
+                //TODO: If the data was changed, reload the tasklists from storage.
+                loadTasklistsFromStorage();
+            }
+        }
     }
 
     /**

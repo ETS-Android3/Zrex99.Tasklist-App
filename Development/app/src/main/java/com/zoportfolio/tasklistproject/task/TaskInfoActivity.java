@@ -100,6 +100,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                     //Set the result intent so that the main activity can handle the changed data.
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra(MainActivity.EXTRA_TASKLISTS, mTaskLists);
+                    resultIntent.putExtra(MainActivity.EXTRA_TASKLISTPOSITION, mTaskListPosition);
                     setResult(MainActivity.RESULT_CODE_TASK_CHANGED, resultIntent);
                     finish();
                     //TODO: When returning to the main activity I will compare the returned task to the tasklist there and make sure there is a difference,
