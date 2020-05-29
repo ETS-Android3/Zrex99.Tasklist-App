@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
+import com.zoportfolio.tasklistproject.contracts.FileContracts;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
 import com.zoportfolio.tasklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
@@ -38,10 +39,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     private static final String FRAGMENT_ALERT_NEWTASKLIST_TAG = "FRAGMENT_ALERT_NEWTASKLIST";
     private static final String FRAGMENT_TASKLIST_TAG = "FRAGMENT_TASKLIST";
-
-    //I think I need to .gitignore this or hide this, not sure.
-    public static final String FILE_TASKLIST_FOLDER = "TasklistFolder";
-    public static final String FILE_TASKLIST_NAME = "TasklistChecklist";
 
     public static final String KEY_TASKLISTS = "KEY_TASKLISTS";
 
@@ -453,12 +450,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         ArrayList<String> taskListsJSON = convertTasklistsForSaving();
 
         //Once all tasklists have been added to the string array, save them to storage.
-        FileUtility.saveToProtectedStorage(this, FILE_TASKLIST_NAME, FILE_TASKLIST_FOLDER, taskListsJSON);
+        FileUtility.saveToProtectedStorage(this, FileContracts.FILE_TASKLIST_NAME, FileContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
     }
 
     private boolean checkForTasklistsInStorage() {
         //If this returns 0, that means there are no files
-        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, FILE_TASKLIST_FOLDER);
+        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, FileContracts.FILE_TASKLIST_FOLDER);
         return fileCount > 0;
     }
 
@@ -474,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
 
         ArrayList<String> taskListJSONList = new ArrayList<>();
-        Object obj = FileUtility.retrieveFromStorage(this, FILE_TASKLIST_NAME);
+        Object obj = FileUtility.retrieveFromStorage(this, FileContracts.FILE_TASKLIST_NAME);
         if(obj instanceof ArrayList<?>) {
             ArrayList<?> arrayList = (ArrayList<?>) obj;
             if(arrayList.size() > 0) {
@@ -493,8 +490,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         if(!mTaskLists.isEmpty()) {
             loadTaskListFragment(mTaskLists.get(0));
         }
-
-
     }
 
     private void loadOnFreshAppOpen() {

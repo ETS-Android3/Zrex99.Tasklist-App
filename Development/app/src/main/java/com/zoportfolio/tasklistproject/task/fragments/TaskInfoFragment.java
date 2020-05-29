@@ -88,8 +88,6 @@ public class TaskInfoFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //TODO: Return here, filling out the fragment functionality and linking it up.
-
         mUserTask = (UserTask) (getArguments() != null ? getArguments().getSerializable(ARG_USERTASK) : null);
         if(mUserTask != null) {
             Log.i(TAG, "onActivityCreated: Task valid: " + mUserTask.getTaskName());
@@ -98,6 +96,7 @@ public class TaskInfoFragment extends Fragment {
             Log.i(TAG, "onActivityCreated: title set.");
 
             String notificationTime = mTvNotificationTime.getText().toString() + " " + mUserTask.getTaskNotificationTimeAsReadable();
+            //TODO: I need to make sure that the notification time is in standard format when setting it to the text view.
             mTvNotificationTime.setText(notificationTime);
             Log.i(TAG, "onActivityCreated: notification time set.");
 
@@ -119,13 +118,9 @@ public class TaskInfoFragment extends Fragment {
                         mEditing = true;
                         //Load the editing adapter.
 
-                        //TODO: Going to set up editing for the description first.
-                        // Need to save the description after the user has entered it.
-                        // I think the description will save when the user exits the editing state.
+                        //All of the editing is done and handled now.
                         setUpDescriptionEditing();
 
-                        //TODO: For the rest of the editing I will do the following:
-                        // Title = make title text view clickable and then show an alert for a new name.
                         setUpNotificationEditing(mUserTask.getTaskNotificationTime());
 
                         setUpTitleEditing();

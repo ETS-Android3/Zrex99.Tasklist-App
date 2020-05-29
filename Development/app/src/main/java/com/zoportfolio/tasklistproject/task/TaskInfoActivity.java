@@ -15,9 +15,11 @@ import com.zoportfolio.tasklistproject.MainActivity;
 import com.zoportfolio.tasklistproject.R;
 import com.zoportfolio.tasklistproject.alerts.EditTaskNotificationTimeAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.EditTaskTitleAlertFragment;
+import com.zoportfolio.tasklistproject.contracts.FileContracts;
 import com.zoportfolio.tasklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
+import com.zoportfolio.tasklistproject.utility.FileUtility;
 
 import java.util.ArrayList;
 
@@ -33,6 +35,9 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     //TODO: Need to change the position of the backbutton in the xml slightly.
     // Trying to acheive a more user friendly and less cluttered look.
+
+    //TODO: NOTE: The saving works on the edited tasks, still need to communicate with the main activity though,
+    // Will need to test this exstensively.
 
     //These two vars will keep track of the user data.
     private UserTask mTaskOriginal;
@@ -97,6 +102,8 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                     resultIntent.putExtra(MainActivity.EXTRA_TASKLISTS, mTaskLists);
                     setResult(MainActivity.RESULT_CODE_TASK_CHANGED, resultIntent);
                     finish();
+                    //TODO: When returning to the main activity I will compare the returned task to the tasklist there and make sure there is a difference,
+                    // then load the tasklists from storage.
                 }
             }
         });
@@ -121,6 +128,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         //May not need to reload the task info fragment in this . Will need to see.
         //loadTaskInfoFragment();
         //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
+        updateTaskLists();
     }
 
     @Override
@@ -154,7 +162,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             loadTaskInfoFragment();
         }else {
             //Not sure why i am checking, will look for reasons in the morning.
-            //TODO: Need to save and get rid of the alert fragment.
             mTaskEdited.setTaskName(taskNameEdited);
             if(!mTaskEdited.getTaskName().equals(mTaskOriginal.getTaskName())) {
                 Log.i(TAG, "saveTappedEditTitle: Task name has been edited and is different.");
@@ -162,7 +169,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             closeEditTaskTitleAlertFragment();
             loadTaskInfoFragment();
         }
-        //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
+        updateTaskLists();
     }
 
     //--- Edit Notification Time Alert Interface ---
@@ -174,9 +181,23 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void saveTappedEditNotificationTime(String taskNotificationTimeEdited) {
-        //TODO: will need to copy parts from the saveTappedEditTitle method,
-        // tomorrow when I come back to work on this.
-        Log.i(TAG, "saveTappedEditNotificationTime: new notification time: " + taskNotificationTimeEdited);
+        if(!mEdited) {
+            mEdited = true;//If this was the first edit of the task, then set the edited bool to true.
+            mTaskEdited.setTaskNotificationTime(taskNotificationTimeEdited);
+            if(!mTaskEdited.getTaskNotificationTime().equals(mTaskOriginal.getTaskName())) {
+                Log.i(TAG, "saveTappedEditNotificationTime: Task notification time has been edited and is different.");
+            }
+            closeEditTaskNotificationTimeAlertFragment();
+            loadTaskInfoFragment();
+        }else {
+            mTaskEdited.setTaskNotificationTime(taskNotificationTimeEdited);
+            if(!mTaskEdited.getTaskNotificationTime().equals(mTaskOriginal.getTaskName())) {
+                Log.i(TAG, "saveTappedEditNotificationTime: Task notification time has been edited and is different.");
+            }
+            closeEditTaskNotificationTimeAlertFragment();
+            loadTaskInfoFragment();
+        }
+        updateTaskLists();
     }
 
     /**
@@ -196,28 +217,12 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         }
     }
 
-
-    //TODO: Would be good to turn this into a static method on UserTaskList class.
-    private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> taskListJSONList) {
-        ArrayList<UserTaskList> taskLists = new ArrayList<>();
-        if(!taskListJSONList.isEmpty()) {
-            for (int i = 0; i < taskListJSONList.size(); i++) {
-                String taskListJSONString = taskListJSONList.get(i);
-                UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
-                if(userTaskList != null) {
-                    taskLists.add(userTaskList);
-                }
-            }
-        }
-        return taskLists;
-    }
-
     private void updateTaskLists() {
 
         int updatedTaskPosition = -1;
         UserTaskList taskList = mTaskLists.get(mTaskListPosition);
         for (int i = 0; i < taskList.getTasks().size(); i++) {
-            if(taskList.getTasks().get(i).equals(mTaskOriginal)) {
+            if(taskList.getTasks().get(i).getTaskName().equals(mTaskOriginal.getTaskName())) {
                 Log.i(TAG, "updateTaskLists: found the position of the task to change.");
                 //Found the position of the task to change.
                 updatedTaskPosition = i;
@@ -229,6 +234,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             taskList.getTasks().set(updatedTaskPosition, mTaskEdited);
         }
 
+        saveTasklistsToStorage();
     }
 
     /**
@@ -318,6 +324,52 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         }
     }
 
+    /**
+     * Custom methods - FILE I/O
+     */
+
+    //TODO: Convert these methods into a utility class for saving and loading.
+
+    private ArrayList<String> convertTasklistsForSaving() {
+        ArrayList<String> taskListsJSON = new ArrayList<>();
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            UserTaskList taskList = mTaskLists.get(i);
+            //Add the JSON tasklist to the arrayList.
+            taskListsJSON.add(taskList.toJSONString());
+        }
+        return taskListsJSON;
+    }
+
+
+    private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> taskListJSONList) {
+        ArrayList<UserTaskList> taskLists = new ArrayList<>();
+        if(!taskListJSONList.isEmpty()) {
+            for (int i = 0; i < taskListJSONList.size(); i++) {
+                String taskListJSONString = taskListJSONList.get(i);
+                UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
+                if(userTaskList != null) {
+                    taskLists.add(userTaskList);
+                }
+            }
+        }
+        return taskLists;
+    }
+
+    private void saveTasklistsToStorage() {
+        //Convert all the tasklists to JSON for saving.
+        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
+
+        //Once all tasklists have been added to the string array, save them to storage.
+        boolean saveStatus = FileUtility.saveToProtectedStorage(this, FileContracts.FILE_TASKLIST_NAME, FileContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
+        //TODO: Can toast that saving was successful not sure.
+        Log.i(TAG, "saveTasklistsToStorage: Save status: " + saveStatus);
+    }
+
+    private boolean checkForTasklistsInStorage() {
+        //If this returns 0, that means there are no files
+        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, FileContracts.FILE_TASKLIST_FOLDER);
+        return fileCount > 0;
+    }
 
 
 }
