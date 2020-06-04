@@ -2,6 +2,7 @@ package com.zoportfolio.tasklistproject.tasklist.dataModels;
 
 import android.util.Log;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -173,5 +174,13 @@ public class UserTask implements Serializable {
         return null;
     }
 
+
+    public static byte[] serializeUserTask(UserTask _userTask) {
+        return SerializationUtils.serialize(_userTask);
+    }
+
+    public static UserTask deserializeUserTaskByteData(byte[] _userTaskByteData) {
+        return (UserTask) SerializationUtils.deserialize(_userTaskByteData);
+    }
 
 }

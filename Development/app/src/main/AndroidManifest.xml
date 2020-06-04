@@ -22,6 +22,10 @@
         </activity>
         <activity android:name="com.zoportfolio.tasklistproject.task.TaskInfoActivity">
         </activity>
+        <receiver android:name=".notifications.receivers.TasklistsRefreshBroadcast"
+            android:enabled="true"/>
+        <receiver android:name=".notifications.receivers.TaskReminderBroadcast"
+            android:enabled="true"/>
     </application>
 
 </manifest>

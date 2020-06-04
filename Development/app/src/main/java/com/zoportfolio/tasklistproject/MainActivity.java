@@ -7,9 +7,19 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
@@ -22,6 +32,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
 import com.zoportfolio.tasklistproject.contracts.FileContracts;
+import com.zoportfolio.tasklistproject.notifications.receivers.TasklistsRefreshBroadcast;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
 import com.zoportfolio.tasklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
@@ -50,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     public static final int RESULT_CODE_TASK_UNCHANGED = 20;
     public static final int REQUEST_CODE_TASK_VIEWING = 3;
 
+    public static final String NOTIFICATION_CHANNELID_TASKREMINDER = "TASKREMINDER_100";
+
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
 
@@ -67,7 +80,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        //Create the notification channel.
+        createNotificationChannel();
 
         //Check for action bar and hide it if it is up.
         if(getSupportActionBar() != null) {
@@ -426,7 +440,76 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     }
 
     private void setupTasklistsRefreshBroadcast() {
-        
+
+        //Going to null check the mTasklists global variable just to be safe.
+        if(mTaskLists != null && !mTaskLists.isEmpty()) {
+            Log.i(TAG, "setupTasklistsRefreshBroadcast: Tasklists setup and available, creating alarmManager for refresh broadcast");
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent intent = new Intent(this, TasklistsRefreshBroadcast.class);
+
+            ArrayList<String> taskListsJSON = convertTasklistsForSaving();
+            intent.putExtra(EXTRA_TASKLISTS, taskListsJSON);
+
+            //Using flag update current for this pending intent, so that whenever it gets created it just updates the intent data.
+            PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            if(alarmManager != null) {
+                //TODO: Need to test this with a timer of 5 seconds, but for production the hour of day to use is 0 = 12 am
+                Calendar alarmTime = Calendar.getInstance();
+//                alarmTime.setTimeInMillis(System.currentTimeMillis());
+//                alarmTime.set(Calendar.HOUR_OF_DAY, 6);
+
+                alarmTime.add(Calendar.SECOND, 5);
+
+                alarmManager.set(AlarmManager.RTC,
+                        alarmTime.getTimeInMillis(),
+                        alarmIntent);
+
+//                alarmManager.setInexactRepeating(AlarmManager.RTC,
+//                        alarmTime.getTimeInMillis(),
+//                        AlarmManager.INTERVAL_DAY,
+//                        alarmIntent);
+            }
+        }else {
+            Log.i(TAG, "setupTasklistsRefreshBroadcast: Tasklists were null or the tasklists were empty, " +
+                    "did not set up refreshBroadcast.");
+        }
+
+    }
+
+    private void createNotificationChannel() {
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && manager != null) {
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNELID_TASKREMINDER, "Notification channel for reminding user of tasks that need to be completed.", NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("This channel is used to remind user of tasks that need to be completed. These notifications will happen based on the time the user sets in the app.");
+
+            //Set the lights for the channel.
+            channel.enableLights(true);
+            channel.setLightColor(Color.GREEN);
+
+            //Set the vibration to the channel.
+            channel.enableVibration(true);
+
+            long VIBRATION_DURATION = 500L;
+            long WAITING_DURATION = 500L;
+            long[] vibrationPattern = {WAITING_DURATION, VIBRATION_DURATION, WAITING_DURATION, VIBRATION_DURATION};
+
+            channel.setVibrationPattern(vibrationPattern);
+
+            //Set the sound to the channel as well.
+            //using the default notification sound and the audio attribute of SONIFICATION, which has to be built.
+            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            AudioAttributes attributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+            channel.setSound(alarmSound, attributes);
+
+            //Set the visibility of the notification to public.
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+            //Create the notification channel.
+            manager.createNotificationChannel(channel);
+        }
     }
 
 
@@ -508,6 +591,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     private void loadOnFreshAppOpen() {
         if(checkForTasklistsInStorage()) {
             loadTasklistsFromStorage();
+            setupTasklistsRefreshBroadcast();
         }else {
             //If there are no files saved, display the no data text view.
             TextView textView = findViewById(R.id.tv_noData);
