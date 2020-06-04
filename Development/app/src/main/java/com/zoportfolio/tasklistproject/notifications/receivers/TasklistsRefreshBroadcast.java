@@ -25,9 +25,6 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //TODO: This Receiver will be the one that handles refreshing all of the alarmManager sets
-        // and assigning the times to notifiy based on the task, using the TaskReminderBroadcast.
-
         if(intent != null) {
             if(intent.hasExtra(MainActivity.EXTRA_TASKLISTS)) {
                 //Grab the object from the intent and then call the method to convert the tasklists.
@@ -35,17 +32,12 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
                 mTaskLists = convertTasklistsObjectFromJSON(obj);
 
                 resetAllTasksToUnchecked();
-
-                //Call method to set all tasks alarms
                 setAllTasksAlarm(context);
-
-                //End of if(intent.hasExtra(MainActivity.EXTRA_TASKLISTS))
             }
         }
     }
 
     private ArrayList<UserTaskList> convertTasklistsObjectFromJSON(Object _obj) {
-
         ArrayList<String> taskListJSONList = new ArrayList<>();
         if(_obj instanceof ArrayList<?>) {
             ArrayList<?> arrayList = (ArrayList<?>) _obj;
@@ -98,10 +90,13 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
     }
 
     private void setAlarmForTask(Context _context, UserTask _task, int _positionID) {
-        Log.i(TAG, "setAlarmForTask: creating alarm manager for task");
+        //TODO: NOTE this method is set to use testing times and for production needs to have the values changed to actual data.
         AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
 
-        //TODO: The intent im sending here is faulty and does not have any data attached to it.
+        //IMPORTANT, Had to convert the task data into byte data in order to get this to work properly.
+        // Filling the intent with the byte array of the task data,
+        // implementing SerializationUtils from Apache commons lang3,
+        // and adding compileOptions to utilize java 1.8 in gradle.
         Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
 
         byte[] userTaskByteData = UserTask.serializeUserTask(_task);
@@ -120,8 +115,9 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 //            String hour = notificationTimeSplit[0];
 //            String minute = notificationTimeSplit[1];
 
+            //TODO: Testing data.
             String hour = "0";
-            String minute = "1";
+            String minute = "30";
 
             Calendar taskAlarmTime = Calendar.getInstance();
             taskAlarmTime.setTimeInMillis(System.currentTimeMillis());
