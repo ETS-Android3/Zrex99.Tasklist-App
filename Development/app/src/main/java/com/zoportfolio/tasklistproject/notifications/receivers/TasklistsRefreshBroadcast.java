@@ -8,8 +8,10 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.zoportfolio.tasklistproject.MainActivity;
+import com.zoportfolio.tasklistproject.contracts.FileContracts;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
+import com.zoportfolio.tasklistproject.utility.FileUtility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +33,7 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
                 Object obj = intent.getSerializableExtra(MainActivity.EXTRA_TASKLISTS);
                 mTaskLists = convertTasklistsObjectFromJSON(obj);
 
-                resetAllTasksToUnchecked();
+                resetAllTasksToUnchecked(context);
                 setAllTasksAlarm(context);
             }
         }
@@ -64,7 +66,23 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
         return taskLists;
     }
 
-    private void resetAllTasksToUnchecked() {
+    private ArrayList<String> convertTasklistsForSaving() {
+        ArrayList<String> taskListsJSON = new ArrayList<>();
+        for (int i = 0; i < mTaskLists.size(); i++) {
+            UserTaskList taskList = mTaskLists.get(i);
+            //Add the JSON tasklist to the arrayList.
+            taskListsJSON.add(taskList.toJSONString());
+        }
+        return taskListsJSON;
+    }
+
+    private void saveTasklistsToStorage(Context _context) {
+        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
+        boolean saveStatus = FileUtility.saveToProtectedStorage(_context, FileContracts.FILE_TASKLIST_NAME, FileContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
+        Log.i(TAG, "saveTasklistsToStorage: TasklistsRefreshBroadcast: Save status: " + saveStatus);
+    }
+
+    private void resetAllTasksToUnchecked(Context _context) {
         for (int i = 0; i < mTaskLists.size(); i++) {
             //Tasklist scope
             for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
@@ -72,8 +90,7 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
                 mTaskLists.get(i).getTasks().get(j).setTaskChecked(false);
             }
         }
-
-        //TODO: Have to save the now unchecked taskslists to the storage.
+        saveTasklistsToStorage(_context);
     }
 
     private void setAllTasksAlarm(Context _context) {
@@ -116,8 +133,8 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 //            String minute = notificationTimeSplit[1];
 
             //TODO: Testing data.
-            String hour = "0";
-            String minute = "30";
+            String hour = "23";
+            String minute = "33";
 
             Calendar taskAlarmTime = Calendar.getInstance();
             taskAlarmTime.setTimeInMillis(System.currentTimeMillis());

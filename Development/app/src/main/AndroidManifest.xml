@@ -20,11 +20,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.zoportfolio.tasklistproject.task.TaskInfoActivity">
+        <activity android:name="com.zoportfolio.tasklistproject.task.TaskInfoActivity"
+            android:parentActivityName=".MainActivity">
         </activity>
         <receiver android:name=".notifications.receivers.TasklistsRefreshBroadcast"
             android:enabled="true"/>
         <receiver android:name=".notifications.receivers.TaskReminderBroadcast"
+            android:enabled="true"/>
+        <receiver android:name=".notifications.receivers.TaskCheckedBroadcast"
             android:enabled="true"/>
     </application>
 

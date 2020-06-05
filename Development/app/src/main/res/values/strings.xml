@@ -47,6 +47,10 @@
 
     <string name="toast_TextInvalid">Please do not leave the text field blank, enter a valid name.</string>
 
+    <!-- Notification strings-->
+    <string name="notification_task_check_action">CHECK OFF</string>
+    <string name="notification_task_view_action">VIEW TASK</string>
+
     <!--  Content description strings.  -->
     <string name="contentDescription_ImageButtonUnchecked">Unchecked circle, that can be checked by tapping.</string>
     <string name="contentDescription_ImageButtonChecked">Check mark, that can be unchecked by tapping.</string>
