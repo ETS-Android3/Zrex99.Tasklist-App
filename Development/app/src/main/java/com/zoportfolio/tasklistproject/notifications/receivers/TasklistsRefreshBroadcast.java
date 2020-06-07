@@ -29,9 +29,10 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
                 //Grab the object from the intent and then call the method to convert the tasklists.
                 Object obj = intent.getSerializableExtra(MainActivity.EXTRA_TASKLISTS);
                 mTaskLists = convertTasklistsObjectFromJSON(obj);
-
-                resetAllTasksToUnchecked(context);
-                setAllTasksAlarm(context);
+                if(!mTaskLists.isEmpty()) {
+                    resetAllTasksToUnchecked(context);
+                    setAllTasksAlarm(context);
+                }
             }
         }
     }
@@ -82,9 +83,14 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
     private void resetAllTasksToUnchecked(Context _context) {
         for (int i = 0; i < mTaskLists.size(); i++) {
             //Tasklist scope
-            for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
-                //Task scope
-                mTaskLists.get(i).getTasks().get(j).setTaskChecked(false);
+            //TODO: This is super important to check that the tasklist that will be looped through ACTUALLY HAS TASKS.
+            // May have to place this in other positions in the app.
+            // Just a simple check to make sure the tasklist has tasks.
+            if(!mTaskLists.get(i).getTasks().isEmpty()) {
+                for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
+                    //Task scope
+                    mTaskLists.get(i).getTasks().get(j).setTaskChecked(false);
+                }
             }
         }
         saveTasklistsToStorage(_context);
@@ -93,18 +99,19 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
     private void setAllTasksAlarm(Context _context) {
         for (int i = 0; i < mTaskLists.size(); i++) {
             //Tasklist scope
-            for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
-                //Task scope
-                UserTask task = mTaskLists.get(i).getTasks().get(j);
-                String id = i + String.valueOf(j);
-                int idPosition = Integer.parseInt(id);
-                setAlarmForTask(_context, task, idPosition);
+            if(!mTaskLists.get(i).getTasks().isEmpty()) {
+                for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
+                    //Task scope
+                    UserTask task = mTaskLists.get(i).getTasks().get(j);
+                    String id = i + String.valueOf(j);
+                    int idPosition = Integer.parseInt(id);
+                    setAlarmForTask(_context, task, idPosition);
+                }
             }
         }
     }
 
     private void setAlarmForTask(Context _context, UserTask _task, int _positionID) {
-        //TODO: NOTE this method is set to use testing times and for production needs to have the values changed to actual data.
         AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
 
         //IMPORTANT, Had to convert the task data into byte data in order to get this to work properly.
@@ -126,12 +133,8 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
             String notificationTime = _task.getTaskNotificationTime();
             String[] notificationTimeSplit = notificationTime.split("/");
 
-//            String hour = notificationTimeSplit[0];
-//            String minute = notificationTimeSplit[1];
-
-            //TODO: Testing data.
-            String hour = "22";
-            String minute = "45";
+            String hour = notificationTimeSplit[0];
+            String minute = notificationTimeSplit[1];
 
             Calendar taskAlarmTime = Calendar.getInstance();
             taskAlarmTime.setTimeInMillis(System.currentTimeMillis());

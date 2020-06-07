@@ -13,6 +13,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         //To handle the back event,
         // go back a tasklist if the first tasklist is not shown,
         // otherwise handle the back according to the system.
@@ -182,9 +184,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         super.onActivityResult(requestCode, resultCode, data);
         //TODO: Handle the changed task data and save the updated tasklists.
         if(requestCode == REQUEST_CODE_TASK_VIEWING) {
-            if(resultCode == RESULT_CODE_TASK_UNCHANGED) {
-                //Do nothing as the task was not changed.
-            }else if(resultCode == RESULT_CODE_TASK_CHANGED) {
+            if(resultCode == RESULT_CODE_TASK_CHANGED) {
                 //TODO: If the data was changed, reload the tasklists from storage.
                 loadTasklistsFromStorage();
             }
@@ -218,13 +218,18 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 //For the first time adding a tasklist.
                 mTaskLists = new ArrayList<UserTaskList>();
                 mTaskLists.add(newTaskList);
+
+                //Check that the tasklist refresh broadcast is not active, and then set it up.
+                if(!loadTasklistRefreshBroadcastStateFromSharedPreferences()) {
+                    setupTasklistsRefreshBroadcast();
+                }
+
             }else {
                 mTaskLists.add(newTaskList);
             }
 
             //Save the tasklists to storage.
             saveTasklistsToStorage();
-
 
             loadTaskListFragment(newTaskList);
             //Testing loadViewPager();
@@ -273,7 +278,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void taskListUpdated(UserTaskList updatedTaskList) {
-        //TODO: Need to know which tasklist was updated in order to update the proper tasklist.
         int indexPositionForTasklist = -1;
         for (int i = 0; i < mTaskLists.size(); i++) {
             if(mTaskLists.get(i).getTaskListName().equals(updatedTaskList.getTaskListName())) {
@@ -295,19 +299,20 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void cancelTappedNewTaskAlert() {
-
         //TODO: MAJOR IMPORTANT,
         // realistically i should not be doing this at all,
         // and while it does work, it would be much better to handle all fragments ONLY in this activity
         // The fix would be to have the TaskListFragment interface the add task tapped all the way to the activity,
         // and then the activity will handle showing the new alert fragment, and then send the new data back to the TaskListFragment.
-
         closeAlertFragmentFromTaskListFragment();
     }
 
     @Override
     public void saveTappedNewTaskAlert(String taskName, String taskNotificationTime, String taskListName) {
-
+        //TODO: Need to add any new task to the broadcast list when it is created.
+        // Basically add the new task to the taskReminderBroadcast and give it an alarm manager,
+        // when it is added for the first time,
+        // after the first day, the other taskListRefresh broadcast will take care of it.
         UserTask newTask = new UserTask(taskName, taskNotificationTime);
         for (int i = 0; i < mTaskLists.size(); i++) {
             if(mTaskLists.get(i).getTaskListName().equals(taskListName)) {
@@ -321,6 +326,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 break;
             }
         }
+
+        //TODO: ***Add task to the taskReminderBroadcast.***
 
         Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskSavingSuccesful), Toast.LENGTH_LONG);
         toast.show();
@@ -414,7 +421,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         mPager.setAdapter(pagerAdapter);
     }
 
-    private void loadTaskInfoActivity(UserTask selectedTask, String taskListName) {//The tasklist name will be how we identify the tasklist that holds the selected task.
+    private void loadTaskInfoActivity(UserTask selectedTask, String taskListName) {
+        //The tasklist name will be how we identify the tasklist that holds the selected task.
 
         //Find the tasklist position.
         int taskListPosition = -1;
@@ -422,13 +430,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             if(mTaskLists.get(i).getTaskListName().equals(taskListName)) {
                 //Position found.
                 taskListPosition = i;
-                Log.i(TAG, "loadTaskInfoActivity: position of tasklist found.");
             }
         }
 
         ArrayList<String> taskListsJSON = convertTasklistsForSaving();
 
-        Log.i(TAG, "loadTaskInfoActivity: preparing intent.");
         Intent intent = new Intent(this, TaskInfoActivity.class);
         intent.putExtra(EXTRA_TASK, selectedTask);
         intent.putExtra(EXTRA_TASKLISTPOSITION, taskListPosition);
@@ -436,14 +442,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         intent.putExtra(EXTRA_TASKLISTS, taskListsJSON);
 
         startActivityForResult(intent, REQUEST_CODE_TASK_VIEWING);
-        Log.i(TAG, "loadTaskInfoActivity: activity started.");
     }
 
     private void setupTasklistsRefreshBroadcast() {
 
         //Going to null check the mTasklists global variable just to be safe.
         if(mTaskLists != null && !mTaskLists.isEmpty()) {
-            Log.i(TAG, "setupTasklistsRefreshBroadcast: Tasklists setup and available, creating alarmManager for refresh broadcast");
             AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent intent = new Intent(this, TasklistsRefreshBroadcast.class);
 
@@ -454,25 +458,29 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             if(alarmManager != null) {
-                //TODO: Need to test this with a timer of 5 seconds, but for production the hour of day to use is 0 = 12 am
                 Calendar alarmTime = Calendar.getInstance();
-//                alarmTime.setTimeInMillis(System.currentTimeMillis());
-//                alarmTime.set(Calendar.HOUR_OF_DAY, 6);
+                alarmTime.setTimeInMillis(System.currentTimeMillis());
+                alarmTime.set(Calendar.HOUR_OF_DAY, 0);
 
-                alarmTime.add(Calendar.SECOND, 5);
 
-                alarmManager.set(AlarmManager.RTC,
+                //Testing alarmManager block
+//                alarmManager.set(AlarmManager.RTC,
+//                        alarmTime.getTimeInMillis(),
+//                        alarmIntent);
+
+                alarmManager.setInexactRepeating(AlarmManager.RTC,
                         alarmTime.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY,
                         alarmIntent);
 
-//                alarmManager.setInexactRepeating(AlarmManager.RTC,
-//                        alarmTime.getTimeInMillis(),
-//                        AlarmManager.INTERVAL_DAY,
-//                        alarmIntent);
+                //To keep from continually adding and setting this alarmManager whenever the main activity runs,
+                // utilize the shared preferences to check if it needs to be set.
+                saveTasklistRefreshBroadcastStateToSharedPreferences(true);
             }
         }else {
             Log.i(TAG, "setupTasklistsRefreshBroadcast: Tasklists were null or the tasklists were empty, " +
                     "did not set up refreshBroadcast.");
+            saveTasklistRefreshBroadcastStateToSharedPreferences(false);
         }
 
     }
@@ -512,6 +520,23 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
     }
 
+    private void saveTasklistRefreshBroadcastStateToSharedPreferences(Boolean _state) {
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putBoolean(PublicContracts.PREF_TASKLIST_REFRESH_ACTIVE_KEY, _state);
+        editor.apply();
+    }
+
+    private boolean loadTasklistRefreshBroadcastStateFromSharedPreferences() {
+        boolean returnBool = false;
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        if(preferences.contains(PublicContracts.PREF_TASKLIST_REFRESH_ACTIVE_KEY)) {
+            returnBool = preferences.getBoolean(PublicContracts.PREF_TASKLIST_REFRESH_ACTIVE_KEY, false);
+        }
+        //Will return true if the alarm manager is already active, otherwise will return false
+        return returnBool;
+    }
 
     /**
      * Custom methods - FILE I/O
@@ -591,7 +616,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     private void loadOnFreshAppOpen() {
         if(checkForTasklistsInStorage()) {
             loadTasklistsFromStorage();
-            setupTasklistsRefreshBroadcast();
+
+            //TODO: Will have to start the tasklist refresh broadcast when the user adds their first tasklit.
+            //If the tasklist refresh broadcast is not active, set it up.
+            if(!loadTasklistRefreshBroadcastStateFromSharedPreferences()) {
+                setupTasklistsRefreshBroadcast();
+            }
+
         }else {
             //If there are no files saved, display the no data text view.
             TextView textView = findViewById(R.id.tv_noData);
@@ -634,6 +665,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskDeletingSuccesful), Toast.LENGTH_SHORT);
             toast.show();
         }
+
+        //TODO: Will need to reset the tasklist refresh broadcast here.
+        // Will probably need to cancel the alarm for the deleted task as well.
     }
 
     private void deleteTaskList(int taskListPosition) {
@@ -650,8 +684,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 //Reload the taskListFragment.
                 loadTaskListFragment(mTaskLists.get(0));
             }
-
         }
+
+        //TODO: Will need to reset the tasklist refresh broadcast here.
+
     }
 
 

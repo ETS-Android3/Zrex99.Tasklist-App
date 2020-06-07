@@ -54,12 +54,8 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
     }
 
     private void createNotificationForTask(Context _context, UserTask _userTask) {
-        Log.i(TAG, "createNotificationForTask: Creating Notification");
-        Log.i(TAG, "createNotificationForTask: TaskName: " + _userTask.getTaskName());
-        //TODO: Return here to work next. Will keep the tasklists refresh broadcast with testing variables for now.
 
         //TODO: ***CHECK THIS*** all main features are completed and it is now time for beta testing and final cleanup.
-        // Start cleanup with the taskbroadcasts and making sure the notification system is using the user data and not test data.
         // Then build+sign the APK and send it to lesly and start beta testing.
         // Then move onto other todos throughout the app and cleanup. HERE WE GOOOOO YAHOOOOOO.
 
@@ -105,7 +101,7 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
                 checkIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        //IMPORTANT: for the timebeing I am going to have the third action of opening the app on the notification. Will remove or change based on beta test feedback.
+        //IMPORTANT: for the time being I am going to have the third action of opening the app on the notification. Will remove or change based on beta test feedback.
         //openMainIntent
         Intent launchAppIntent = new Intent(_context, MainActivity.class);
         launchAppIntent.setAction(ACTION_LAUNCH_APP_NOTIFICATION);
@@ -132,7 +128,6 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
         NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
         if(notificationManager != null) {
             notificationManager.notify(notificationId, notification);
-            Log.i(TAG, "createNotificationForTask: notification should be showing up.");
         }
     }
 
