@@ -1,5 +1,6 @@
 package com.zoportfolio.tasklistproject.task;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,12 +16,14 @@ import com.zoportfolio.tasklistproject.MainActivity;
 import com.zoportfolio.tasklistproject.R;
 import com.zoportfolio.tasklistproject.alerts.EditTaskNotificationTimeAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.EditTaskTitleAlertFragment;
-import com.zoportfolio.tasklistproject.contracts.FileContracts;
+import com.zoportfolio.tasklistproject.contracts.PublicContracts;
+import com.zoportfolio.tasklistproject.notifications.receivers.TaskReminderBroadcast;
 import com.zoportfolio.tasklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
 import com.zoportfolio.tasklistproject.utility.FileUtility;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragment.TaskInfoFragmentListener,
@@ -61,26 +64,40 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             getSupportActionBar().hide();
         }
 
-        //Need to grab the data from the intent.
+        //Get the intent.
         Intent intent = getIntent();
-        mTaskOriginal = (UserTask) intent.getSerializableExtra(MainActivity.EXTRA_TASK);
-        mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
-        mTaskListPosition = intent.getIntExtra(MainActivity.EXTRA_TASKLISTPOSITION, -1);
 
-        ArrayList<String> taskListJSONList = new ArrayList<>();
-        Object obj = intent.getSerializableExtra(MainActivity.EXTRA_TASKLISTS);
-        if(obj instanceof ArrayList<?>) {
-            ArrayList<?> arrayList = (ArrayList<?>) obj;
-            if(arrayList.size() > 0) {
-                for (int i = 0; i < arrayList.size(); i++) {
-                    Object o = arrayList.get(i);
-                    if(o instanceof String) {
-                        taskListJSONList.add((String) o);
+        if(intent.getAction() != null) {
+            if(intent.getAction().equals(TaskReminderBroadcast.ACTION_TASK_VIEW_NOTIFICATION)) {
+                //Start the activity from the notification.
+                mTaskOriginal = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
+                mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
+                mTaskLists = loadTasklistsFromStorage(this);
+                mTaskListPosition = findTaskListPosition(mTaskOriginal, mTaskLists);
+            }else {
+                //Start the activity the normal way.
+                //Need to grab the data from the intent.
+                mTaskOriginal = (UserTask) intent.getSerializableExtra(MainActivity.EXTRA_TASK);
+                mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
+                mTaskListPosition = intent.getIntExtra(MainActivity.EXTRA_TASKLISTPOSITION, -1);
+
+                ArrayList<String> taskListJSONList = new ArrayList<>();
+                Object obj = intent.getSerializableExtra(MainActivity.EXTRA_TASKLISTS);
+                if(obj instanceof ArrayList<?>) {
+                    ArrayList<?> arrayList = (ArrayList<?>) obj;
+                    if(arrayList.size() > 0) {
+                        for (int i = 0; i < arrayList.size(); i++) {
+                            Object o = arrayList.get(i);
+                            if(o instanceof String) {
+                                taskListJSONList.add((String) o);
+                            }
+                        }
                     }
                 }
+                mTaskLists = convertTasklistsFromLoading(taskListJSONList);
             }
         }
-        mTaskLists = convertTasklistsFromLoading(taskListJSONList);
+
 
         //TODO: Look into why the ripple is not working on this button,
         // easy fix imo is to just use an image button potentially.
@@ -204,6 +221,25 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     /**
      * Custom methods
      */
+
+    private int findTaskListPosition(UserTask _userTask, ArrayList<UserTaskList> _taskLists) {
+        //TODO: Will need to test this to ensure it return the correct position.
+        int position =  -1;
+        for (int i = 0; i < _taskLists.size(); i++) {
+            //Super Tasklist scope
+            for (int j = 0; j < _taskLists.get(i).getTasks().size(); j++) {
+                //Tasklist scope
+                if(_taskLists.get(i).getTasks().get(j).getTaskName().equals(_userTask.getTaskName())) {
+                    position = i;
+                }
+            }
+        }
+        return position;
+    }
+
+    private UserTask convertUserTaskFromByteData(byte[] _byteData) {
+        return UserTask.deserializeUserTaskByteData(_byteData);
+    }
 
     private UserTask createNewUserTaskForEditing(UserTask _userTaskOriginal) {
         if(_userTaskOriginal.getTaskDescription() != null) {//Create new task with description.
@@ -341,12 +377,46 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         return taskListsJSON;
     }
 
+    private void saveTasklistsToStorage() {
+        //Convert all the tasklists to JSON for saving.
+        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
 
-    private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> taskListJSONList) {
+        //Once all tasklists have been added to the string array, save them to storage.
+        boolean saveStatus = FileUtility.saveToProtectedStorage(this, PublicContracts.FILE_TASKLIST_NAME, PublicContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
+        //TODO: Can toast that saving was successful not sure.
+        Log.i(TAG, "saveTasklistsToStorage: Save status: " + saveStatus);
+    }
+
+    private boolean checkForTasklistsInStorage() {
+        //If this returns 0, that means there are no files
+        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, PublicContracts.FILE_TASKLIST_FOLDER);
+        return fileCount > 0;
+    }
+
+    private ArrayList<UserTaskList> loadTasklistsFromStorage(Context _context) {
+        ArrayList<String> taskListJSONList = new ArrayList<>();
+        Object obj = FileUtility.retrieveFromStorage(_context, PublicContracts.FILE_TASKLIST_NAME);
+        if(obj instanceof ArrayList<?>) {
+            ArrayList<?> arrayList = (ArrayList<?>) obj;
+            if(arrayList.size() > 0) {
+                for (int i = 0; i < arrayList.size(); i++) {
+                    Object o = arrayList.get(i);
+                    if(o instanceof String) {
+                        taskListJSONList.add((String) o);
+                    }
+                }
+            }
+        }
+
+        //Convert the tasklists from ArrayList<String> JSON
+        return convertTasklistsFromLoading(taskListJSONList);
+    }
+
+    private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> _taskListJSONList) {
         ArrayList<UserTaskList> taskLists = new ArrayList<>();
-        if(!taskListJSONList.isEmpty()) {
-            for (int i = 0; i < taskListJSONList.size(); i++) {
-                String taskListJSONString = taskListJSONList.get(i);
+        if(!_taskListJSONList.isEmpty()) {
+            for (int i = 0; i < _taskListJSONList.size(); i++) {
+                String taskListJSONString = _taskListJSONList.get(i);
                 UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
                 if(userTaskList != null) {
                     taskLists.add(userTaskList);
@@ -355,22 +425,5 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         }
         return taskLists;
     }
-
-    private void saveTasklistsToStorage() {
-        //Convert all the tasklists to JSON for saving.
-        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
-
-        //Once all tasklists have been added to the string array, save them to storage.
-        boolean saveStatus = FileUtility.saveToProtectedStorage(this, FileContracts.FILE_TASKLIST_NAME, FileContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
-        //TODO: Can toast that saving was successful not sure.
-        Log.i(TAG, "saveTasklistsToStorage: Save status: " + saveStatus);
-    }
-
-    private boolean checkForTasklistsInStorage() {
-        //If this returns 0, that means there are no files
-        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, FileContracts.FILE_TASKLIST_FOLDER);
-        return fileCount > 0;
-    }
-
 
 }

@@ -31,7 +31,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
-import com.zoportfolio.tasklistproject.contracts.FileContracts;
+import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.notifications.receivers.TasklistsRefreshBroadcast;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
 import com.zoportfolio.tasklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
@@ -546,12 +546,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         ArrayList<String> taskListsJSON = convertTasklistsForSaving();
 
         //Once all tasklists have been added to the string array, save them to storage.
-        FileUtility.saveToProtectedStorage(this, FileContracts.FILE_TASKLIST_NAME, FileContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
+        FileUtility.saveToProtectedStorage(this, PublicContracts.FILE_TASKLIST_NAME, PublicContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
     }
 
     private boolean checkForTasklistsInStorage() {
         //If this returns 0, that means there are no files
-        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, FileContracts.FILE_TASKLIST_FOLDER);
+        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, PublicContracts.FILE_TASKLIST_FOLDER);
         return fileCount > 0;
     }
 
@@ -567,7 +567,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
 
         ArrayList<String> taskListJSONList = new ArrayList<>();
-        Object obj = FileUtility.retrieveFromStorage(this, FileContracts.FILE_TASKLIST_NAME);
+        Object obj = FileUtility.retrieveFromStorage(this, PublicContracts.FILE_TASKLIST_NAME);
         if(obj instanceof ArrayList<?>) {
             ArrayList<?> arrayList = (ArrayList<?>) obj;
             if(arrayList.size() > 0) {

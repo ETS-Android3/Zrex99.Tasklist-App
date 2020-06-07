@@ -15,6 +15,7 @@ import androidx.core.app.TaskStackBuilder;
 
 import com.zoportfolio.tasklistproject.MainActivity;
 import com.zoportfolio.tasklistproject.R;
+import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 
@@ -24,11 +25,16 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
 
     private static final String TAG = "TReminderBroadcast.TAG";
 
-    public static final String EXTRA_TEST = "EXTRA_TEST";
-
     //TODO: WIll have to put all contract vars into the contract class.
     // 200 is for task notification actions.
+    // 100 is for launching the app.
+    public static final int REQUEST_LAUNCH_APP_NOTIFICATION = 100;
     public static final int REQUEST_TASK_CHECKED_NOTIFICATION = 200;
+    public static final int REQUEST_TASK_VIEW_NOTIFICATION = 210;
+
+
+    public static final String ACTION_TASK_VIEW_NOTIFICATION = "ACTION_TASK_VIEW";
+    public static final String ACTION_LAUNCH_APP_NOTIFICATION = "ACTION_LAUNCH_APP_";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -36,8 +42,8 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
         // such as clicking the notification to launch the app and show the specific task,
         // checking off the specific task in the notification (if feasible).
         if(intent != null) {
-            if(intent.hasExtra(TasklistsRefreshBroadcast.EXTRA_TASK_BYTEDATA)) {
-                UserTask userTask = convertUserTaskFromByteData(intent.getByteArrayExtra(TasklistsRefreshBroadcast.EXTRA_TASK_BYTEDATA));
+            if(intent.hasExtra(PublicContracts.EXTRA_TASK_BYTEDATA)) {
+                UserTask userTask = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
                 createNotificationForTask(context, userTask);
             }
         }
@@ -52,14 +58,13 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
         Log.i(TAG, "createNotificationForTask: TaskName: " + _userTask.getTaskName());
         //TODO: Return here to work next. Will keep the tasklists refresh broadcast with testing variables for now.
 
-        //https://www.reddit.com/r/androiddev/comments/gcwkre/android_notification_as_deep_as_possible/
+        //TODO: ***CHECK THIS*** all main features are completed and it is now time for beta testing and final cleanup.
+        // Start cleanup with the taskbroadcasts and making sure the notification system is using the user data and not test data.
+        // Then build+sign the APK and send it to lesly and start beta testing.
+        // Then move onto other todos throughout the app and cleanup. HERE WE GOOOOO YAHOOOOOO.
 
-        //TODO: Create a notification that displays the task name + description (if there is one),
-        // and has an action for checking off the task in the notification, and an action for viewing the task.
-        // The action that checks off the task will fire off another intent im assuming,
-        // that will update the tasklists and if this is the case, I will need to implement the rand UUID for all tasks,
-        // or send the tasklist into this broadcast receiver OR load the tasklists from storage and look for the task with the same name in the code/work/receiver.
-        // The action that views the task will launch the taskinfoactivity, this will need all tasklists and the task.
+        //Create the byte data of the task.
+        byte[] userTaskByteData = UserTask.serializeUserTask(_userTask);
 
         //Create the string messages for the notification.
         String taskDescription = _userTask.getTaskDescription();
@@ -78,34 +83,49 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
                 .setBigContentTitle(bigContentTitleMessage)
                 .setSummaryText(summaryTextMessage);
 
-        //TODO: Work on adding the two actions "Check" and "View".
-        // Check action works, need to work on view action.
+
         //Create the actions for the notification.
-        //TODO: Decide if this should be the content intent or its own action.
+
+        //Going to just implement this action as a View, that will open the taskinfoactivity and show it for the user.
+        //Depending on how beta testing goes, I will add a action for the user to tap the notification and open the main activity.
+        //viewIntent
         Intent taskInfoIntent = new Intent(_context, TaskInfoActivity.class);
-        taskInfoIntent.putExtra(EXTRA_TEST, "Hello World");
+        taskInfoIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
+        taskInfoIntent.setAction(ACTION_TASK_VIEW_NOTIFICATION );
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(_context);
         stackBuilder.addNextIntentWithParentStack(taskInfoIntent);
+        PendingIntent taskInfoPendingIntent = stackBuilder.getPendingIntent(REQUEST_TASK_VIEW_NOTIFICATION, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent taskInfoPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        //checkIntent
         Intent checkIntent = new Intent(_context, TaskCheckedBroadcast.class);
-        //TODO: Replace extra with the byte data of the task.
-        checkIntent.putExtra(EXTRA_TEST, "Replace this extra with the task in the notification");
+        checkIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
         PendingIntent checkPendingIntent = PendingIntent.getBroadcast(_context,
                 REQUEST_TASK_CHECKED_NOTIFICATION,
                 checkIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //IMPORTANT: for the timebeing I am going to have the third action of opening the app on the notification. Will remove or change based on beta test feedback.
+        //openMainIntent
+        Intent launchAppIntent = new Intent(_context, MainActivity.class);
+        launchAppIntent.setAction(ACTION_LAUNCH_APP_NOTIFICATION);
+
+        stackBuilder.addNextIntent(launchAppIntent);
+        PendingIntent launchAppPendingIntent = stackBuilder.getPendingIntent(REQUEST_LAUNCH_APP_NOTIFICATION, PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         //Create the notification.
         Bitmap largeIcon = BitmapFactory.decodeResource(_context.getResources(), R.drawable.ic_task_notification_placeholder);
         Notification notification = new NotificationCompat.Builder(_context, MainActivity.NOTIFICATION_CHANNELID_TASKREMINDER)
                 .setLargeIcon(largeIcon)
                 .setSmallIcon(R.drawable.ic_task_notification_placeholder)
-                .setContentTitle("Get rid of setContentTitle if this appears.")
+                .setContentTitle("Reminder for completing task")
+                .setContentIntent(launchAppPendingIntent)
                 .addAction(R.drawable.ic_task_notification_check_placeholder, _context.getString(R.string.notification_task_check_action), checkPendingIntent)
+                .addAction(R.drawable.ic_task_notification_placeholder, _context.getResources().getString(R.string.notification_task_view_action), taskInfoPendingIntent)
                 .setStyle(bigTextStyle)
+                //Going to use auto cancel, may change this based on beta test feedback.
+                .setAutoCancel(true)
                 .build();
         int notificationId = UUID.randomUUID().hashCode();
 
@@ -114,7 +134,6 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
             notificationManager.notify(notificationId, notification);
             Log.i(TAG, "createNotificationForTask: notification should be showing up.");
         }
-
     }
 
 

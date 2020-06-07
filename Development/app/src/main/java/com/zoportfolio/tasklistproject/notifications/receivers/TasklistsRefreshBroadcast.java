@@ -8,20 +8,17 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.zoportfolio.tasklistproject.MainActivity;
-import com.zoportfolio.tasklistproject.contracts.FileContracts;
+import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
 import com.zoportfolio.tasklistproject.utility.FileUtility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.UUID;
 
 public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 
     private static final String TAG = "TlRefreshBroadcast.TAG";
-
-    public static final String EXTRA_TASK_BYTEDATA = "EXTRA_TASK_BYTEDATA";
 
     private ArrayList<UserTaskList> mTaskLists;
 
@@ -78,7 +75,7 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 
     private void saveTasklistsToStorage(Context _context) {
         ArrayList<String> taskListsJSON = convertTasklistsForSaving();
-        boolean saveStatus = FileUtility.saveToProtectedStorage(_context, FileContracts.FILE_TASKLIST_NAME, FileContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
+        boolean saveStatus = FileUtility.saveToProtectedStorage(_context, PublicContracts.FILE_TASKLIST_NAME, PublicContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
         Log.i(TAG, "saveTasklistsToStorage: TasklistsRefreshBroadcast: Save status: " + saveStatus);
     }
 
@@ -117,7 +114,7 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
         Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
 
         byte[] userTaskByteData = UserTask.serializeUserTask(_task);
-        taskIntent.putExtra(EXTRA_TASK_BYTEDATA, userTaskByteData);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
 
         PendingIntent taskAlarmIntent = PendingIntent.getBroadcast(_context.getApplicationContext(),
                 _positionID,
@@ -133,8 +130,8 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 //            String minute = notificationTimeSplit[1];
 
             //TODO: Testing data.
-            String hour = "23";
-            String minute = "33";
+            String hour = "22";
+            String minute = "45";
 
             Calendar taskAlarmTime = Calendar.getInstance();
             taskAlarmTime.setTimeInMillis(System.currentTimeMillis());
