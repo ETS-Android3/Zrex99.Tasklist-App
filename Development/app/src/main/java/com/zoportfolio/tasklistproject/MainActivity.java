@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.crashlytics.internal.common.CrashlyticsCore;
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
@@ -121,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         fabAddTaskList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if(!isAlertUp) {
                     //When the fab is clicked the new task list alert should pop up.
                     loadAlertFragment();
