@@ -8,7 +8,7 @@ import android.util.Log;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
-import com.zoportfolio.tasklistproject.utility.FileUtility;
+import com.zoportfolio.tasklistproject.utility.IOUtility;
 
 import java.util.ArrayList;
 
@@ -21,13 +21,13 @@ public class TaskCheckedBroadcast extends BroadcastReceiver {
         if(intent != null) {
             if(intent.hasExtra(PublicContracts.EXTRA_TASK_BYTEDATA)) {
                 //Check for tasklists in storage as precaution.
-                if(checkForTasklistsInStorage(context)) {
+
+                if(IOUtility.checkForTasklistsInStorage(context)) {
                     Log.i(TAG, "onReceive: files in storage.");
-                    ArrayList<UserTaskList> taskLists = loadTasklistsFromStorage(context);
+                    ArrayList<UserTaskList> taskLists = IOUtility.loadTasklistsFromStorage(context);
                     UserTask userTask = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
                     updateTask(context, userTask, taskLists);
                 }
-                
             }
         }
     }
@@ -52,67 +52,6 @@ public class TaskCheckedBroadcast extends BroadcastReceiver {
         }
 
         //Save the updated tasklists.
-        saveTasklistsToStorage(_context, _taskLists);
+        IOUtility.saveTasklistsToStorage(_context, _taskLists);
     }
-
-    private ArrayList<String> convertTasklistsForSaving(ArrayList<UserTaskList> _taskLists) {
-        ArrayList<String> taskListsJSON = new ArrayList<>();
-        for (int i = 0; i < _taskLists.size(); i++) {
-            UserTaskList taskList = _taskLists.get(i);
-            //Add the JSON tasklist to the arrayList.
-            taskListsJSON.add(taskList.toJSONString());
-        }
-        return taskListsJSON;
-    }
-
-    private void saveTasklistsToStorage(Context _context, ArrayList<UserTaskList> _taskLists) {
-        //Convert all the tasklists to JSON for saving.
-        ArrayList<String> taskListsJSON = convertTasklistsForSaving(_taskLists);
-
-        //Once all tasklists have been added to the string array, save them to storage.
-        boolean saveStatus = FileUtility.saveToProtectedStorage(_context, PublicContracts.FILE_TASKLIST_NAME, PublicContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
-        //TODO: Can toast that saving was successful not sure.
-        Log.i(TAG, "saveTasklistsToStorage: Save status: " + saveStatus);
-    }
-
-    private boolean checkForTasklistsInStorage(Context _context) {
-        //If this returns 0, that means there are no files
-        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(_context, PublicContracts.FILE_TASKLIST_FOLDER);
-        return fileCount > 0;
-    }
-
-    private ArrayList<UserTaskList> loadTasklistsFromStorage(Context _context) {
-        ArrayList<String> taskListJSONList = new ArrayList<>();
-        Object obj = FileUtility.retrieveFromStorage(_context, PublicContracts.FILE_TASKLIST_NAME);
-        if(obj instanceof ArrayList<?>) {
-            ArrayList<?> arrayList = (ArrayList<?>) obj;
-            if(arrayList.size() > 0) {
-                for (int i = 0; i < arrayList.size(); i++) {
-                    Object o = arrayList.get(i);
-                    if(o instanceof String) {
-                        taskListJSONList.add((String) o);
-                    }
-                }
-            }
-        }
-
-        //Convert the tasklists from ArrayList<String> JSON
-        return convertTasklistsFromLoading(taskListJSONList);
-    }
-
-    private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> _taskListJSONList) {
-        ArrayList<UserTaskList> taskLists = new ArrayList<>();
-        if(!_taskListJSONList.isEmpty()) {
-            for (int i = 0; i < _taskListJSONList.size(); i++) {
-                String taskListJSONString = _taskListJSONList.get(i);
-                UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
-                if(userTaskList != null) {
-                    taskLists.add(userTaskList);
-                }
-            }
-        }
-        return taskLists;
-    }
-
-
 }

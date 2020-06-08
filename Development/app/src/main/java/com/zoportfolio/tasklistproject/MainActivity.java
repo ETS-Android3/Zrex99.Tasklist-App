@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -122,10 +123,17 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         fabAddTaskList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isAlertUp) {
-                    //When the fab is clicked the new task list alert should pop up.
-                    loadAlertFragment();
-                    isAlertUp = true;
+
+                //TODO: This will be used for the testing version until i am able to get the pager to work.
+                if(mTaskLists != null && mTaskLists.size() == 1) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Feature disabled and will be coming in future update.", Toast.LENGTH_LONG);
+                    toast.show();
+                }else {
+                    if(!isAlertUp) {
+                        //When the fab is clicked the new task list alert should pop up.
+                        loadAlertFragment();
+                        isAlertUp = true;
+                    }
                 }
             }
         });
