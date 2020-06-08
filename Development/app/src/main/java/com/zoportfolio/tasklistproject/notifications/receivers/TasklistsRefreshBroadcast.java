@@ -12,6 +12,7 @@ import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
 import com.zoportfolio.tasklistproject.utility.FileUtility;
+import com.zoportfolio.tasklistproject.utility.IOUtility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -64,22 +65,6 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
         return taskLists;
     }
 
-    private ArrayList<String> convertTasklistsForSaving() {
-        ArrayList<String> taskListsJSON = new ArrayList<>();
-        for (int i = 0; i < mTaskLists.size(); i++) {
-            UserTaskList taskList = mTaskLists.get(i);
-            //Add the JSON tasklist to the arrayList.
-            taskListsJSON.add(taskList.toJSONString());
-        }
-        return taskListsJSON;
-    }
-
-    private void saveTasklistsToStorage(Context _context) {
-        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
-        boolean saveStatus = FileUtility.saveToProtectedStorage(_context, PublicContracts.FILE_TASKLIST_NAME, PublicContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
-        Log.i(TAG, "saveTasklistsToStorage: TasklistsRefreshBroadcast: Save status: " + saveStatus);
-    }
-
     private void resetAllTasksToUnchecked(Context _context) {
         for (int i = 0; i < mTaskLists.size(); i++) {
             //Tasklist scope
@@ -93,7 +78,7 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
                 }
             }
         }
-        saveTasklistsToStorage(_context);
+        IOUtility.saveTasklistsToStorage(_context, mTaskLists);
     }
 
     private void setAllTasksAlarm(Context _context) {
@@ -113,6 +98,11 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 
     private void setAlarmForTask(Context _context, UserTask _task, int _positionID) {
         AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
+
+        //TODO: HAVE TO USE THIS CODE BLUEPRINT TO:
+        // MAKE SURE WHEN A NEW TASK IS ADDED IT GETS AN ALARM SET FOR IT,
+        // CHECK FOR THE ALARM TO BE ACTIVE FROM SHARED PREFERENCES AND THEN GO FROM THERE,
+        // DO THIS IN THE MAIN ACTIVITY WHEN A NEW TASK IS ADDED.
 
         //IMPORTANT, Had to convert the task data into byte data in order to get this to work properly.
         // Filling the intent with the byte array of the task data,

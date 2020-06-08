@@ -100,7 +100,7 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
                     //This will update the text view, as the user is changing the time.
                     //TODO: Fix the text views constraints and size, its a bit smushed right now.
                     String convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(String.valueOf(hourOfDay), meridies) + ":" + String.valueOf(minute) + " " + meridies;
-                    String tvString = getResources().getString(R.string.alert_TaskNotificationTimeEdited) + convertedTime;
+                    String tvString = getResources().getString(R.string.alert_TaskNotificationTimeEdited) + " " + convertedTime;
                     mTvNotificationTimeEdited.setText(tvString);
                 }
             });

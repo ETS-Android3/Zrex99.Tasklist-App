@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     public static final String NOTIFICATION_CHANNELID_TASKREMINDER = "TASKREMINDER_100";
 
+    public static final String ACTION_TASK_VIEW_ACTIVITY = "ACTION_TASK_VIEW_ACTIVITY";
+
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
 
@@ -444,10 +446,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         ArrayList<String> taskListsJSON = convertTasklistsForSaving();
 
         Intent intent = new Intent(this, TaskInfoActivity.class);
+        intent.setAction(ACTION_TASK_VIEW_ACTIVITY);
         intent.putExtra(EXTRA_TASK, selectedTask);
         intent.putExtra(EXTRA_TASKLISTPOSITION, taskListPosition);
 
         intent.putExtra(EXTRA_TASKLISTS, taskListsJSON);
+
 
         startActivityForResult(intent, REQUEST_CODE_TASK_VIEWING);
     }

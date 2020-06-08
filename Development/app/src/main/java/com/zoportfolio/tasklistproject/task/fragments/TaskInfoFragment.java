@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import com.zoportfolio.tasklistproject.R;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
+import com.zoportfolio.tasklistproject.utility.TimeConversionUtility;
 
 public class TaskInfoFragment extends Fragment {
 
@@ -95,9 +96,18 @@ public class TaskInfoFragment extends Fragment {
             mTvTitle.setText(mUserTask.getTaskName());
             Log.i(TAG, "onActivityCreated: title set.");
 
-            String notificationTime = mTvNotificationTime.getText().toString() + " " + mUserTask.getTaskNotificationTimeAsReadable();
-            //TODO: I need to make sure that the notification time is in standard format when setting it to the text view.
-            mTvNotificationTime.setText(notificationTime);
+            String taskNotificationTime = mUserTask.getTaskNotificationTime();
+            String[] notificationTimeSplit = taskNotificationTime.split("/");
+
+            String hour = notificationTimeSplit[0];
+            String minute = notificationTimeSplit[1];
+            String meridies = notificationTimeSplit[2];
+
+            String convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(String.valueOf(hour), meridies) + ":" + String.valueOf(minute) + " " + meridies;
+
+            String notificationTimeDisplayText = mTvNotificationTime.getText().toString() + " " + convertedTime;
+
+            mTvNotificationTime.setText(notificationTimeDisplayText);
             Log.i(TAG, "onActivityCreated: notification time set.");
 
             if(mUserTask.getTaskDescription() != null) {
@@ -147,12 +157,13 @@ public class TaskInfoFragment extends Fragment {
      */
 
     private void setUpTitleEditing() {
-        mTvTitle.setEnabled(true);
         mTvTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Interface to the activity to display the title change alert.
-                mListener.editTitle(mUserTask.getTaskName());
+                if(mEditing) {
+                    //Interface to the activity to display the title change alert, only if the editing variable is true.
+                    mListener.editTitle(mUserTask.getTaskName());
+                }
             }
         });
     }
@@ -189,8 +200,6 @@ public class TaskInfoFragment extends Fragment {
 
         mBtnChangeNotificationTime.setVisibility(View.GONE);
         mBtnChangeNotificationTime.setEnabled(false);
-
-        mTvTitle.setEnabled(false);
 
         mTvDescription.setText(editedDescription);
         mTvDescription.setVisibility(View.VISIBLE);

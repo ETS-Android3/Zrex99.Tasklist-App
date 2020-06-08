@@ -33,14 +33,11 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
     public static final int REQUEST_TASK_VIEW_NOTIFICATION = 210;
 
 
-    public static final String ACTION_TASK_VIEW_NOTIFICATION = "ACTION_TASK_VIEW";
-    public static final String ACTION_LAUNCH_APP_NOTIFICATION = "ACTION_LAUNCH_APP_";
+    public static final String ACTION_TASK_VIEW_NOTIFICATION = "ACTION_TASK_VIEW_NOTIFICATION";
+    public static final String ACTION_LAUNCH_APP_NOTIFICATION = "ACTION_LAUNCH_APP_NOTIFICATION";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //TODO: This Receiver will be the one that handles the notification building and functionality,
-        // such as clicking the notification to launch the app and show the specific task,
-        // checking off the specific task in the notification (if feasible).
         if(intent != null) {
             if(intent.hasExtra(PublicContracts.EXTRA_TASK_BYTEDATA)) {
                 UserTask userTask = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
@@ -54,11 +51,6 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
     }
 
     private void createNotificationForTask(Context _context, UserTask _userTask) {
-
-        //TODO: ***CHECK THIS*** all main features are completed and it is now time for beta testing and final cleanup.
-        // Then build+sign the APK and send it to lesly and start beta testing.
-        // Then move onto other todos throughout the app and cleanup. HERE WE GOOOOO YAHOOOOOO.
-
         //Create the byte data of the task.
         byte[] userTaskByteData = UserTask.serializeUserTask(_userTask);
 

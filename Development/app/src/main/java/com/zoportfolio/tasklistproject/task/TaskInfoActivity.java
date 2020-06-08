@@ -74,7 +74,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                 mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
                 mTaskLists = loadTasklistsFromStorage(this);
                 mTaskListPosition = findTaskListPosition(mTaskOriginal, mTaskLists);
-            }else {
+            }else if(intent.getAction().equals(MainActivity.ACTION_TASK_VIEW_ACTIVITY)) {
                 //Start the activity the normal way.
                 //Need to grab the data from the intent.
                 mTaskOriginal = (UserTask) intent.getSerializableExtra(MainActivity.EXTRA_TASK);
