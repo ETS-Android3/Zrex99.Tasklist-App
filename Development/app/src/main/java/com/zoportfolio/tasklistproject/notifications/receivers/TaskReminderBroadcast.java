@@ -19,6 +19,7 @@ import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 
+import java.util.Calendar;
 import java.util.UUID;
 
 public class TaskReminderBroadcast extends BroadcastReceiver {
@@ -41,13 +42,33 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
         if(intent != null) {
             if(intent.hasExtra(PublicContracts.EXTRA_TASK_BYTEDATA)) {
                 UserTask userTask = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
-                createNotificationForTask(context, userTask);
+                if(checkForCorrectNotificationTime(userTask)) {
+                    createNotificationForTask(context, userTask);    
+                }
             }
         }
     }
 
     private UserTask convertUserTaskFromByteData(byte[] _byteData) {
         return UserTask.deserializeUserTaskByteData(_byteData);
+    }
+
+    private boolean checkForCorrectNotificationTime(UserTask _userTask) {
+        boolean correctTime = false;
+
+        String notificationTime = _userTask.getTaskNotificationTime();
+        String[] notificationTimeSplit = notificationTime.split("/");
+        String hour = notificationTimeSplit[0];
+        String minute = notificationTimeSplit[1];
+
+        Calendar rightNow = Calendar.getInstance();
+        int currentHour24Format = rightNow.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = rightNow.get(Calendar.MINUTE);
+
+        if(currentHour24Format == Integer.parseInt(hour) && currentMinute == Integer.parseInt(minute)) {
+            correctTime = true;
+        }
+        return correctTime;
     }
 
     private void createNotificationForTask(Context _context, UserTask _userTask) {

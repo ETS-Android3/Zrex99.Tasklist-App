@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     public static final String ACTION_TASK_VIEW_ACTIVITY = "ACTION_TASK_VIEW_ACTIVITY";
 
+    public static final String FILE_REFRESH_BROADCAST_ACTIVE = "FILE_REFRESH_BROADCAST_ACTIVE";
+
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
 
@@ -533,7 +535,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     }
 
     private void saveTasklistRefreshBroadcastStateToSharedPreferences(Boolean _state) {
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(FILE_REFRESH_BROADCAST_ACTIVE, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putBoolean(PublicContracts.PREF_TASKLIST_REFRESH_ACTIVE_KEY, _state);
@@ -542,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     private boolean loadTasklistRefreshBroadcastStateFromSharedPreferences() {
         boolean returnBool = false;
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(FILE_REFRESH_BROADCAST_ACTIVE, MODE_PRIVATE);
         if(preferences.contains(PublicContracts.PREF_TASKLIST_REFRESH_ACTIVE_KEY)) {
             returnBool = preferences.getBoolean(PublicContracts.PREF_TASKLIST_REFRESH_ACTIVE_KEY, false);
         }
