@@ -1,5 +1,7 @@
 package com.zoportfolio.tasklistproject.task;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -147,6 +149,9 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         //loadTaskInfoFragment();
         //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
         updateTaskLists();
+
+        //After updating the tasklists, update the alarmmanager for this task.
+
     }
 
     @Override
@@ -201,26 +206,86 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     public void saveTappedEditNotificationTime(String taskNotificationTimeEdited) {
         if(!mEdited) {
             mEdited = true;//If this was the first edit of the task, then set the edited bool to true.
-            mTaskEdited.setTaskNotificationTime(taskNotificationTimeEdited);
-            if(!mTaskEdited.getTaskNotificationTime().equals(mTaskOriginal.getTaskName())) {
-                Log.i(TAG, "saveTappedEditNotificationTime: Task notification time has been edited and is different.");
-            }
-            closeEditTaskNotificationTimeAlertFragment();
-            loadTaskInfoFragment();
-        }else {
-            mTaskEdited.setTaskNotificationTime(taskNotificationTimeEdited);
-            if(!mTaskEdited.getTaskNotificationTime().equals(mTaskOriginal.getTaskName())) {
-                Log.i(TAG, "saveTappedEditNotificationTime: Task notification time has been edited and is different.");
-            }
-            closeEditTaskNotificationTimeAlertFragment();
-            loadTaskInfoFragment();
         }
+        mTaskEdited.setTaskNotificationTime(taskNotificationTimeEdited);
+        if(!mTaskEdited.getTaskNotificationTime().equals(mTaskOriginal.getTaskName())) {
+            Log.i(TAG, "saveTappedEditNotificationTime: Task notification time has been edited and is different.");
+        }
+        closeEditTaskNotificationTimeAlertFragment();
+        loadTaskInfoFragment();
         updateTaskLists();
+        if(checkIfNotificationTimeIsAfterCurrentTime(mTaskEdited)) {
+            updateAlarmForTask(getApplicationContext());
+        }
     }
 
     /**
      * Custom methods
      */
+
+    private void updateAlarmForTask(Context _context) {
+
+        UserTask _task = mTaskEdited;
+        int _positionID = mTaskLists.get(mTaskListPosition).getTaskPosition(_task);
+
+        AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
+        //IMPORTANT, Had to convert the task data into byte data in order to get this to work properly.
+        // Filling the intent with the byte array of the task data,
+        // implementing SerializationUtils from Apache commons lang3,
+        // and adding compileOptions to utilize java 1.8 in gradle.
+        Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
+
+        byte[] userTaskByteData = UserTask.serializeUserTask(_task);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_POSITIONID, _positionID);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
+
+        PendingIntent taskAlarmIntent = PendingIntent.getBroadcast(_context.getApplicationContext(),
+                _positionID,
+                taskIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if(taskAlarmManager != null) {
+
+            String notificationTime = _task.getTaskNotificationTime();
+            String[] notificationTimeSplit = notificationTime.split("/");
+
+            String hour = notificationTimeSplit[0];
+            String minute = notificationTimeSplit[1];
+
+            java.util.Calendar taskAlarmTime = java.util.Calendar.getInstance();
+            taskAlarmTime.setTimeInMillis(System.currentTimeMillis());
+            taskAlarmTime.set(java.util.Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+            taskAlarmTime.set(java.util.Calendar.MINUTE, Integer.parseInt(minute));
+            taskAlarmTime.set(java.util.Calendar.SECOND, 0);
+
+            taskAlarmManager.set(AlarmManager.RTC_WAKEUP,
+                    taskAlarmTime.getTimeInMillis(),
+                    taskAlarmIntent);
+        }
+    }
+
+    private boolean checkIfNotificationTimeIsAfterCurrentTime(UserTask _userTask) {
+        boolean afterCurrentTime = false;
+
+        String notificationTime = _userTask.getTaskNotificationTime();
+        String[] notificationTimeSplit = notificationTime.split("/");
+        String hour = notificationTimeSplit[0];
+        String minute = notificationTimeSplit[1];
+
+        java.util.Calendar rightNow = java.util.Calendar.getInstance();
+        int currentHour24Format = rightNow.get(java.util.Calendar.HOUR_OF_DAY);
+        int currentMinute = rightNow.get(java.util.Calendar.MINUTE);
+
+        if(Integer.parseInt(hour) > currentHour24Format) {
+            //If the hour is past the current hour, then it is true.
+            afterCurrentTime = true;
+        }else if(Integer.parseInt(hour) == currentHour24Format && Integer.parseInt(minute) > currentMinute) {
+            //If the hour is the current hour, and the minute is greater than the current minute, then it is true.
+            afterCurrentTime = true;
+        }
+
+        return afterCurrentTime;
+    }
 
     private int findTaskListPosition(UserTask _userTask, ArrayList<UserTaskList> _taskLists) {
         //TODO: Will need to test this to ensure it return the correct position.

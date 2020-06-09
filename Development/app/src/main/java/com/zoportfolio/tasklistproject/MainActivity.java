@@ -13,6 +13,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -35,6 +36,7 @@ import com.google.firebase.crashlytics.internal.common.CrashlyticsCore;
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
+import com.zoportfolio.tasklistproject.notifications.receivers.TaskReminderBroadcast;
 import com.zoportfolio.tasklistproject.notifications.receivers.TasklistsRefreshBroadcast;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
 import com.zoportfolio.tasklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
@@ -272,7 +274,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             if(mTaskLists.get(i).equals(taskList)) {
                 taskListPosition = i;
                 deleteTaskList(taskListPosition);
+                //TODO: Have to show the no data view.
             }
+        }
+
+        for (int i = 0; i < taskList.getTasks().size(); i++) {
+            cancelAlarmForTask(this, taskList.getTasks().get(i), i);
         }
     }
 
@@ -286,6 +293,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 deleteTaskFromTaskList(taskListPosition, position);
             }
         }
+
+        cancelAlarmForTask(this, task, position);
     }
 
     @Override
@@ -321,16 +330,19 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void saveTappedNewTaskAlert(String taskName, String taskNotificationTime, String taskListName) {
-        //TODO: Need to add any new task to the broadcast list when it is created.
-        // Basically add the new task to the taskReminderBroadcast and give it an alarm manager,
-        // when it is added for the first time,
-        // after the first day, the other taskListRefresh broadcast will take care of it.
         UserTask newTask = new UserTask(taskName, taskNotificationTime);
+        int taskPosition = -1;
         for (int i = 0; i < mTaskLists.size(); i++) {
             if(mTaskLists.get(i).getTaskListName().equals(taskListName)) {
                 Log.i(TAG, "saveTappedNewTaskAlert: tasklist found.");
                 //Add the new task.
                 mTaskLists.get(i).getTasks().add(newTask);
+                for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
+                    if(mTaskLists.get(i).getTasks().get(j).equals(newTask)) {
+                        Log.i(TAG, "saveTappedNewTaskAlert: Task position is " + j);
+                        taskPosition = j;
+                    }
+                }
                 //Save the updated tasklists
                 saveTasklistsToStorage();
                 //Reload the taskListFragment.
@@ -339,19 +351,105 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             }
         }
 
-        //TODO: ***Add task to the taskReminderBroadcast.***
-
         Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskSavingSuccesful), Toast.LENGTH_LONG);
         toast.show();
 
-        //Have to close out the alert.
+        //Have to close out the alert fragment.
         closeAlertFragmentFromTaskListFragment();
+
+        if(checkIfNotificationTimeIsAfterCurrentTime(newTask)) {
+            Log.i(TAG, "saveTappedNewTaskAlert: Notification time is after current time.");
+            setAlarmForTask(this, newTask, taskPosition);
+        }
     }
 
 
     /**
      * Custom methods
      */
+
+
+    private void setAlarmForTask(Context _context, UserTask _task, int _positionID) {
+        AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
+        //IMPORTANT, Had to convert the task data into byte data in order to get this to work properly.
+        // Filling the intent with the byte array of the task data,
+        // implementing SerializationUtils from Apache commons lang3,
+        // and adding compileOptions to utilize java 1.8 in gradle.
+        Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
+
+        byte[] userTaskByteData = UserTask.serializeUserTask(_task);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_POSITIONID, _positionID);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
+
+        PendingIntent taskAlarmIntent = PendingIntent.getBroadcast(_context.getApplicationContext(),
+                _positionID,
+                taskIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if(taskAlarmManager != null) {
+
+            String notificationTime = _task.getTaskNotificationTime();
+            String[] notificationTimeSplit = notificationTime.split("/");
+
+            String hour = notificationTimeSplit[0];
+            String minute = notificationTimeSplit[1];
+
+            java.util.Calendar taskAlarmTime = java.util.Calendar.getInstance();
+            taskAlarmTime.setTimeInMillis(System.currentTimeMillis());
+            taskAlarmTime.set(java.util.Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+            taskAlarmTime.set(java.util.Calendar.MINUTE, Integer.parseInt(minute));
+            taskAlarmTime.set(java.util.Calendar.SECOND, 0);
+
+            taskAlarmManager.set(AlarmManager.RTC_WAKEUP,
+                    taskAlarmTime.getTimeInMillis(),
+                    taskAlarmIntent);
+
+            Log.i(TAG, "setAlarmForTask: Alarm set in main activity.");
+        }
+    }
+
+    private void cancelAlarmForTask(Context _context, UserTask _task, int _positionID) {
+        AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
+
+        byte[] userTaskByteData = UserTask.serializeUserTask(_task);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_POSITIONID, _positionID);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
+
+        PendingIntent taskAlarmIntent = PendingIntent.getBroadcast(_context.getApplicationContext(),
+                _positionID,
+                taskIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if(taskAlarmManager != null) {
+            taskAlarmManager.cancel(taskAlarmIntent);
+            Log.i(TAG, "cancelAlarmForTask: cancelled task");
+        }
+    }
+
+    private boolean checkIfNotificationTimeIsAfterCurrentTime(UserTask _userTask) {
+        boolean afterCurrentTime = false;
+
+        String notificationTime = _userTask.getTaskNotificationTime();
+        String[] notificationTimeSplit = notificationTime.split("/");
+        String hour = notificationTimeSplit[0];
+        String minute = notificationTimeSplit[1];
+
+        java.util.Calendar rightNow = java.util.Calendar.getInstance();
+        int currentHour24Format = rightNow.get(java.util.Calendar.HOUR_OF_DAY);
+        int currentMinute = rightNow.get(java.util.Calendar.MINUTE);
+
+        if(Integer.parseInt(hour) > currentHour24Format) {
+            //If the hour is past the current hour, then it is true.
+            afterCurrentTime = true;
+        }else if(Integer.parseInt(hour) == currentHour24Format && Integer.parseInt(minute) > currentMinute) {
+            //If the hour is the current hour, and the minute is greater than the current minute, then it is true.
+            afterCurrentTime = true;
+        }
+
+        return afterCurrentTime;
+    }
 
     private void loadCurrentDate(TextView _tvCurrentDateDisplay) {
 

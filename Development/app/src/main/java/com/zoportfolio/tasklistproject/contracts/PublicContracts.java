@@ -7,6 +7,7 @@ public class PublicContracts {
     public static final String FILE_TASKLIST_NAME = "TasklistChecklist";
 
     public static final String EXTRA_TASK_BYTEDATA = "EXTRA_TASK_BYTEDATA";
+    public static final String EXTRA_TASK_POSITIONID = "EXTRA_TASK_POSITIONID";
 
     public static final String PREF_TASKLIST_REFRESH_ACTIVE_KEY = "PREF_TASKLIST_REFRESH_ACTIVE";
 

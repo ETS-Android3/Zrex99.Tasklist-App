@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.util.Calendar;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.zoportfolio.tasklistproject.MainActivity;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;

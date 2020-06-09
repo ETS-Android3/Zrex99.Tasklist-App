@@ -112,6 +112,7 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
         Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
 
         byte[] userTaskByteData = UserTask.serializeUserTask(_task);
+        taskIntent.putExtra(PublicContracts.EXTRA_TASK_POSITIONID, _positionID);
         taskIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
 
         PendingIntent taskAlarmIntent = PendingIntent.getBroadcast(_context.getApplicationContext(),

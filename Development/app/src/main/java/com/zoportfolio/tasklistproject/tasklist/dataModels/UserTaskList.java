@@ -67,6 +67,17 @@ public class UserTaskList implements Serializable {
         mTasks = tasks;
     }
 
+    public int getTaskPosition(UserTask _task) {
+        int returnPosition = -1;
+        for (int i = 0; i < mTasks.size(); i++) {
+            if(mTasks.get(i).getTaskName().equals(_task.getTaskName())) {
+                Log.i(TAG, "getTaskPosition: found task to return position.");
+                returnPosition = i;
+            }
+        }
+        return returnPosition;
+    }
+
 
 
     /**
