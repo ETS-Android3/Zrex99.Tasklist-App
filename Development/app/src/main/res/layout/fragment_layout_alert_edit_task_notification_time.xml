@@ -34,29 +34,35 @@
 
     <TextView
         android:id="@+id/tv_AlertTitleText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:textAlignment="center"
         android:text="@string/alert_newTaskNotificationTimeEdit"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginTitle"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginEditText"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMarginTitle" />
 
     <TextView
         android:id="@+id/tv_AlertNewNotificationTime"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/alert_TaskNotificationTimeEdited"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline_topMarginTimePicker"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginEditText"
-        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
-        app:layout_constraintTop_toBottomOf="@+id/tv_AlertTitleText" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline_bottomMarginTitle" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_leftMargin"
@@ -73,11 +79,18 @@
         app:layout_constraintGuide_percent="0.96" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
+        android:id="@+id/guideline_topMarginTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.02" />
+        app:layout_constraintGuide_percent="0.04" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottomMarginTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.14" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_bottomMargin"
@@ -113,17 +126,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.25" />
+        app:layout_constraintGuide_percent="0.35" />
 
     <TimePicker
         android:id="@+id/tp_NotificationTime"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@color/colorPrimaryMain"
+        android:descendantFocusability="blocksDescendants"
         android:timePickerMode="spinner"
         app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginTimePicker"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
@@ -135,6 +149,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65" />
+        app:layout_constraintGuide_percent="0.75" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

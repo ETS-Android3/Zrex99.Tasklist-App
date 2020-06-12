@@ -98,8 +98,12 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
                     mNotificationTime = UserTask.formatNotificationTime(hourOfDay, minute, meridies);
 
                     //This will update the text view, as the user is changing the time.
-                    //TODO: Fix the text views constraints and size, its a bit smushed right now.
-                    String convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(String.valueOf(hourOfDay), meridies) + ":" + String.valueOf(minute) + " " + meridies;
+                    String convertedTime = "";
+                    if(minute < 10) {
+                        convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(String.valueOf(hourOfDay), meridies) + ":0" + String.valueOf(minute) + " " + meridies;
+                    }else {
+                        convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(String.valueOf(hourOfDay), meridies) + ":" + String.valueOf(minute) + " " + meridies;
+                    }
                     String tvString = getResources().getString(R.string.alert_TaskNotificationTimeEdited) + " " + convertedTime;
                     mTvNotificationTimeEdited.setText(tvString);
                 }
@@ -114,7 +118,6 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
                 mListener.cancelTappedEditNotificationTime();
             }
         });
-
         mTvConfirmAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

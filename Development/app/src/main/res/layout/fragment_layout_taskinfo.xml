@@ -82,7 +82,7 @@
         android:layout_height="wrap_content"
         android:text="@string/task_notificationPlaceholder"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
         app:layout_constraintTop_toBottomOf="@id/guideline_topMarginTextViews"/>
@@ -95,7 +95,7 @@
         android:text="@string/task_descriptionPlaceholder"
         android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline_bottomMarginTextViews"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
@@ -153,10 +153,11 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/nuemorph_button_ripple"
         android:text="@string/task_NotificationButton"
+        android:textSize="12sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginTextViews"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginTextViews"
-        app:layout_constraintTop_toBottomOf="@id/guideline_bottomMarginTextViews"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottomMarginTextViews" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

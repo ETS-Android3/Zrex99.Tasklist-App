@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.zoportfolio.tasklistproject.MainActivity"
-            android:windowSoftInputMode="stateVisible|adjustPan">
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
         <activity android:name="com.zoportfolio.tasklistproject.task.TaskInfoActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustNothing">
         </activity>
         <receiver android:name=".notifications.receivers.TasklistsRefreshBroadcast"
             android:enabled="true"/>

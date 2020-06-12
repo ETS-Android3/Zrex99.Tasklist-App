@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ChecklistProject</string>
+    <string name="app_name">TaskMaster</string>
 
     <!-- Alert fragment strings-->
     <string name="alert_newTaskListTitle">Enter new tasklist name</string>

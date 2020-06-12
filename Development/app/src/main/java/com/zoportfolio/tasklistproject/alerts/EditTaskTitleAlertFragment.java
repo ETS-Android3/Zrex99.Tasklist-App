@@ -76,7 +76,7 @@ public class EditTaskTitleAlertFragment extends Fragment {
         //Prompt text
         String taskNameToEdit = (getArguments() != null ? getArguments().getString(ARG_TASKNAMETOEDIT) : null);
         if(taskNameToEdit != null) {
-            String promptString = "Please change the name of task: " + "\"" + taskNameToEdit;
+            String promptString = "Please change the name of task: " + "\"" + taskNameToEdit + "\"";
             mTvPrompt.setText(promptString);
         }else {
             mTvPrompt.setText(getResources().getString(R.string.alert_newTaskTitleEdit));

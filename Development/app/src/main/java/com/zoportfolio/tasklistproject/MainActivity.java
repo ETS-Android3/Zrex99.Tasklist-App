@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -88,6 +89,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //TODO: Have to test this with the physical device, and make sure it does not affect the alert edit texts.
+        // May have to put it into the task info activity as well.
+        // Used in the on resume as well.
+        // IMPORTANT USED THE ADJUSTNOTHING FLAG IN MANIFEST AND THAT SEEMS TO WORK, STILL NEED TO TEST.
+//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         //Create the notification channel.
         createNotificationChannel();
@@ -791,7 +797,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             saveTasklistsToStorage();
             //Check for any remaining tasklists, if not then load the no data text view.
             if(mTaskLists.isEmpty()) {
-                loadOnFreshAppOpen();
+                FrameLayout frameLayout = findViewById(R.id.fragment_Container_Tasklist);
+                frameLayout.setVisibility(View.GONE);
+
+                TextView textView = findViewById(R.id.tv_noData);
+                textView.setVisibility(View.VISIBLE);
+
             }else {
                 //Reload the taskListFragment.
                 loadTaskListFragment(mTaskLists.get(0));

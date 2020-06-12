@@ -36,15 +36,20 @@
 
     <TextView
         android:id="@+id/tv_AlertTitleText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/alert_newTaskListTitle"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:textAlignment="center"
+        android:text="@string/alert_newTaskTitle"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
-        app:layout_constraintStart_toStartOf="@+id/guideline_leftMargin"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+        app:layout_constraintBottom_toTopOf="@id/guidelinebottomMarginTitle"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginEditText"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginEditText"
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMarginTitle" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_leftMargin"
@@ -61,11 +66,18 @@
         app:layout_constraintGuide_percent="0.96" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
+        android:id="@+id/guideline_topMarginTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.02" />
+        app:layout_constraintGuide_percent="0.08" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelinebottomMarginTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.20" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_bottomMargin"
@@ -139,11 +151,12 @@
         android:id="@+id/tp_NotificationTime"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@color/colorPrimaryMain"
+        android:descendantFocusability="blocksDescendants"
         android:timePickerMode="spinner"
         app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginTimePicker"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"

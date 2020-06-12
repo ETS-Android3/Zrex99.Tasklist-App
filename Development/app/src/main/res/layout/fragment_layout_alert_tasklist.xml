@@ -44,7 +44,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline_rightMargin"
         app:layout_constraintStart_toStartOf="@+id/guideline_leftMargin"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+        app:layout_constraintTop_toTopOf="@+id/guideline_topMarginTitle" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_leftMargin"
@@ -61,7 +61,7 @@
         app:layout_constraintGuide_percent="0.96" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
+        android:id="@+id/guideline_topMarginTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

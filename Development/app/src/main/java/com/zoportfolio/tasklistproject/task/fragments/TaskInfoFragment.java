@@ -103,8 +103,12 @@ public class TaskInfoFragment extends Fragment {
             String minute = notificationTimeSplit[1];
             String meridies = notificationTimeSplit[2];
 
-            String convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(String.valueOf(hour), meridies) + ":" + String.valueOf(minute) + " " + meridies;
-
+            String convertedTime = "";
+            if(Integer.parseInt(minute) < 10) {
+                convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(hour, meridies) + ":0" + String.valueOf(minute) + " " + meridies;
+            }else {
+                convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(hour, meridies) + ":" + String.valueOf(minute) + " " + meridies;
+            }
             String notificationTimeDisplayText = mTvNotificationTime.getText().toString() + " " + convertedTime;
 
             mTvNotificationTime.setText(notificationTimeDisplayText);
