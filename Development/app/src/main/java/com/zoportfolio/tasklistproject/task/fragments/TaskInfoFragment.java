@@ -104,22 +104,21 @@ public class TaskInfoFragment extends Fragment {
             String meridies = notificationTimeSplit[2];
 
             String convertedTime = "";
-            if(Integer.parseInt(minute) < 10) {
-                convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(hour, meridies) + ":0" + String.valueOf(minute) + " " + meridies;
+            if(minute.equals("00")) {
+                convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(hour, meridies) + ":" + minute + " " + meridies;
+            }else if(Integer.parseInt(minute) < 10) {
+                convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(hour, meridies) + ":0" + minute + " " + meridies;
             }else {
-                convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(hour, meridies) + ":" + String.valueOf(minute) + " " + meridies;
+                convertedTime = TimeConversionUtility.convertMilitaryHourFormatToStandardHourFormat(hour, meridies) + ":" + minute + " " + meridies;
             }
             String notificationTimeDisplayText = mTvNotificationTime.getText().toString() + " " + convertedTime;
 
             mTvNotificationTime.setText(notificationTimeDisplayText);
-            Log.i(TAG, "onActivityCreated: notification time set.");
 
             if(mUserTask.getTaskDescription() != null) {
                 mTvDescription.setText(mUserTask.getTaskDescription());
-                Log.i(TAG, "onActivityCreated: description filled from data.");
             }else {
                 mTvDescription.setText(getResources().getString(R.string.task_descriptionNoData));
-                Log.i(TAG, "onActivityCreated: no description data.");
             }
 
             //Fill out the editing functionality.

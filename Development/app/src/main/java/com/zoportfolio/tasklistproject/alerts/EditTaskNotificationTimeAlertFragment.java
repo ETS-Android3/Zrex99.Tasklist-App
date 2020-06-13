@@ -79,9 +79,7 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
             String minute = notificationTimeSplit[1];
             String meridies = notificationTimeSplit[2];
 
-            int convertedHour = TimeConversionUtility.convertStandardHourFormatToMilitaryHourFormat(hour, meridies);
-
-            mTpNotificationTime.setHour(convertedHour);
+            mTpNotificationTime.setHour(Integer.parseInt(hour));
             mTpNotificationTime.setMinute(Integer.parseInt(minute));
 
             mTpNotificationTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
