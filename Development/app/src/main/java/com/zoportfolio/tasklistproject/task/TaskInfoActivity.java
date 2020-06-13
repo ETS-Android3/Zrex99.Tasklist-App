@@ -339,6 +339,13 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         saveTasklistsToStorage();
     }
 
+    private void setIsAlertUpInTaskInfoFragment(boolean _alertUp) {
+        TaskInfoFragment fragment = (TaskInfoFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TASKINFO_TAG);
+        if(fragment != null) {
+            fragment.setIsAlertUp(_alertUp);
+        }
+    }
+
     /**
      * Custom methods - Loading and Closing Fragments.
      */
@@ -379,6 +386,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                 .commit();
 
         mIsAlertUp = true;
+        setIsAlertUpInTaskInfoFragment(mIsAlertUp);
     }
 
     private void closeEditTaskTitleAlertFragment() {
@@ -395,6 +403,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
             //Notify the alertUp variable.
             mIsAlertUp = false;
+            setIsAlertUpInTaskInfoFragment(mIsAlertUp);
         }
     }
 
@@ -407,6 +416,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                 .commit();
 
         mIsAlertUp = true;
+        setIsAlertUpInTaskInfoFragment(mIsAlertUp);
     }
 
     private void closeEditTaskNotificationTimeAlertFragment() {
@@ -423,6 +433,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
             //Notify the alertUp variable.
             mIsAlertUp = false;
+            setIsAlertUpInTaskInfoFragment(mIsAlertUp);
         }
     }
 

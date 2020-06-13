@@ -13,8 +13,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
@@ -37,6 +39,7 @@ import com.google.firebase.crashlytics.internal.common.CrashlyticsCore;
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
+import com.zoportfolio.tasklistproject.notifications.receivers.TaskCheckedBroadcast;
 import com.zoportfolio.tasklistproject.notifications.receivers.TaskReminderBroadcast;
 import com.zoportfolio.tasklistproject.notifications.receivers.TasklistsRefreshBroadcast;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
@@ -45,6 +48,7 @@ import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
 import com.zoportfolio.tasklistproject.tasklist.fragments.TaskListFragment;
 import com.zoportfolio.tasklistproject.utility.FileUtility;
+import com.zoportfolio.tasklistproject.utility.IOUtility;
 
 import java.util.ArrayList;
 
@@ -73,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     public static final String FILE_REFRESH_BROADCAST_ACTIVE = "FILE_REFRESH_BROADCAST_ACTIVE";
 
+
+
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
 
@@ -80,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     private ArrayList<UserTaskList> mTaskLists;
 
     private static Boolean isAlertUp = false;
+
+    private final TaskCheckedReceiver taskCheckedReceiver = new TaskCheckedReceiver();
 
     /**
      * Lifecycle methods
@@ -166,8 +174,23 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        //Reload the mTaskLists from storage and then reload the Tasklist fragment.
+        loadOnResumeAppOpen();
+
+        //Register the receiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PublicContracts.ACTION_TASK_CHECKED_NOTIFICATION);
+
+        this.registerReceiver(taskCheckedReceiver, filter);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        //Unregister the receiver
+        this.unregisterReceiver(taskCheckedReceiver);
     }
 
     @Override
@@ -202,14 +225,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //TODO: Handle the changed task data and save the updated tasklists.
         if(requestCode == REQUEST_CODE_TASK_VIEWING) {
             if(resultCode == RESULT_CODE_TASK_CHANGED) {
-                //TODO: If the data was changed, reload the tasklists from storage.
                 loadTasklistsFromStorage();
             }
         }
     }
+
 
     /**
      * Interface methods
@@ -280,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             if(mTaskLists.get(i).equals(taskList)) {
                 taskListPosition = i;
                 deleteTaskList(taskListPosition);
-                //TODO: Have to show the no data view.
             }
         }
 
@@ -735,7 +756,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         if(checkForTasklistsInStorage()) {
             loadTasklistsFromStorage();
 
-            //TODO: Will have to start the tasklist refresh broadcast when the user adds their first tasklit.
             //If the tasklist refresh broadcast is not active, set it up.
             if(!loadTasklistRefreshBroadcastStateFromSharedPreferences()) {
                 setupTasklistsRefreshBroadcast();
@@ -745,6 +765,20 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //If there are no files saved, display the no data text view.
             TextView textView = findViewById(R.id.tv_noData);
             textView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void loadOnResumeAppOpen() {
+        if(IOUtility.checkForTasklistsInStorage(this)) {
+            if(mTaskLists == null) {
+                mTaskLists = new ArrayList<>();
+            }else {
+                mTaskLists.clear();
+            }
+            mTaskLists = IOUtility.loadTasklistsFromStorage(this);
+            if(!mTaskLists.isEmpty()) {
+                loadTaskListFragment(mTaskLists.get(0));
+            }
         }
     }
 
@@ -813,5 +847,24 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     }
 
+
+    class TaskCheckedReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction() != null && intent.getAction().equals(PublicContracts.ACTION_TASK_CHECKED_NOTIFICATION)) {
+                if(mTaskLists == null) {
+                    mTaskLists = new ArrayList<UserTaskList>();
+                }else {
+                    mTaskLists.clear();
+                }
+                mTaskLists = IOUtility.loadTasklistsFromStorage(context);
+                if(!mTaskLists.isEmpty()) {
+                    //TODO: When I implement multiple tasklists, need to check which tasklist the task that was checked came from, and reload that list.
+                    loadTaskListFragment(mTaskLists.get(0));
+                }
+            }
+        }
+    }
 
 }

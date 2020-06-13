@@ -160,19 +160,39 @@ public class TaskInfoFragment extends Fragment {
      * Custom methods
      */
 
+    public void setIsAlertUp(boolean _alertUp) {
+        isAlertUp = _alertUp;
+        handleDescriptionEditingStateBasedOnAlertState(_alertUp);
+    }
+
+    private void handleDescriptionEditingStateBasedOnAlertState(boolean _alertUp) {
+        if(_alertUp) {
+            mEtDescription.setEnabled(false);
+        }else {
+            mEtDescription.setEnabled(true);
+        }
+    }
+
     private void setUpTitleEditing() {
         mTvTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mEditing) {
-                    //Interface to the activity to display the title change alert, only if the editing variable is true.
-                    mListener.editTitle(mUserTask.getTaskName());
+                    if(isAlertUp) {
+                        Log.i(TAG, "onClick: alert is already up");
+                        //TODO: Toast that an alert is already up and that they need to finish editing or close the alert.
+                    }else {
+                        //Interface to the activity to display the title change alert, only if the editing variable is true.
+                        mListener.editTitle(mUserTask.getTaskName());
+                    }
+
                 }
             }
         });
     }
 
     private void setUpDescriptionEditing() {
+
         //Hide the tv description and show the et description
         String description = mTvDescription.getText().toString();
         mTvDescription.setVisibility(View.GONE);
@@ -182,6 +202,10 @@ public class TaskInfoFragment extends Fragment {
         mEtDescription.addTextChangedListener(mTextEditorWatcher);
     }
 
+    private void takeDownDescriptionEditing() {
+
+    }
+
     private void setUpNotificationEditing(final String notificationTime) {
         //Show the notification button
         mBtnChangeNotificationTime.setVisibility(View.VISIBLE);
@@ -189,10 +213,12 @@ public class TaskInfoFragment extends Fragment {
         mBtnChangeNotificationTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Have to create an alert for just the timepicker with cancel and save.
-                // Then show this alert here.
-                // Use interface to have the activity handle the alert fragment.
-                mListener.editNotificationTime(notificationTime);
+                if(isAlertUp) {
+                    Log.i(TAG, "onClick: alert is already up");
+                    //TODO: Toast that an alert is already up and that they need to finish editing or close the alert.
+                }else {
+                    mListener.editNotificationTime(notificationTime);
+                }
             }
         });
     }

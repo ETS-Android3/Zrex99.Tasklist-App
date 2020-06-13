@@ -27,6 +27,10 @@ public class TaskCheckedBroadcast extends BroadcastReceiver {
                     ArrayList<UserTaskList> taskLists = IOUtility.loadTasklistsFromStorage(context);
                     UserTask userTask = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
                     updateTask(context, userTask, taskLists);
+
+                    Intent taskCheckedIntent = new Intent();
+                    taskCheckedIntent.setAction(PublicContracts.ACTION_TASK_CHECKED_NOTIFICATION);
+                    context.sendBroadcast(taskCheckedIntent);
                 }
             }
         }
