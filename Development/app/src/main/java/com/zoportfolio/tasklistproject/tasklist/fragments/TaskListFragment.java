@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -18,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.R;
@@ -217,12 +221,39 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
 
             if(a != null) {
+
                 FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
                 frameLayout.setVisibility(View.VISIBLE);
 
-                mContext.getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_Container_AlertNewTask, NewTaskAlertFragment.newInstance(taskNames, mTaskList.getTaskListName()), FRAGMENT_ALERT_NEWTASK_TAG)
-                        .commit();
+                NewTaskAlertFragment fragment = NewTaskAlertFragment.newInstance(taskNames, mTaskList.getTaskListName());
+
+                Animation animation = AnimationUtils.loadAnimation(a, R.anim.slide_in_up);
+                animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        try {
+                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.replace(R.id.fragment_Container_AlertNewTask, fragment, FRAGMENT_ALERT_NEWTASK_TAG);
+                            fragmentTransaction.commit();
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+
+                frameLayout.startAnimation(animation);
 
                 isAlertUp = true;
                 mListener.isNewTaskAlertUp(true);
@@ -254,14 +285,39 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
             //Get the fragment by its tag, and null check it.
             Fragment fragment = mContext.getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
             if(fragment != null) {
-                //Hide the frame layout.
-                FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
-                frameLayout.setVisibility(View.GONE);
 
-                //Remove the fragment.
-                mContext.getSupportFragmentManager().beginTransaction()
-                        .remove(fragment)
-                        .commit();
+                //Get the frame layout that holds the fragment.
+                FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
+
+                Animation animation = AnimationUtils.loadAnimation(a, R.anim.slide_out_down);
+                animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        try {
+                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.remove(fragment);
+                            fragmentTransaction.commitAllowingStateLoss();
+                            //Hide the frame layout.
+                            frameLayout.setVisibility(View.GONE);
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+
+                frameLayout.startAnimation(animation);
 
                 //Set the bool to false, so a new alert can appear.
                 isAlertUp = false;
@@ -270,6 +326,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         }
     }
 
+    //Not using this because I should be having the newtaskalertfragment communicate to the main activity.
     public void addNewTaskToTaskList(UserTask _newTask) {
         mTaskList.addTaskToList(_newTask);
         updateTaskListView(true);

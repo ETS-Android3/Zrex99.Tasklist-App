@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -30,6 +31,8 @@ import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -523,9 +526,35 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             }
         }
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_AlertNewTaskList, NewTaskListAlertFragment.newInstance(taskListNames), FRAGMENT_ALERT_NEWTASKLIST_TAG)
-                .commit();
+        NewTaskListAlertFragment fragment = NewTaskListAlertFragment.newInstance(taskListNames);
+
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
+        animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                try {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_Container_AlertNewTaskList, fragment, FRAGMENT_ALERT_NEWTASKLIST_TAG);
+                    fragmentTransaction.commit();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        frameLayout.startAnimation(animation);
 
         isAlertUp = true;
     }
@@ -536,12 +565,36 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         if(fragment != null) {
             //Hide the frame layout.
             FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTaskList);
-            frameLayout.setVisibility(View.GONE);
 
-            //Remove the fragment.
-            getSupportFragmentManager().beginTransaction()
-                    .remove(fragment)
-                    .commit();
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_down);
+            animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    try {
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.remove(fragment);
+                        fragmentTransaction.commitAllowingStateLoss();
+                        //Hide the frame layout.
+                        frameLayout.setVisibility(View.GONE);
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            frameLayout.startAnimation(animation);
 
             //Set the bool to false, so a new alert can appear.
             isAlertUp = false;

@@ -1,14 +1,21 @@
 package com.zoportfolio.tasklistproject.notifications.receivers;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
+
 import com.zoportfolio.tasklistproject.MainActivity;
+import com.zoportfolio.tasklistproject.R;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
@@ -17,6 +24,7 @@ import com.zoportfolio.tasklistproject.utility.IOUtility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.UUID;
 
 public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 
@@ -31,14 +39,12 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
             if(intent.getAction() != null && intent.getAction().equals(PublicContracts.ACTION_RESET_TASKLISTS_BROADCAST)) {
 
                 //TODO: May have to turn this into a JobService i think, not sure which is the correct one.
-
-                //TODO: THE REASON WHY THIS DOESNT WORK IS BECAUSE I AM RELYING ON THE USER NOT UPDATING THE TASKLISTS IN ANY, I SHOULD BE LOADING THE TASKLISTS IN FROM STORAGE.
-                // THIS IS CREATING NOTIFICATION ALARMS FOR TASKS THAT ARENT EVEN SAVED ANYMORE.
                 
                 mTaskLists = IOUtility.loadTasklistsFromStorage(context);
                 if(!mTaskLists.isEmpty()) {
                     resetAllTasksToUnchecked(context);
                     setAllTasksAlarm(context);
+                    createDebugNotification(context);
                     Log.i(TAG, "onReceive: end time of receiver");
                 }
             }
@@ -146,5 +152,33 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
         }
     }
 
+    //TODO: This is only for testing and will be deleted after beta phase.
+    private void createDebugNotification(Context _context) {
+        //Create the string messages for the notification.
+
+        String bigTextMessage = "This is a test of the tasklistsrefreshBroadcast class, to see if it was activated on bootup or at 12 am midnight.";
+        String bigContentTitleMessage = "All tasks alarmManagers were reset successfully";
+        String summaryTextMessage = "TasklistsRefreshBroadcast class was activated";
+
+        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
+                .bigText(bigTextMessage)
+                .setBigContentTitle(bigContentTitleMessage)
+                .setSummaryText(summaryTextMessage);
+
+        Bitmap largeIcon = BitmapFactory.decodeResource(_context.getResources(), R.drawable.ic_task_notification_placeholder);
+        Notification notification = new NotificationCompat.Builder(_context, MainActivity.NOTIFICATION_CHANNELID_TASKREMINDER)
+                .setLargeIcon(largeIcon)
+                .setSmallIcon(R.drawable.ic_task_notification_placeholder)
+                .setContentTitle("DEBUG NOTIFICATION")
+                .setStyle(bigTextStyle)
+                .build();
+        int notificationId = UUID.randomUUID().hashCode();
+
+        NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(notificationManager != null) {
+            notificationManager.notify(notificationId, notification);
+        }
+
+    }
 
 }

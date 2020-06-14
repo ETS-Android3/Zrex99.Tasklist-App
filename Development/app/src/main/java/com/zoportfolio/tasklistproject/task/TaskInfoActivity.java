@@ -7,12 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.zoportfolio.tasklistproject.MainActivity;
 import com.zoportfolio.tasklistproject.R;
@@ -154,7 +157,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         }
 
         //After updating the tasklists, update the alarmmanager for this task.
-
     }
 
     @Override
@@ -387,9 +389,35 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskTitle);
         frameLayout.setVisibility(View.VISIBLE);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_AlertEditTaskTitle, EditTaskTitleAlertFragment.newInstance(taskNames, mTaskLists.get(mTaskListPosition).getTaskListName(), _taskName), FRAGMENT_EDIT_TASK_TITLE_TAG)
-                .commit();
+        EditTaskTitleAlertFragment fragment = EditTaskTitleAlertFragment.newInstance(taskNames, mTaskLists.get(mTaskListPosition).getTaskListName(), _taskName);
+
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
+        animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                try {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_Container_AlertEditTaskTitle, fragment, FRAGMENT_EDIT_TASK_TITLE_TAG);
+                    fragmentTransaction.commit();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        frameLayout.startAnimation(animation);
 
         mIsAlertUp = true;
         setIsAlertUpInTaskInfoFragment(mIsAlertUp);
@@ -398,14 +426,37 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private void closeEditTaskTitleAlertFragment() {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_EDIT_TASK_TITLE_TAG);
         if(fragment != null) {
-            //Hide the frame layout
             FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskTitle);
-            frameLayout.setVisibility(View.GONE);
 
-            //Remove the fragment
-            getSupportFragmentManager().beginTransaction()
-                    .remove(fragment)
-                    .commit();
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_down);
+            animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    try {
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.remove(fragment);
+                        fragmentTransaction.commitAllowingStateLoss();
+                        //Hide the frame layout.
+                        frameLayout.setVisibility(View.GONE);
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            frameLayout.startAnimation(animation);
 
             //Notify the alertUp variable.
             mIsAlertUp = false;
@@ -417,9 +468,35 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskNotificationTime);
         frameLayout.setVisibility(View.VISIBLE);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_AlertEditTaskNotificationTime, EditTaskNotificationTimeAlertFragment.newInstance(_taskNotificationTime), FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG)
-                .commit();
+        EditTaskNotificationTimeAlertFragment fragment = EditTaskNotificationTimeAlertFragment.newInstance(_taskNotificationTime);
+
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
+        animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                try {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_Container_AlertEditTaskNotificationTime, fragment, FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG);
+                    fragmentTransaction.commit();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        frameLayout.startAnimation(animation);
 
         mIsAlertUp = true;
         setIsAlertUpInTaskInfoFragment(mIsAlertUp);
@@ -428,14 +505,37 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private void closeEditTaskNotificationTimeAlertFragment() {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG);
         if(fragment != null) {
-            //Hide the frame layout
             FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertEditTaskNotificationTime);
-            frameLayout.setVisibility(View.GONE);
 
-            //Remove the fragment
-            getSupportFragmentManager().beginTransaction()
-                    .remove(fragment)
-                    .commit();
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_down);
+            animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    try {
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.remove(fragment);
+                        fragmentTransaction.commitAllowingStateLoss();
+                        //Hide the frame layout.
+                        frameLayout.setVisibility(View.GONE);
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            frameLayout.startAnimation(animation);
 
             //Notify the alertUp variable.
             mIsAlertUp = false;
