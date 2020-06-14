@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         fabAddTaskList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                
                 //TODO: This will be used for the testing version until i am able to get the pager to work.
                 if(mTaskLists != null && mTaskLists.size() == 1) {
                     Toast toast = Toast.makeText(getApplicationContext(), "Feature disabled and will be coming in future update.", Toast.LENGTH_LONG);
@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                     if(!isAlertUp) {
                         //When the fab is clicked the new task list alert should pop up.
                         loadAlertFragment();
-                        isAlertUp = true;
                     }
                 }
             }
@@ -343,6 +342,11 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
     }
 
+    @Override
+    public void isNewTaskAlertUp(boolean _alertState) {
+        isAlertUp = _alertState;
+    }
+
     //NewTaskAlertFragment Callbacks
 
     @Override
@@ -522,6 +526,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_Container_AlertNewTaskList, NewTaskListAlertFragment.newInstance(taskListNames), FRAGMENT_ALERT_NEWTASKLIST_TAG)
                 .commit();
+
+        isAlertUp = true;
     }
 
     private void closeAlertFragment() {

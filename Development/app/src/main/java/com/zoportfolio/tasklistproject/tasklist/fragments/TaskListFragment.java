@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -73,6 +74,8 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         //TODO: Will need a tasklist ID,
         // potential solution = use tasklist name, prevent user from entering duplicate names.
         void taskListUpdated(UserTaskList updatedTaskList);
+
+        void isNewTaskAlertUp(boolean _alertState);
     }
 
     @Override
@@ -120,28 +123,32 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                     @Override
                     public void onClick(View v) {
                         //Check the editing state, control flow from there
-                        if(!mEditing) { //The list view is not being edited.
-                            //Set the fragment to be editing the list view.
-                            mEditing = true;
-                            //Load the editing adapter.
-                            editTaskListView(true);
 
-                            mIbTrash.setVisibility(View.VISIBLE);
-                            mIbTrash.setEnabled(true);
-                            mIbTrash.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    mListener.trashTapped(mTaskList);
-                                }
-                            });
+                        if(!isAlertUp) {
+                            //If the tasklist is not empty, handle code.
+                            if(!mEditing) { //The list view is not being edited.
+                                //Set the fragment to be editing the list view.
+                                mEditing = true;
+                                //Load the editing adapter.
+                                editTaskListView(true);
 
-                        }else {//The list view is in the edit state.
-                            //Set the fragment back to its natural state.
-                            mEditing = false;
+                                mIbTrash.setVisibility(View.VISIBLE);
+                                mIbTrash.setEnabled(true);
+                                mIbTrash.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        mListener.trashTapped(mTaskList);
+                                    }
+                                });
 
-                            updateTaskListView(true);
-                            mIbTrash.setVisibility(View.GONE);
-                            mIbTrash.setEnabled(false);
+                            }else {//The list view is in the edit state.
+                                //Set the fragment back to its natural state.
+                                mEditing = false;
+
+                                updateTaskListView(true);
+                                mIbTrash.setVisibility(View.GONE);
+                                mIbTrash.setEnabled(false);
+                            }
                         }
                     }
                 });
@@ -191,7 +198,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     @Override
     public void addTaskTapped() {
 
-        //TODO: So far this method works perfectly, flaws are with the NewTaskAlertFragment Class.
         if(!isAlertUp) {
 
             //Reset the adapter, so that the views are NOT clickable in it.
@@ -219,6 +225,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                         .commit();
 
                 isAlertUp = true;
+                mListener.isNewTaskAlertUp(true);
             }
         }
 
@@ -258,6 +265,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
                 //Set the bool to false, so a new alert can appear.
                 isAlertUp = false;
+                mListener.isNewTaskAlertUp(false);
             }
         }
     }

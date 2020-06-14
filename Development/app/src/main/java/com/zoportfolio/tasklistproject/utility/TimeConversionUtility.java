@@ -27,8 +27,10 @@ public class TimeConversionUtility {
             convertedHour = 12;
         }else if(Integer.parseInt(_hour) > 12 && Integer.parseInt(_hour) < 24) {//If the hour is greater than 12 but less than 24, minus 12 from the hour.
             convertedHour = Integer.parseInt(_hour) - 12;
-        }else if(Integer.parseInt(_hour) <= 12 ) {//Nothing needs to be done here.
+        }else if(Integer.parseInt(_hour) <= 12 && Integer.parseInt(_hour) > 0) {//Nothing needs to be done here.
             convertedHour = Integer.parseInt(_hour);
+        }else if(_hour.equals("0")) {
+            convertedHour = 12;
         }
         return convertedHour;
     }

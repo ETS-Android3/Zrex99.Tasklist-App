@@ -149,6 +149,9 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         //loadTaskInfoFragment();
         //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
         updateTaskLists();
+        if(checkIfNotificationTimeIsAfterCurrentTime(mTaskEdited)) {
+            updateAlarmForTask(getApplicationContext());
+        }
 
         //After updating the tasklists, update the alarmmanager for this task.
 
@@ -193,6 +196,9 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             loadTaskInfoFragment();
         }
         updateTaskLists();
+        if(checkIfNotificationTimeIsAfterCurrentTime(mTaskEdited)) {
+            updateAlarmForTask(getApplicationContext());
+        }
     }
 
     //--- Edit Notification Time Alert Interface ---
