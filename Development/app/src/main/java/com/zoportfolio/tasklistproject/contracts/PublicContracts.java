@@ -5,6 +5,7 @@ public class PublicContracts {
     //TODO: I think I need to .gitignore this or hide this, not sure.
 
     public static final String ACTION_TASK_CHECKED_NOTIFICATION = "ACTION_TASK_CHECKED_NOTIFICATION";
+    public static final String ACTION_RESET_TASKLISTS_BROADCAST = "ACTION_RESET_TASKLISTS_BROADCAST";
 
     public static final String FILE_TASKLIST_FOLDER = "TasklistFolder";
     public static final String FILE_TASKLIST_NAME = "TasklistChecklist";

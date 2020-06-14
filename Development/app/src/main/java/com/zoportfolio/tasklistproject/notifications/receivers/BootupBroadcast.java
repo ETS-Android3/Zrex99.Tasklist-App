@@ -42,10 +42,7 @@ public class BootupBroadcast extends BroadcastReceiver {
         if(!_taskLists.isEmpty()) {
             AlarmManager alarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(_context, TasklistsRefreshBroadcast.class);
-
-
-            ArrayList<String> taskListsJSON = IOUtility.convertTasklistsForSaving(_taskLists);
-            intent.putExtra(MainActivity.EXTRA_TASKLISTS, taskListsJSON);
+            intent.setAction(PublicContracts.ACTION_RESET_TASKLISTS_BROADCAST);
 
             //Using flag update current for this pending intent, so that whenever it gets created it just updates the intent data.
             PendingIntent alarmIntent = PendingIntent.getBroadcast(_context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -54,14 +51,20 @@ public class BootupBroadcast extends BroadcastReceiver {
                 Calendar alarmTime = Calendar.getInstance();
                 alarmTime.setTimeInMillis(System.currentTimeMillis());
                 alarmTime.set(Calendar.HOUR_OF_DAY, 0);
-
+                alarmTime.set(Calendar.MINUTE, 0);
+                alarmTime.set(Calendar.SECOND, 0);
 
                 //Testing alarmManager block
 //                alarmManager.set(AlarmManager.RTC,
 //                        alarmTime.getTimeInMillis(),
 //                        alarmIntent);
 
-                alarmManager.setInexactRepeating(AlarmManager.RTC,
+//                alarmManager.setInexactRepeating(AlarmManager.RTC,
+//                        alarmTime.getTimeInMillis(),
+//                        AlarmManager.INTERVAL_DAY,
+//                        alarmIntent);
+
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                         alarmTime.getTimeInMillis(),
                         AlarmManager.INTERVAL_DAY,
                         alarmIntent);

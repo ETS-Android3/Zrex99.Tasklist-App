@@ -77,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     public static final String FILE_REFRESH_BROADCAST_ACTIVE = "FILE_REFRESH_BROADCAST_ACTIVE";
 
-
-
     private ViewPager mPager;
     private PagerAdapter pagerAdapter;
 
@@ -97,11 +95,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //TODO: Have to test this with the physical device, and make sure it does not affect the alert edit texts.
-        // May have to put it into the task info activity as well.
-        // Used in the on resume as well.
-        // IMPORTANT USED THE ADJUSTNOTHING FLAG IN MANIFEST AND THAT SEEMS TO WORK, STILL NEED TO TEST.
-//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         //Create the notification channel.
         createNotificationChannel();
@@ -111,10 +104,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             getSupportActionBar().hide();
         }
 
-        //testStorageFeatures();
-
         loadOnFreshAppOpen();
-
 
         //Grab the current date text view to get the date.
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
@@ -143,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         fabAddTaskList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+
                 //TODO: This will be used for the testing version until i am able to get the pager to work.
                 if(mTaskLists != null && mTaskLists.size() == 1) {
                     Toast toast = Toast.makeText(getApplicationContext(), "Feature disabled and will be coming in future update.", Toast.LENGTH_LONG);
@@ -260,13 +250,19 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 mTaskLists = new ArrayList<UserTaskList>();
                 mTaskLists.add(newTaskList);
 
+
+                //TODO: Have to refine this super if block (if(mTaskLists == null)) to be cleaner and not as messy as it is right now.
                 //Check that the tasklist refresh broadcast is not active, and then set it up.
                 if(!loadTasklistRefreshBroadcastStateFromSharedPreferences()) {
+                    Log.i(TAG, "saveTapped: New task list: state was false, setting up tasklists refresh broadcast");
                     setupTasklistsRefreshBroadcast();
                 }
 
             }else {
                 mTaskLists.add(newTaskList);
+                if(!loadTasklistRefreshBroadcastStateFromSharedPreferences()) {
+                    setupTasklistsRefreshBroadcast();
+                }
             }
 
             //Save the tasklists to storage.
@@ -307,6 +303,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         for (int i = 0; i < taskList.getTasks().size(); i++) {
             cancelAlarmForTask(this, taskList.getTasks().get(i), i);
         }
+        if(mTaskLists.isEmpty()) {
+            saveTasklistRefreshBroadcastStateToSharedPreferences(false);    
+        }
+        
     }
 
     @Override
@@ -595,9 +595,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         if(mTaskLists != null && !mTaskLists.isEmpty()) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent intent = new Intent(this, TasklistsRefreshBroadcast.class);
-
-            ArrayList<String> taskListsJSON = convertTasklistsForSaving();
-            intent.putExtra(EXTRA_TASKLISTS, taskListsJSON);
+            intent.setAction(PublicContracts.ACTION_RESET_TASKLISTS_BROADCAST);
 
             //Using flag update current for this pending intent, so that whenever it gets created it just updates the intent data.
             PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -606,17 +604,23 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 Calendar alarmTime = Calendar.getInstance();
                 alarmTime.setTimeInMillis(System.currentTimeMillis());
                 alarmTime.set(Calendar.HOUR_OF_DAY, 0);
-
+                alarmTime.set(Calendar.MINUTE, 0);
+                alarmTime.set(Calendar.SECOND, 0);
 
                 //Testing alarmManager block
 //                alarmManager.set(AlarmManager.RTC,
 //                        alarmTime.getTimeInMillis(),
 //                        alarmIntent);
 
-                alarmManager.setInexactRepeating(AlarmManager.RTC,
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                         alarmTime.getTimeInMillis(),
                         AlarmManager.INTERVAL_DAY,
                         alarmIntent);
+
+//                alarmManager.setInexactRepeating(AlarmManager.RTC,
+//                        alarmTime.getTimeInMillis(),
+//                        AlarmManager.INTERVAL_DAY,
+//                        alarmIntent);
 
                 //To keep from continually adding and setting this alarmManager whenever the main activity runs,
                 // utilize the shared preferences to check if it needs to be set.
@@ -850,6 +854,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
 
         //TODO: Will need to reset the tasklist refresh broadcast here.
+        // Not sure how needed this is.
+        if(mTaskLists.isEmpty()) {
+            saveTasklistRefreshBroadcastStateToSharedPreferences(false);
+        }
 
     }
 

@@ -26,14 +26,20 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.i(TAG, "onReceive: start time of receiver");
         if(intent != null) {
-            if(intent.hasExtra(MainActivity.EXTRA_TASKLISTS)) {
-                //Grab the object from the intent and then call the method to convert the tasklists.
-                Object obj = intent.getSerializableExtra(MainActivity.EXTRA_TASKLISTS);
-                mTaskLists = convertTasklistsObjectFromJSON(obj);
+            if(intent.getAction() != null && intent.getAction().equals(PublicContracts.ACTION_RESET_TASKLISTS_BROADCAST)) {
+
+                //TODO: May have to turn this into a JobService i think, not sure which is the correct one.
+
+                //TODO: THE REASON WHY THIS DOESNT WORK IS BECAUSE I AM RELYING ON THE USER NOT UPDATING THE TASKLISTS IN ANY, I SHOULD BE LOADING THE TASKLISTS IN FROM STORAGE.
+                // THIS IS CREATING NOTIFICATION ALARMS FOR TASKS THAT ARENT EVEN SAVED ANYMORE.
+                
+                mTaskLists = IOUtility.loadTasklistsFromStorage(context);
                 if(!mTaskLists.isEmpty()) {
                     resetAllTasksToUnchecked(context);
                     setAllTasksAlarm(context);
+                    Log.i(TAG, "onReceive: end time of receiver");
                 }
             }
         }
