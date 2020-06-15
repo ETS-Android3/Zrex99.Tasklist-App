@@ -39,7 +39,7 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
             if(intent.getAction() != null && intent.getAction().equals(PublicContracts.ACTION_RESET_TASKLISTS_BROADCAST)) {
 
                 //TODO: May have to turn this into a JobService i think, not sure which is the correct one.
-                
+
                 mTaskLists = IOUtility.loadTasklistsFromStorage(context);
                 if(!mTaskLists.isEmpty()) {
                     resetAllTasksToUnchecked(context);

@@ -17,10 +17,12 @@ public class TaskListFragmentPagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = "TLFragmentPagerAd.TAG";
 
     private ArrayList<UserTaskList> mTaskLists;
+    private boolean mViewsEnabled;
 
-    public TaskListFragmentPagerAdapter(@NonNull FragmentManager fm, int behavior, ArrayList<UserTaskList> _taskLists) {
+    public TaskListFragmentPagerAdapter(@NonNull FragmentManager fm, int behavior, ArrayList<UserTaskList> _taskLists, boolean _viewsEnabled) {
         super(fm, behavior);
         mTaskLists = _taskLists;
+        mViewsEnabled = _viewsEnabled;
         Log.i(TAG, "TaskListFragmentPagerAdapter: Constructed");
     }
 
@@ -28,7 +30,7 @@ public class TaskListFragmentPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         //Return a new instance of the TaskList Fragment, that is created with the right tasklist.
-        return TaskListFragment.newInstance(mTaskLists.get(position));
+        return TaskListFragment.newInstance(mTaskLists.get(position), mViewsEnabled);
     }
 
     @Override

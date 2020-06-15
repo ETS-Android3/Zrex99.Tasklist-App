@@ -8,7 +8,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -30,7 +29,6 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -38,11 +36,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.internal.common.CrashlyticsCore;
 import com.zoportfolio.tasklistproject.alerts.NewTaskAlertFragment;
 import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
-import com.zoportfolio.tasklistproject.notifications.receivers.TaskCheckedBroadcast;
 import com.zoportfolio.tasklistproject.notifications.receivers.TaskReminderBroadcast;
 import com.zoportfolio.tasklistproject.notifications.receivers.TasklistsRefreshBroadcast;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
@@ -88,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     private static Boolean isAlertUp = false;
 
+    private int pagerLastPosition = 0;
+
     private final TaskCheckedReceiver taskCheckedReceiver = new TaskCheckedReceiver();
 
     /**
@@ -113,21 +111,34 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
         loadCurrentDate(tvCurrentDate);
 
-        //TODO: Will need to null check the mTaskList at crucial points through the app.
-        // Coming back to this stuff after I handle the other features.
-//        mPager = findViewById(R.id.vp_Tasklist);
-//
-//        if(mTaskLists == null || mTaskLists.isEmpty()) {
-//            //Hide the view pager to display a textview to tell the user to input a new tasklist.
-//            mPager.setVisibility(View.INVISIBLE);
-//        }else {
-//            //TODO: Test this out, alot.
-//            mPager.setVisibility(View.VISIBLE);
-//            pagerAdapter = new TaskListFragmentPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTaskLists);
-//            mPager.setAdapter(pagerAdapter);
-//        }
+        mPager = findViewById(R.id.vp_Tasklist);
 
-//        loadTaskListFragment(null);
+        if(mTaskLists == null || mTaskLists.isEmpty()) {
+            //Hide the view pager to display a textview to tell the user to input a new tasklist.
+            mPager.setVisibility(View.INVISIBLE);
+        }else {
+            mPager.setVisibility(View.VISIBLE);
+            pagerAdapter = new TaskListFragmentPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTaskLists, true);
+            mPager.setAdapter(pagerAdapter);
+            //TODO: May need to set this in the reload view pager method as well.
+            mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    pagerLastPosition = position;
+                    //Call a method to update the pagination when I include that into the app.
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+        }
 
         //TODOS...
         //TODO: I have to fix the nuemorphic container drawable. SOLVED: Couldn't fix the problem so I will move on for now.
@@ -137,16 +148,27 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             @Override
             public void onClick(View v) {
 
-                //TODO: This will be used for the testing version until i am able to get the pager to work.
-                if(mTaskLists != null && mTaskLists.size() == 1) {
-                    Toast toast = Toast.makeText(getApplicationContext(), "Feature disabled and will be coming in future update.", Toast.LENGTH_LONG);
-                    toast.show();
+                if(mTaskLists.size() == 10) {
+                    //TODO: WHEN IMPLEMENTING IN APP PURCHASES COME HERE.
+                    //TODO: Toast that the limit has been hit, ideally if there are 10 tasklists, disable and hide the fab
+                    // If the user did not purchase the rest, then toast that they can purchase additional tasklists in the settings,
+                    // or create a different alert that states that the user has to purchase additional tasklists from which they can purchase one more.
                 }else {
                     if(!isAlertUp) {
                         //When the fab is clicked the new task list alert should pop up.
-                        loadAlertFragment();
+                        loadNewTaskListAlertFragment();
                     }
                 }
+
+
+
+//                //TODO: This will be used for the testing version until i am able to get the pager to work.
+//                if(mTaskLists != null && mTaskLists.size() == 1) {
+//                    Toast toast = Toast.makeText(getApplicationContext(), "Feature disabled and will be coming in future update.", Toast.LENGTH_LONG);
+//                    toast.show();
+//                }else {
+//
+//                }
             }
         });
     }
@@ -208,7 +230,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 mTaskLists.clear();
             }
             mTaskLists = convertTasklistsFromLoading(taskListsJSON);
-            loadTaskListFragment(mTaskLists.get(0));
+            //TODO: Have to reload ViewPager from here. HAVE TO TEST
+            //loadTaskListFragment(mTaskLists.get(0));
+            reloadViewPager(0, true);
         }
 
         //Load the UI.
@@ -234,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     @Override
     public void cancelTapped() {
         //TODO: Revert the background views to being touchable.
-        closeAlertFragment();
+        closeNewTaskListAlertFragment(mPager.getCurrentItem());
     }
 
     @Override
@@ -244,9 +268,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             Log.i(TAG, "saveTapped: New taskList name: " + taskListName);
             //Create a new taskList
             UserTaskList newTaskList = new UserTaskList(taskListName);
-
-            //Close the Alert fragment before showing the taskList fragment.
-            closeAlertFragment();
 
             if(mTaskLists == null) {
                 //For the first time adding a tasklist.
@@ -271,8 +292,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //Save the tasklists to storage.
             saveTasklistsToStorage();
 
-            loadTaskListFragment(newTaskList);
-            //Testing loadViewPager();
+//            loadTaskListFragment(newTaskList);
+            closeNewTaskListAlertFragment(mTaskLists.size() - 1);
+
         }else {
             //If this happens I need to display to the user that something went wrong.
             //A toast that the saving went wrong.
@@ -306,10 +328,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         for (int i = 0; i < taskList.getTasks().size(); i++) {
             cancelAlarmForTask(this, taskList.getTasks().get(i), i);
         }
-        if(mTaskLists.isEmpty()) {
-            saveTasklistRefreshBroadcastStateToSharedPreferences(false);    
-        }
-        
     }
 
     @Override
@@ -380,7 +398,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 //Save the updated tasklists
                 saveTasklistsToStorage();
                 //Reload the taskListFragment.
-                loadTaskListFragment(mTaskLists.get(i));
+                //loadTaskListFragment(mTaskLists.get(i));
+                reloadViewPager(i, true);
                 break;
             }
         }
@@ -507,14 +526,14 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_Tasklist);
         frameLayout.setVisibility(View.VISIBLE);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance(_userTaskList), FRAGMENT_TASKLIST_TAG)
-                .commit();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.fragment_Container_Tasklist, TaskListFragment.newInstance(_userTaskList), FRAGMENT_TASKLIST_TAG)
+//                .commit();
     }
 
     //This method will load the NewTaskListAlert Fragment.
     //TODO: I might need to setup back button support for this fragment, will also need to make sure no other taps on background views are possible.
-    private void loadAlertFragment() {
+    private void loadNewTaskListAlertFragment() {
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTaskList);
         frameLayout.setVisibility(View.VISIBLE);
 
@@ -557,9 +576,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         frameLayout.startAnimation(animation);
 
         isAlertUp = true;
+        reloadViewPager(mPager.getCurrentItem(), false);
     }
 
-    private void closeAlertFragment() {
+    private void closeNewTaskListAlertFragment(int _tasklistPosition) {
         //Get the fragment by its tag, and null check it.
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASKLIST_TAG);
         if(fragment != null) {
@@ -598,6 +618,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
             //Set the bool to false, so a new alert can appear.
             isAlertUp = false;
+            reloadViewPager(_tasklistPosition, true);
         }
     }
 
@@ -609,12 +630,14 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
     }
 
-    private void loadViewPager() {
+    private void reloadViewPager(int _positionOfTaskList, boolean _shouldViewsBeEnabled) {
         TextView textView = findViewById(R.id.tv_noData);
         textView.setVisibility(View.GONE);
+        mPager = findViewById(R.id.vp_Tasklist);
         mPager.setVisibility(View.VISIBLE);
-        pagerAdapter = new TaskListFragmentPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTaskLists);
+        pagerAdapter = new TaskListFragmentPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, mTaskLists, _shouldViewsBeEnabled);
         mPager.setAdapter(pagerAdapter);
+        mPager.setCurrentItem(_positionOfTaskList);
     }
 
     private void loadTaskInfoActivity(UserTask selectedTask, String taskListName) {
@@ -811,7 +834,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         mTaskLists = convertTasklistsFromLoading(taskListJSONList);
 
         if(!mTaskLists.isEmpty()) {
-            loadTaskListFragment(mTaskLists.get(0));
+//            loadTaskListFragment(mTaskLists.get(0));
+            reloadViewPager(0, true);
         }
     }
 
@@ -840,7 +864,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             }
             mTaskLists = IOUtility.loadTasklistsFromStorage(this);
             if(!mTaskLists.isEmpty()) {
-                loadTaskListFragment(mTaskLists.get(0));
+//                loadTaskListFragment(mTaskLists.get(0));
+                reloadViewPager(0, true);
             }
         }
     }
@@ -894,6 +919,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             saveTasklistsToStorage();
             //Check for any remaining tasklists, if not then load the no data text view.
             if(mTaskLists.isEmpty()) {
+
+                //TODO: If there are no more tasklists I have to hide and delete the view pager.
                 FrameLayout frameLayout = findViewById(R.id.fragment_Container_Tasklist);
                 frameLayout.setVisibility(View.GONE);
 
@@ -902,7 +929,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
             }else {
                 //Reload the taskListFragment.
-                loadTaskListFragment(mTaskLists.get(0));
+//                loadTaskListFragment(mTaskLists.get(0));
+                reloadViewPager(mTaskLists.size()-1, true);
+
             }
         }
 
@@ -927,8 +956,9 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 }
                 mTaskLists = IOUtility.loadTasklistsFromStorage(context);
                 if(!mTaskLists.isEmpty()) {
-                    //TODO: When I implement multiple tasklists, need to check which tasklist the task that was checked came from, and reload that list.
-                    loadTaskListFragment(mTaskLists.get(0));
+                    //TODO: When I implement multiple tasklists, need to check which tasklist the task that was checked came from, and reload the view pager with that position.
+//                    loadTaskListFragment(mTaskLists.get(0));
+                    reloadViewPager(0, true);
                 }
             }
         }

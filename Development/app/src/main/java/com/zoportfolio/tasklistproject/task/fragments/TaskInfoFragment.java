@@ -201,10 +201,6 @@ public class TaskInfoFragment extends Fragment {
         mEtDescription.addTextChangedListener(mTextEditorWatcher);
     }
 
-    private void takeDownDescriptionEditing() {
-
-    }
-
     private void setUpNotificationEditing(final String notificationTime) {
         //Show the notification button
         mBtnChangeNotificationTime.setVisibility(View.VISIBLE);

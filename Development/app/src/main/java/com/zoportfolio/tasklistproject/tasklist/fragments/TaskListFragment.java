@@ -41,6 +41,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     //TODO: Implementing the rest of the logic, see TODOs below.
 
     private static final String ARG_USERTASKLIST = "userTaskList";
+    private static final String ARG_VIEWS_ENABLED = "viewsEnabled";
 
     private FragmentActivity mContext;
 
@@ -55,11 +56,14 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     private UserTaskList mTaskList;
 
     private static Boolean isAlertUp = false;
+    private boolean mViewsEnabled;
 
-    public static TaskListFragment newInstance(UserTaskList _userTaskList) {
+
+    public static TaskListFragment newInstance(UserTaskList _userTaskList, boolean _viewsEnabled) {
         
         Bundle args = new Bundle();
         args.putSerializable(ARG_USERTASKLIST, _userTaskList);
+        args.putBoolean(ARG_VIEWS_ENABLED, _viewsEnabled);
 
         TaskListFragment fragment = new TaskListFragment();
         fragment.setArguments(args);
@@ -108,9 +112,14 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mTaskList = (UserTaskList) (getArguments() != null ? getArguments().getSerializable(ARG_USERTASKLIST) : null);
+        if(getArguments() != null) {
+            mTaskList = (UserTaskList) getArguments().getSerializable(ARG_USERTASKLIST);
+            mViewsEnabled = getArguments().getBoolean(ARG_VIEWS_ENABLED);
+        }
 
-        if(getActivity() != null && mTaskList != null) {
+
+        if(getActivity() != null && mTaskList != null && mViewsEnabled) {
+            Log.i(TAG, "onActivityCreated: loading with views enabled");
             mTvName.setText(mTaskList.getTaskListName());
 
             //Fill adapter and set it to the listView.
@@ -159,6 +168,9 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
             }
 
+        }else if(getActivity() != null && mTaskList != null && !mViewsEnabled) {
+            Log.i(TAG, "onActivityCreated: loading with views disabled");
+            disableAllViews();
         }else {
             Log.i(TAG, "onActivityCreated: Tasklist is null.");
         }
@@ -274,6 +286,58 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     /**
      * Custom methods
      */
+
+
+    private void disableAllViews() {
+        mTvName.setText(mTaskList.getTaskListName());
+
+        //Fill adapter and set it to the listView.
+        if(mTaskList.getTasks() != null) {
+            updateTaskListView(false);
+            mLvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Log.i(TAG, "onItemClick: Row:" + position + " Task: " + mTaskList.getTasks().get(position).getTaskName());
+                }
+            });
+
+            mIbEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Check the editing state, control flow from there
+
+                    if(!isAlertUp) {
+                        //If the tasklist is not empty, handle code.
+                        if(!mEditing) { //The list view is not being edited.
+                            //Set the fragment to be editing the list view.
+                            mEditing = true;
+                            //Load the editing adapter.
+                            editTaskListView(true);
+
+                            mIbTrash.setVisibility(View.VISIBLE);
+                            mIbTrash.setEnabled(true);
+                            mIbTrash.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mListener.trashTapped(mTaskList);
+                                }
+                            });
+
+                        }else {//The list view is in the edit state.
+                            //Set the fragment back to its natural state.
+                            mEditing = false;
+
+                            updateTaskListView(true);
+                            mIbTrash.setVisibility(View.GONE);
+                            mIbTrash.setEnabled(false);
+                        }
+                    }
+                }
+            });
+            mIbEdit.setEnabled(false);
+        }
+
+    }
 
     public void closeAlertFragment() {
 
