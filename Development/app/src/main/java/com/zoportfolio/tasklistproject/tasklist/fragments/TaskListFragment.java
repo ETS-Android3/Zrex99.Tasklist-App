@@ -36,14 +36,10 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     private static final String TAG = "TaskListFragment.TAG";
 
-    private static final String FRAGMENT_ALERT_NEWTASK_TAG = "FRAGMENT_ALERT_NEWTASK";
-    
     //TODO: Implementing the rest of the logic, see TODOs below.
 
     private static final String ARG_USERTASKLIST = "userTaskList";
     private static final String ARG_VIEWS_ENABLED = "viewsEnabled";
-
-    private FragmentActivity mContext;
 
     //Views
     private ListView mLvTasks;
@@ -84,6 +80,7 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         void taskListUpdated(UserTaskList updatedTaskList);
 
         void isNewTaskAlertUp(boolean _alertState);
+        void addTask(ArrayList<String> _taskNames, String _taskListName);
     }
 
     @Override
@@ -91,7 +88,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         super.onAttach(context);
         if(context instanceof TaskListFragmentListener) {
             mListener = (TaskListFragmentListener)context;
-            mContext = (FragmentActivity) context;
         }
     }
 
@@ -214,12 +210,8 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     @Override
     public void addTaskTapped() {
 
+        //TODO: Not sure how necessary this if check is, test it out and get rid of it, if it isnt.
         if(!isAlertUp) {
-
-            //Reset the adapter, so that the views are NOT clickable in it.
-            updateTaskListView(false);
-
-            Activity a = getActivity();
 
             ArrayList<String> taskNames = new ArrayList<>();
 
@@ -231,45 +223,10 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
                 }
             }
 
-
-            if(a != null) {
-
-                FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
-                frameLayout.setVisibility(View.VISIBLE);
-
-                NewTaskAlertFragment fragment = NewTaskAlertFragment.newInstance(taskNames, mTaskList.getTaskListName());
-
-                Animation animation = AnimationUtils.loadAnimation(a, R.anim.slide_in_up);
-                animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
-
-                animation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                        try {
-                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
-                            fragmentTransaction.replace(R.id.fragment_Container_AlertNewTask, fragment, FRAGMENT_ALERT_NEWTASK_TAG);
-                            fragmentTransaction.commit();
-                        }catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-
-                frameLayout.startAnimation(animation);
-
-                isAlertUp = true;
-                mListener.isNewTaskAlertUp(true);
+            if(mTaskList != null) {
+                mListener.addTask(taskNames, mTaskList.getTaskListName());
             }
+
         }
 
     }
@@ -338,65 +295,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
         }
 
     }
-
-    public void closeAlertFragment() {
-
-        Activity a = getActivity();
-        if(a != null) {
-            //Reset the adapter, so that the views are clickable in it.
-            updateTaskListView(true);
-
-            //Get the fragment by its tag, and null check it.
-            Fragment fragment = mContext.getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
-            if(fragment != null) {
-
-                //Get the frame layout that holds the fragment.
-                FrameLayout frameLayout = a.findViewById(R.id.fragment_Container_AlertNewTask);
-
-                Animation animation = AnimationUtils.loadAnimation(a, R.anim.slide_out_down);
-                animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
-
-                animation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        try {
-                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
-                            fragmentTransaction.remove(fragment);
-                            fragmentTransaction.commitAllowingStateLoss();
-                            //Hide the frame layout.
-                            frameLayout.setVisibility(View.GONE);
-                        }catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-
-                frameLayout.startAnimation(animation);
-
-                //Set the bool to false, so a new alert can appear.
-                isAlertUp = false;
-                mListener.isNewTaskAlertUp(false);
-            }
-        }
-    }
-
-    //Not using this because I should be having the newtaskalertfragment communicate to the main activity.
-    public void addNewTaskToTaskList(UserTask _newTask) {
-        mTaskList.addTaskToList(_newTask);
-        updateTaskListView(true);
-    }
-
-
 
     private void updateTaskListView(boolean _listViewEnabled) {
         TasksAdapter ta = new TasksAdapter(getActivity(), mTaskList.getTasks(), this, _listViewEnabled);

@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.icu.text.MessagePattern;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.media.AudioAttributes;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     public static final String TAG = "MainActivity.TAG";
 
     private static final String FRAGMENT_ALERT_NEWTASKLIST_TAG = "FRAGMENT_ALERT_NEWTASKLIST";
+    private static final String FRAGMENT_ALERT_NEWTASK_TAG = "FRAGMENT_ALERT_NEWTASK";
     private static final String FRAGMENT_TASKLIST_TAG = "FRAGMENT_TASKLIST";
 
     public static final String KEY_TASKLISTS = "KEY_TASKLISTS";
@@ -364,6 +366,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     }
 
     @Override
+    public void addTask(ArrayList<String> _taskNames, String _taskListName) {
+
+        //TODO: Test this out
+        loadNewTaskAlertFragment(_taskNames, _taskListName);
+    }
+
+    @Override
     public void isNewTaskAlertUp(boolean _alertState) {
         isAlertUp = _alertState;
     }
@@ -377,7 +386,10 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         // and while it does work, it would be much better to handle all fragments ONLY in this activity
         // The fix would be to have the TaskListFragment interface the add task tapped all the way to the activity,
         // and then the activity will handle showing the new alert fragment, and then send the new data back to the TaskListFragment.
-        closeAlertFragmentFromTaskListFragment();
+//        closeAlertFragmentFromTaskListFragment();
+
+        //Call the method on the main activity
+        closeNewTaskAlertFragment(mPager.getCurrentItem());
     }
 
     @Override
@@ -399,16 +411,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                 saveTasklistsToStorage();
                 //Reload the taskListFragment.
                 //loadTaskListFragment(mTaskLists.get(i));
-                reloadViewPager(i, true);
+                closeNewTaskAlertFragment(i);
                 break;
             }
         }
 
         Toast toast = Toast.makeText(this, getResources().getString(R.string.toast_TaskSavingSuccesful), Toast.LENGTH_LONG);
         toast.show();
-
-        //Have to close out the alert fragment.
-        closeAlertFragmentFromTaskListFragment();
 
         if(checkIfNotificationTimeIsAfterCurrentTime(newTask)) {
             Log.i(TAG, "saveTappedNewTaskAlert: Notification time is after current time.");
@@ -622,12 +631,90 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
     }
 
-    private void closeAlertFragmentFromTaskListFragment() {
-        //Tell the TaskListFragment to close the NewTaskAlertFragment
-        TaskListFragment fragment = (TaskListFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TASKLIST_TAG);
+
+    private void loadNewTaskAlertFragment(ArrayList<String> _taskNames, String _taskListName) {
+
+
+        FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTask);
+        frameLayout.setVisibility(View.VISIBLE);
+
+        NewTaskAlertFragment fragment = NewTaskAlertFragment.newInstance(_taskNames, _taskListName);
+
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
+        animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                try {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_Container_AlertNewTask, fragment, FRAGMENT_ALERT_NEWTASK_TAG);
+                    fragmentTransaction.commit();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        frameLayout.startAnimation(animation);
+
+        isAlertUp = true;
+        reloadViewPager(mPager.getCurrentItem(), false);
+    }
+
+    private void closeNewTaskAlertFragment(int _tasklistPosition) {
+
+        //Get the fragment by its tag, and null check it.
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASK_TAG);
         if(fragment != null) {
-            fragment.closeAlertFragment();
+
+            //Get the frame layout that holds the fragment.
+            FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTask);
+
+            Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_down);
+            animation.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    try {
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.remove(fragment);
+                        fragmentTransaction.commitAllowingStateLoss();
+                        //Hide the frame layout.
+                        frameLayout.setVisibility(View.GONE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            frameLayout.startAnimation(animation);
+
+            isAlertUp = false;
+            reloadViewPager(_tasklistPosition, true);
         }
+
     }
 
     private void reloadViewPager(int _positionOfTaskList, boolean _shouldViewsBeEnabled) {
@@ -920,16 +1007,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             //Check for any remaining tasklists, if not then load the no data text view.
             if(mTaskLists.isEmpty()) {
 
-                //TODO: If there are no more tasklists I have to hide and delete the view pager.
-                FrameLayout frameLayout = findViewById(R.id.fragment_Container_Tasklist);
-                frameLayout.setVisibility(View.GONE);
+                mPager.setVisibility(View.GONE);
 
                 TextView textView = findViewById(R.id.tv_noData);
                 textView.setVisibility(View.VISIBLE);
 
             }else {
-                //Reload the taskListFragment.
-//                loadTaskListFragment(mTaskLists.get(0));
+                //Reload view pager.
                 reloadViewPager(mTaskLists.size()-1, true);
 
             }
