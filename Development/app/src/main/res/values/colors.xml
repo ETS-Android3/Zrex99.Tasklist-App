@@ -9,4 +9,6 @@
     <color name="colorSecondaryAction">#1758B9</color>
     <color name="colorDelete">#FF0000</color>
 
+    <color name="colorPagination">#8CD5AF</color>
+
 </resources>

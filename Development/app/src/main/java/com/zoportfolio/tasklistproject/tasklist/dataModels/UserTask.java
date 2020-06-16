@@ -20,6 +20,7 @@ public class UserTask implements Serializable {
 
     //Keys/Contracts vars
     // private static final [type]
+    private static final String KEY_T_ID = "KEY_T_ID";
     private static final String KEY_T_NAME = "KEY_T_NAME";
     private static final String KEY_T_DESCRIPTION = "KEY_T_DESCRIPTION";
     private static final String KEY_T_NOTIFICATION_TIME = "KEY_T_NOTIFICATION_TIME";
@@ -28,6 +29,7 @@ public class UserTask implements Serializable {
     //Class vars
     // private [type]
 
+    private int mTaskId;
     private String mTaskName;
     private String mTaskDescription;
     private String mTaskNotificationTime;//IMPORTANT NOTE: Hour in the notification time will be stored and transferred around as 24 hour notation ie. 2pm = 14
@@ -39,14 +41,16 @@ public class UserTask implements Serializable {
 
 
     //To be used if the user adds a task WITHOUT a description.
-    public UserTask(String taskName, String taskNotificationTime) {
+    public UserTask(int taskId, String taskName, String taskNotificationTime) {
+        mTaskId = taskId;
         mTaskName = taskName;
         mTaskNotificationTime = taskNotificationTime;
         mTaskChecked = false;
     }
 
     //To be used if the user adds a task WITH a description.
-    public UserTask(String taskName, String taskNotificationTime, String taskDescription) {
+    public UserTask(int taskId, String taskName, String taskNotificationTime, String taskDescription) {
+        mTaskId = taskId;
         mTaskName = taskName;
         mTaskNotificationTime = taskNotificationTime;
         mTaskDescription = taskDescription;
@@ -54,7 +58,8 @@ public class UserTask implements Serializable {
     }
 
     //To be used when converting the UserTask object FROM JSON WITH a description.
-    public UserTask(String taskName, String taskNotificationTime, String taskDescription, Boolean taskChecked) {
+    public UserTask(int taskId, String taskName, String taskNotificationTime, String taskDescription, Boolean taskChecked) {
+        mTaskId = taskId;
         mTaskName = taskName;
         mTaskNotificationTime = taskNotificationTime;
         mTaskDescription = taskDescription;
@@ -62,7 +67,8 @@ public class UserTask implements Serializable {
     }
 
     //To be used when converting the UserTask object FROM JSON WITHOUT a description.
-    public UserTask(String taskName, String taskNotificationTime, Boolean taskChecked) {
+    public UserTask(int taskId, String taskName, String taskNotificationTime, Boolean taskChecked) {
+        mTaskId = taskId;
         mTaskName = taskName;
         mTaskNotificationTime = taskNotificationTime;
         mTaskChecked = taskChecked;
@@ -71,6 +77,10 @@ public class UserTask implements Serializable {
     /**
      * Getters/Setters
      */
+
+    public int getTaskId() {
+        return mTaskId;
+    }
 
     public String getTaskName() {
         return mTaskName;
@@ -130,6 +140,7 @@ public class UserTask implements Serializable {
         JSONObject object = new JSONObject();
 
         try {
+            object.put(KEY_T_ID, mTaskId);
             object.put(KEY_T_NAME, mTaskName);
             object.put(KEY_T_NOTIFICATION_TIME, mTaskNotificationTime);
             object.put(KEY_T_CHECKED, mTaskChecked);
@@ -152,6 +163,7 @@ public class UserTask implements Serializable {
         try {
             JSONObject object = new JSONObject(_uTaskJSON);
 
+            int taskId = object.getInt(KEY_T_ID);
             String taskName = object.getString(KEY_T_NAME);
             String taskDescription = object.getString(KEY_T_DESCRIPTION);
             String taskNotificationTime = object.getString(KEY_T_NOTIFICATION_TIME);
@@ -161,10 +173,10 @@ public class UserTask implements Serializable {
             if(taskDescription != null  && !taskDescription.equals("Null")) {
                 //Construct with description.
                 Log.i(TAG, "fromJSONString: Creating UserTask from JSON WITH description");
-                return new UserTask(taskName, taskNotificationTime, taskDescription, taskChecked);
+                return new UserTask(taskId, taskName, taskNotificationTime, taskDescription, taskChecked);
             }else {
                 //Construct without description.
-                return new UserTask(taskName, taskNotificationTime, taskChecked);
+                return new UserTask(taskId, taskName, taskNotificationTime, taskChecked);
             }
 
         }catch (JSONException e) {

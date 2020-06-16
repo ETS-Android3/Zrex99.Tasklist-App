@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TaskMaster</string>
+    <string name="app_name">TaskMaster - Daily Habit Builder</string>
 
     <!-- Alert fragment strings-->
     <string name="alert_newTaskListTitle">Enter new tasklist name</string>

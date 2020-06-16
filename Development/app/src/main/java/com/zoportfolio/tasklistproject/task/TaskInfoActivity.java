@@ -316,12 +316,14 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     private UserTask createNewUserTaskForEditing(UserTask _userTaskOriginal) {
         if(_userTaskOriginal.getTaskDescription() != null) {//Create new task with description.
-            return new UserTask(_userTaskOriginal.getTaskName(),
+            return new UserTask( _userTaskOriginal.getTaskId(),
+                    _userTaskOriginal.getTaskName(),
                     _userTaskOriginal.getTaskNotificationTime(),
                     _userTaskOriginal.getTaskDescription(),
                     _userTaskOriginal.getTaskChecked());
         }else {//Create new task without description.
-            return new UserTask(_userTaskOriginal.getTaskName(),
+            return new UserTask( _userTaskOriginal.getTaskId(),
+                    _userTaskOriginal.getTaskName(),
                     _userTaskOriginal.getTaskNotificationTime(),
                     _userTaskOriginal.getTaskChecked());
         }

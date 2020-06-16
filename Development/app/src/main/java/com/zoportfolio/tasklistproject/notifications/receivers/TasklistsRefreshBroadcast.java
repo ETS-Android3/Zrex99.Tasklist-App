@@ -101,15 +101,13 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
                 for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
                     //Task scope
                     UserTask task = mTaskLists.get(i).getTasks().get(j);
-                    String id = i + String.valueOf(j);
-                    int idPosition = Integer.parseInt(id);
-                    setAlarmForTask(_context, task, idPosition);
+                    setAlarmForTask(_context, task, task.getTaskId());
                 }
             }
         }
     }
 
-    private void setAlarmForTask(Context _context, UserTask _task, int _positionID) {
+    private void setAlarmForTask(Context _context, UserTask _task, int _ID) {
         AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
 
         //TODO: HAVE TO USE THIS CODE BLUEPRINT TO:
@@ -124,11 +122,10 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
         Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
 
         byte[] userTaskByteData = UserTask.serializeUserTask(_task);
-        taskIntent.putExtra(PublicContracts.EXTRA_TASK_POSITIONID, _positionID);
         taskIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
 
         PendingIntent taskAlarmIntent = PendingIntent.getBroadcast(_context.getApplicationContext(),
-                _positionID,
+                _ID,
                 taskIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 

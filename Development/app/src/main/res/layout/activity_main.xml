@@ -150,4 +150,16 @@
 
     </FrameLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_PageControl"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+
+        android:nestedScrollingEnabled="false"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_rightMarginFrameContainer"
+        app:layout_constraintStart_toStartOf="@+id/guideline_leftMarginFrameContainer"
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottomMarginFrameContainer" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
