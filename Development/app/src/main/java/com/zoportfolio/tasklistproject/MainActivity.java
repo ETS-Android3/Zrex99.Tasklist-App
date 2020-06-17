@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
 
         loadOnFreshAppOpen();
+        //Yolo
 
         //Grab the current date text view to get the date.
         TextView tvCurrentDate = findViewById(R.id.tv_currentDate);
