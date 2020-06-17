@@ -3,7 +3,9 @@
 Repo for my own unique Tasklist application
 
 Version: 1.6
+
 Platform: Android
+
 Goal of this application: To serve as my main portfolio piece and be an application that I can continually update and upgrade while learning and implementing new features.
 
 Next goal: Release the app on the playstore and start converting it into Kotlin.
