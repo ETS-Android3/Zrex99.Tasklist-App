@@ -234,7 +234,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private void updateAlarmForTask(Context _context) {
 
         UserTask _task = mTaskEdited;
-        int _positionID = mTaskLists.get(mTaskListPosition).getTaskPosition(_task);
 
         AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
         //IMPORTANT, Had to convert the task data into byte data in order to get this to work properly.
@@ -244,11 +243,10 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         Intent taskIntent = new Intent(_context, TaskReminderBroadcast.class);
 
         byte[] userTaskByteData = UserTask.serializeUserTask(_task);
-        taskIntent.putExtra(PublicContracts.EXTRA_TASK_POSITIONID, _positionID);
         taskIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
 
         PendingIntent taskAlarmIntent = PendingIntent.getBroadcast(_context.getApplicationContext(),
-                _positionID,
+                mTaskEdited.getTaskId(),
                 taskIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
