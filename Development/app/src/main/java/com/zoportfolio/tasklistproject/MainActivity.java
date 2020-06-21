@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -176,6 +177,19 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
                         //When the fab is clicked the new task list alert should pop up.
                         loadNewTaskListAlertFragment();
                     }
+                }
+            }
+        });
+
+        Context context = this;
+        ImageButton ibSettings = findViewById(R.id.ib_Settings);
+        ibSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isAlertUp) {
+                    //Open the settings activity.
+                    Toast toast = Toast.makeText(context,"Settings will be coming soon.", Toast.LENGTH_LONG);
+                    toast.show();
                 }
             }
         });
