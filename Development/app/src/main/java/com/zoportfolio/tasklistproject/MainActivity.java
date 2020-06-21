@@ -51,6 +51,7 @@ import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
 import com.zoportfolio.tasklistproject.tasklist.fragments.TaskListFragment;
 import com.zoportfolio.tasklistproject.utility.FileUtility;
 import com.zoportfolio.tasklistproject.utility.IOUtility;
+import com.zoportfolio.tasklistproject.utility.KeyboardUtility;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -256,8 +257,13 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
     @Override
     public void cancelTapped() {
-        //TODO: Revert the background views to being touchable.
         closeNewTaskListAlertFragment(mPager.getCurrentItem());
+        KeyboardUtility.hideKeyboard(this);
+
+        if(mTaskLists == null || mTaskLists.isEmpty()) {
+            TextView textView = findViewById(R.id.tv_noData);
+            textView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -301,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             toastSaveNewTasklistFailed.show();
         }
 
+        KeyboardUtility.hideKeyboard(this);
     }
 
     //TaskListFragment Callbacks
@@ -377,6 +384,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     @Override
     public void cancelTappedNewTaskAlert() {
         closeNewTaskAlertFragment(mPager.getCurrentItem());
+        KeyboardUtility.hideKeyboard(this);
     }
 
     @Override
@@ -409,6 +417,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             Log.i(TAG, "saveTappedNewTaskAlert: Notification time is after current time.");
             setAlarmForTask(this, newTask, newTask.getTaskId());
         }
+        KeyboardUtility.hideKeyboard(this);
     }
 
 

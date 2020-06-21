@@ -27,6 +27,7 @@ import com.zoportfolio.tasklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
 import com.zoportfolio.tasklistproject.utility.FileUtility;
+import com.zoportfolio.tasklistproject.utility.KeyboardUtility;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -173,9 +174,9 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void cancelTappedEditTitle() {
-        // TODO: Need to close and get rid of the alert fragment.
         Log.i(TAG, "cancelTappedEditTitle: closing alert");
         closeEditTaskTitleAlertFragment();
+        KeyboardUtility.hideKeyboard(this);
     }
 
     @Override
@@ -201,6 +202,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         if(checkIfNotificationTimeIsAfterCurrentTime(mTaskEdited)) {
             updateAlarmForTask(getApplicationContext());
         }
+        KeyboardUtility.hideKeyboard(this);
     }
 
     //--- Edit Notification Time Alert Interface ---
