@@ -3,6 +3,7 @@ package com.zoportfolio.tasklistproject.task.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -198,6 +199,7 @@ public class TaskInfoFragment extends Fragment {
 
         mEtDescription.setText(description);
         mEtDescription.setVisibility(View.VISIBLE);
+        mEtDescription.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         mEtDescription.addTextChangedListener(mTextEditorWatcher);
     }
 

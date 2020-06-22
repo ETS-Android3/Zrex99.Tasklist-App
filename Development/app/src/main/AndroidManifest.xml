@@ -27,6 +27,10 @@
             android:windowSoftInputMode="adjustNothing"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".settings.SettingsActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:screenOrientation="portrait">
+        </activity>
         <receiver android:name=".notifications.receivers.TasklistsRefreshBroadcast"
             android:enabled="true"/>
         <receiver android:name=".notifications.receivers.TaskReminderBroadcast"

@@ -44,6 +44,7 @@ import com.zoportfolio.tasklistproject.alerts.NewTaskListAlertFragment;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.notifications.receivers.TaskReminderBroadcast;
 import com.zoportfolio.tasklistproject.notifications.receivers.TasklistsRefreshBroadcast;
+import com.zoportfolio.tasklistproject.settings.SettingsActivity;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
 import com.zoportfolio.tasklistproject.tasklist.adapters.PaginationDotsAdapter;
 import com.zoportfolio.tasklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
@@ -187,9 +188,7 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
             @Override
             public void onClick(View v) {
                 if(!isAlertUp) {
-                    //Open the settings activity.
-                    Toast toast = Toast.makeText(context,"Settings will be coming soon.", Toast.LENGTH_LONG);
-                    toast.show();
+                    loadSettingsActivity();
                 }
             }
         });
@@ -779,6 +778,12 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
 
 
         startActivityForResult(intent, REQUEST_CODE_TASK_VIEWING);
+    }
+
+
+    private void loadSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void setupTasklistsRefreshBroadcast() {
