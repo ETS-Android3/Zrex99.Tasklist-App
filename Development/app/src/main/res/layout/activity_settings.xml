@@ -8,15 +8,6 @@
     tools:context=".settings.SettingsActivity"
     android:id="@+id/settingsLayout">
 
-    <FrameLayout
-        android:id="@+id/fragment_Container_Task"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginFrameContainer"
-        app:layout_constraintLeft_toRightOf="@id/guideline_leftMarginFrameContainer"
-        app:layout_constraintRight_toLeftOf="@id/guideline_rightMarginFrameContainer"
-        app:layout_constraintTop_toBottomOf="@id/guideline_topMarginFrameContainer" />
 
     <!-- Guidelines for the fragment.-->
     <androidx.constraintlayout.widget.Guideline
@@ -62,6 +53,14 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.85" />
 
+    <!-- Guidelines for the privacy policy and terms conditions text views.-->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottomMarginTextViews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.80" />
+
 
     <Button
         android:id="@+id/btn_Back"
@@ -76,6 +75,54 @@
         app:layout_constraintEnd_toStartOf="@id/guideline_leftMarginFrameContainerAlert"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_PrivacyPolicy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/privacyPolicy"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@id/guideline_rightMarginFrameContainerAlert"
+        app:layout_constraintStart_toEndOf="@id/guideline_leftMarginFrameContainerAlert"
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottomMarginTextViews" />
+
+    <TextView
+        android:id="@+id/tv_And"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/and"
+        app:layout_constraintEnd_toEndOf="@id/tv_PrivacyPolicy"
+        app:layout_constraintStart_toStartOf="@id/tv_PrivacyPolicy"
+        app:layout_constraintTop_toBottomOf="@id/tv_PrivacyPolicy" />
+
+    <TextView
+        android:id="@+id/tv_TermsConditions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/termsConditions"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@id/tv_And"
+        app:layout_constraintStart_toStartOf="@id/tv_And"
+        app:layout_constraintTop_toBottomOf="@id/tv_And" />
+
+    <FrameLayout
+        android:id="@+id/fragment_Container_DeveloperData"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottomMarginFrameContainer"
+        app:layout_constraintLeft_toRightOf="@id/guideline_leftMarginFrameContainer"
+        app:layout_constraintRight_toLeftOf="@id/guideline_rightMarginFrameContainer"
+        app:layout_constraintTop_toBottomOf="@id/guideline_topMarginFrameContainer" />
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

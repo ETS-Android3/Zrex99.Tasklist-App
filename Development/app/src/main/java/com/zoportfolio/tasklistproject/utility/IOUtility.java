@@ -30,18 +30,9 @@ public class IOUtility {
         ArrayList<String> taskListsJSON = convertTasklistsForSaving(_taskLists);
         //Once all tasklists have been added to the string array, save them to storage.
         boolean saveStatus = FileUtility.saveToProtectedStorage(_context, PublicContracts.FILE_TASKLIST_NAME, PublicContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
-//        String saveStatusMessage = "";
-//        if(saveStatus) {
-//            saveStatusMessage = "Tasklist updated and saved succesfully";
-//        }else {
-//            saveStatusMessage = "Oops, something went wrong with the tasklist saving and it failed, please try again";
-//        }
-//
-//        Toast toast = Toast.makeText(_context, saveStatusMessage, Toast.LENGTH_LONG);
-//        toast.show();
     }
 
-    public static ArrayList<String> convertTasklistsForSaving(ArrayList<UserTaskList> _taskLists) {
+    private static ArrayList<String> convertTasklistsForSaving(ArrayList<UserTaskList> _taskLists) {
         ArrayList<String> taskListsJSON = new ArrayList<>();
         for (int i = 0; i < _taskLists.size(); i++) {
             UserTaskList taskList = _taskLists.get(i);
@@ -74,7 +65,7 @@ public class IOUtility {
         return convertTasklistsFromLoading(taskListJSONList);
     }
 
-    public static ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> _taskListJSONList) {
+    private static ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> _taskListJSONList) {
         ArrayList<UserTaskList> taskLists = new ArrayList<>();
         if(!_taskListJSONList.isEmpty()) {
             for (int i = 0; i < _taskListJSONList.size(); i++) {

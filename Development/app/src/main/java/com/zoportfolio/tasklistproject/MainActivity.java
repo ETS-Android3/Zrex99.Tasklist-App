@@ -588,7 +588,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         //Get the fragment by its tag, and null check it.
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_ALERT_NEWTASKLIST_TAG);
         if(fragment != null) {
-            //Hide the frame layout.
             FrameLayout frameLayout = findViewById(R.id.fragment_Container_AlertNewTaskList);
 
             Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_down);
@@ -1081,7 +1080,6 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         }
 
     }
-
 
     class TaskCheckedReceiver extends BroadcastReceiver {
 

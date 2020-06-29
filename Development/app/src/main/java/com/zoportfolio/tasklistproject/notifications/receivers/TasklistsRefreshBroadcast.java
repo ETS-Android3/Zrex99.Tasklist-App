@@ -110,11 +110,6 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
     private void setAlarmForTask(Context _context, UserTask _task, int _ID) {
         AlarmManager taskAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
 
-        //TODO: HAVE TO USE THIS CODE BLUEPRINT TO:
-        // MAKE SURE WHEN A NEW TASK IS ADDED IT GETS AN ALARM SET FOR IT,
-        // CHECK FOR THE ALARM TO BE ACTIVE FROM SHARED PREFERENCES AND THEN GO FROM THERE,
-        // DO THIS IN THE MAIN ACTIVITY WHEN A NEW TASK IS ADDED.
-
         //IMPORTANT, Had to convert the task data into byte data in order to get this to work properly.
         // Filling the intent with the byte array of the task data,
         // implementing SerializationUtils from Apache commons lang3,

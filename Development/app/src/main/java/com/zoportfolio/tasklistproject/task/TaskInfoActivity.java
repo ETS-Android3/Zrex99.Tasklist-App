@@ -26,10 +26,9 @@ import com.zoportfolio.tasklistproject.notifications.receivers.TaskReminderBroad
 import com.zoportfolio.tasklistproject.task.fragments.TaskInfoFragment;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
-import com.zoportfolio.tasklistproject.utility.FileUtility;
+import com.zoportfolio.tasklistproject.utility.IOUtility;
 import com.zoportfolio.tasklistproject.utility.KeyboardUtility;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragment.TaskInfoFragmentListener,
@@ -42,13 +41,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private static final String FRAGMENT_EDIT_TASK_TITLE_TAG = "FRAGMENT_EDIT_TASK_TITLE";
     private static final String FRAGMENT_EDIT_TASK_NOTIFICATION_TIME_TAG = "FRAGMENT_EDIT_TASK_TITLE";
 
-    //TODO: Need to change the position of the backbutton in the xml slightly.
-    // Trying to acheive a more user friendly and less cluttered look.
-
-    //TODO: NOTE: The saving works on the edited tasks, still need to communicate with the main activity though,
-    // Will need to test this exstensively.
-
-    //These two vars will keep track of the user data.
+    //These vars will keep track of the user data.
     private UserTask mTaskOriginal;
     private UserTask mTaskEdited;
     private int mTaskListPosition;
@@ -78,7 +71,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                 //Start the activity from the notification.
                 mTaskOriginal = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
                 mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
-                mTaskLists = loadTasklistsFromStorage(this);
+                mTaskLists = IOUtility.loadTasklistsFromStorage(this);
                 mTaskListPosition = findTaskListPosition(mTaskOriginal, mTaskLists);
             }else if(intent.getAction().equals(MainActivity.ACTION_TASK_VIEW_ACTIVITY)) {
                 //Start the activity the normal way.
@@ -100,7 +93,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                         }
                     }
                 }
-                mTaskLists = convertTasklistsFromLoading(taskListJSONList);
+                mTaskLists = convertTasklistsFromIntentJSON(taskListJSONList);
             }
         }
 
@@ -126,8 +119,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
                     resultIntent.putExtra(MainActivity.EXTRA_TASKLISTPOSITION, mTaskListPosition);
                     setResult(MainActivity.RESULT_CODE_TASK_CHANGED, resultIntent);
                     finish();
-                    //TODO: When returning to the main activity I will compare the returned task to the tasklist there and make sure there is a difference,
-                    // then load the tasklists from storage.
                 }
             }
         });
@@ -346,7 +337,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             taskList.getTasks().set(updatedTaskPosition, mTaskEdited);
         }
 
-        saveTasklistsToStorage();
+        IOUtility.saveTasklistsToStorage(this, mTaskLists);
     }
 
     private void setIsAlertUpInTaskInfoFragment(boolean _alertUp) {
@@ -363,7 +354,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private void loadTaskInfoFragment() {
         FrameLayout frameLayout = findViewById(R.id.fragment_Container_Task);
         frameLayout.setVisibility(View.VISIBLE);
-
 
         if(mEdited) {//This is a good spot to use the edited bool, and load the fragment with the right instance of the task object.
             Log.i(TAG, "loadTaskInfoFragment: Loading with edited task");
@@ -422,7 +412,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         frameLayout.startAnimation(animation);
 
         mIsAlertUp = true;
-        setIsAlertUpInTaskInfoFragment(mIsAlertUp);
+        setIsAlertUpInTaskInfoFragment(true);
     }
 
     private void closeEditTaskTitleAlertFragment() {
@@ -462,7 +452,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
             //Notify the alertUp variable.
             mIsAlertUp = false;
-            setIsAlertUpInTaskInfoFragment(mIsAlertUp);
+            setIsAlertUpInTaskInfoFragment(false);
         }
     }
 
@@ -501,7 +491,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         frameLayout.startAnimation(animation);
 
         mIsAlertUp = true;
-        setIsAlertUpInTaskInfoFragment(mIsAlertUp);
+        setIsAlertUpInTaskInfoFragment(true);
     }
 
     private void closeEditTaskNotificationTimeAlertFragment() {
@@ -541,7 +531,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
             //Notify the alertUp variable.
             mIsAlertUp = false;
-            setIsAlertUpInTaskInfoFragment(mIsAlertUp);
+            setIsAlertUpInTaskInfoFragment(false);
         }
     }
 
@@ -550,53 +540,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
      */
 
     //TODO: Convert these methods into a utility class for saving and loading.
-
-    private ArrayList<String> convertTasklistsForSaving() {
-        ArrayList<String> taskListsJSON = new ArrayList<>();
-        for (int i = 0; i < mTaskLists.size(); i++) {
-            UserTaskList taskList = mTaskLists.get(i);
-            //Add the JSON tasklist to the arrayList.
-            taskListsJSON.add(taskList.toJSONString());
-        }
-        return taskListsJSON;
-    }
-
-    private void saveTasklistsToStorage() {
-        //Convert all the tasklists to JSON for saving.
-        ArrayList<String> taskListsJSON = convertTasklistsForSaving();
-
-        //Once all tasklists have been added to the string array, save them to storage.
-        boolean saveStatus = FileUtility.saveToProtectedStorage(this, PublicContracts.FILE_TASKLIST_NAME, PublicContracts.FILE_TASKLIST_FOLDER, taskListsJSON);
-        //TODO: Can toast that saving was successful not sure.
-        Log.i(TAG, "saveTasklistsToStorage: Save status: " + saveStatus);
-    }
-
-    private boolean checkForTasklistsInStorage() {
-        //If this returns 0, that means there are no files
-        int fileCount = FileUtility.getCountOfFolderFromProtectedStorage(this, PublicContracts.FILE_TASKLIST_FOLDER);
-        return fileCount > 0;
-    }
-
-    private ArrayList<UserTaskList> loadTasklistsFromStorage(Context _context) {
-        ArrayList<String> taskListJSONList = new ArrayList<>();
-        Object obj = FileUtility.retrieveFromStorage(_context, PublicContracts.FILE_TASKLIST_NAME);
-        if(obj instanceof ArrayList<?>) {
-            ArrayList<?> arrayList = (ArrayList<?>) obj;
-            if(arrayList.size() > 0) {
-                for (int i = 0; i < arrayList.size(); i++) {
-                    Object o = arrayList.get(i);
-                    if(o instanceof String) {
-                        taskListJSONList.add((String) o);
-                    }
-                }
-            }
-        }
-
-        //Convert the tasklists from ArrayList<String> JSON
-        return convertTasklistsFromLoading(taskListJSONList);
-    }
-
-    private ArrayList<UserTaskList> convertTasklistsFromLoading(ArrayList<String> _taskListJSONList) {
+    private ArrayList<UserTaskList> convertTasklistsFromIntentJSON(ArrayList<String> _taskListJSONList) {
         ArrayList<UserTaskList> taskLists = new ArrayList<>();
         if(!_taskListJSONList.isEmpty()) {
             for (int i = 0; i < _taskListJSONList.size(); i++) {
