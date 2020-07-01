@@ -56,7 +56,6 @@ public class NewTaskAlertFragment extends Fragment {
         super.onAttach(context);
         if(context instanceof NewTaskAlertFragmentListener) {
             mListener = (NewTaskAlertFragmentListener) context;
-            Log.i(TAG, "onAttach: Listener attached");
         }
     }
 
@@ -66,7 +65,6 @@ public class NewTaskAlertFragment extends Fragment {
         View view = getLayoutInflater().inflate(R.layout.fragment_layout_alert_task, container, false);
         mEtNameField = view.findViewById(R.id.et_NewTaskListName);
         mTpNotificationTime = view.findViewById(R.id.tp_NotificationTime);
-        //Meridies options were not showing due to constraints being too small.
         mTpNotificationTime.setIs24HourView(false);
         mTvConfirmAction = view.findViewById(R.id.tv_AlertConfirmText);
         mTvCancelAction = view.findViewById(R.id.tv_AlertCancelText);
@@ -78,8 +76,6 @@ public class NewTaskAlertFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if(getActivity() != null) {
-
-            //mTpNotificationTime.setIs24HourView(false);
             mTpNotificationTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
                 @Override
                 public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
@@ -95,9 +91,6 @@ public class NewTaskAlertFragment extends Fragment {
                 }
             });
 
-
-
-            //Assign the click listeners to the confirm and cancel actions.
             mTvConfirmAction.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -106,7 +99,6 @@ public class NewTaskAlertFragment extends Fragment {
                         //Check that the entered task name is not already used for this task list.
                         String newTaskName = mEtNameField.getText().toString();
 
-                        //TODO: I could see this being problematic potentially if there are no tasks, need to see later.
                         ArrayList<String> taskNames = (getArguments() != null ? getArguments().getStringArrayList(ARG_TASKNAMES) : null);
                         boolean nameTaken = false;
                         if(taskNames != null) {
@@ -149,8 +141,6 @@ public class NewTaskAlertFragment extends Fragment {
      * Custom Methods
      */
 
-    //TODO: Fix the comments here later.
-    //Will return a bool based on if the text is valid or not.
     private boolean ValidateField(EditText editText) {
         //Get the text and trim whitespace from it.
         String text = editText.getText().toString().trim();
@@ -160,7 +150,6 @@ public class NewTaskAlertFragment extends Fragment {
             toastNameTaken.show();
             return false;
         }else {
-            //Return true for valid text.
             return true;
         }
 

@@ -21,8 +21,6 @@ import com.zoportfolio.tasklistproject.settings.fragments.DeveloperDataFragment;
 
 public class SettingsActivity extends AppCompatActivity implements DeveloperDataFragment.DeveloperDataFragmentListener {
 
-
-
     private static final String TAG = "SettingsActivity.TAG";
 
     private static final String FRAGMENT_DEVELOPERDATA_TAG = "FRAGMENT_DEVELOPERDATA";
@@ -50,8 +48,6 @@ public class SettingsActivity extends AppCompatActivity implements DeveloperData
         TextView tv_TermsConditions = findViewById(R.id.tv_TermsConditions);
 
         setupDeveloperDataTextViews(tv_PrivacyPolicy, tv_TermsConditions);
-
-
     }
 
     /**

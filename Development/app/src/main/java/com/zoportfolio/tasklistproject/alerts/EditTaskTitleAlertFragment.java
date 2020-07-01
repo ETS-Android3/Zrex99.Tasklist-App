@@ -23,7 +23,7 @@ public class EditTaskTitleAlertFragment extends Fragment {
 
     private static final String ARG_TASKNAMES = "taskNames";
     private static final String ARG_TASKNAMETOEDIT = "taskNameToEdit";
-    private static final String ARG_TASKLISTNAME = "taskListName";//Don't think i need this variable or arg in this fragment.
+    private static final String ARG_TASKLISTNAME = "taskListName";
 
     //TODO: ALl that needs to be done here is just layout fixes and instanced state saves.
 
@@ -127,7 +127,6 @@ public class EditTaskTitleAlertFragment extends Fragment {
      * Custom Methods
      */
 
-    //Will return a bool based on if the text is valid or not.
     private boolean validateField(EditText editText) {
         //Get the text and trim whitespace from it.
         String text = editText.getText().toString().trim();
@@ -137,7 +136,6 @@ public class EditTaskTitleAlertFragment extends Fragment {
             toastNameTaken.show();
             return false;
         }else {
-            //Return true for valid text.
             return true;
         }
 

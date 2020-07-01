@@ -77,7 +77,6 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
             String[] notificationTimeSplit = notificationTimeToEdit.split("/");
             String hour = notificationTimeSplit[0];
             String minute = notificationTimeSplit[1];
-            String meridies = notificationTimeSplit[2];
 
             mTpNotificationTime.setHour(Integer.parseInt(hour));
             mTpNotificationTime.setMinute(Integer.parseInt(minute));
@@ -92,7 +91,6 @@ public class EditTaskNotificationTimeAlertFragment extends Fragment {
                         meridies = "PM";
                     }
 
-                    Log.i(TAG, "onTimeChanged: Hour: " + hourOfDay + " Minute: " + minute + " Meridies: " + meridies);
                     mNotificationTime = UserTask.formatNotificationTime(hourOfDay, minute, meridies);
 
                     //This will update the text view, as the user is changing the time.

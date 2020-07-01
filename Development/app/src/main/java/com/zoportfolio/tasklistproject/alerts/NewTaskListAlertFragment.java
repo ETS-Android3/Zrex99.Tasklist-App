@@ -56,7 +56,6 @@ public class NewTaskListAlertFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //TODO: Will need to check the alert tasklist layout for any fixes that may need to be made.
         View view = getLayoutInflater().inflate(R.layout.fragment_layout_alert_tasklist, container, false);
         mEtNameField = view.findViewById(R.id.et_NewTaskListName);
         mTvConfirmAction = view.findViewById(R.id.tv_AlertConfirmText);
@@ -128,8 +127,6 @@ public class NewTaskListAlertFragment extends Fragment {
      * Custom Methods
      */
 
-    //TODO: Fix the comments here later.
-    //Will return a bool based on if the text is valid or not.
     private boolean ValidateField(EditText editText) {
         //Get the text and trim whitespace from it.
         String text = editText.getText().toString().trim();
@@ -142,7 +139,6 @@ public class NewTaskListAlertFragment extends Fragment {
             }
             return false;
         }else {
-            //Return true for valid text.
             return true;
         }
 
