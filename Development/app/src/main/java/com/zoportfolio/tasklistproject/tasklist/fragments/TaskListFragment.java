@@ -36,8 +36,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     private static final String TAG = "TaskListFragment.TAG";
 
-    //TODO: Implementing the rest of the logic, see TODOs below.
-
     private static final String ARG_USERTASKLIST = "userTaskList";
     private static final String ARG_VIEWS_ENABLED = "viewsEnabled";
 
@@ -68,15 +66,12 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
 
     private TaskListFragmentListener mListener;
     public interface TaskListFragmentListener {
-        //TODO: rename these callbacks accordingly.
         void taskTapped(UserTaskList taskList, UserTask task, int position);
 
         void trashTapped(UserTaskList taskList);
 
         void deleteTask(UserTaskList taskList, UserTask task, int position);
 
-        //TODO: Will need a tasklist ID,
-        // potential solution = use tasklist name, prevent user from entering duplicate names.
         void taskListUpdated(UserTaskList updatedTaskList);
 
         void isNewTaskAlertUp(boolean _alertState);
@@ -210,7 +205,6 @@ public class TaskListFragment extends Fragment implements TasksAdapter.TasksAdap
     @Override
     public void addTaskTapped() {
 
-        //TODO: Not sure how necessary this if check is, test it out and get rid of it, if it isnt.
         if(!isAlertUp) {
 
             ArrayList<String> taskNames = new ArrayList<>();

@@ -96,7 +96,6 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
         //Create the actions for the notification.
 
         //Going to just implement this action as a View, that will open the taskinfoactivity and show it for the user.
-        //Depending on how beta testing goes, I will add a action for the user to tap the notification and open the main activity.
         //viewIntent
         Intent taskInfoIntent = new Intent(_context, TaskInfoActivity.class);
         taskInfoIntent.putExtra(PublicContracts.EXTRA_TASK_BYTEDATA, userTaskByteData);
@@ -114,7 +113,6 @@ public class TaskReminderBroadcast extends BroadcastReceiver {
                 checkIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        //IMPORTANT: for the time being I am going to have the third action of opening the app on the notification. Will remove or change based on beta test feedback.
         //openMainIntent
         Intent launchAppIntent = new Intent(_context, MainActivity.class);
         launchAppIntent.setAction(ACTION_LAUNCH_APP_NOTIFICATION);

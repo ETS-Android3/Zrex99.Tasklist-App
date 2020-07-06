@@ -10,8 +10,6 @@ import java.io.Serializable;
 
 public class UserTask implements Serializable {
 
-    //TODO: Would like to take a day to write unit tests for the two classes.
-
     private static final String TAG = "UserTask.TAG";
 
     /**

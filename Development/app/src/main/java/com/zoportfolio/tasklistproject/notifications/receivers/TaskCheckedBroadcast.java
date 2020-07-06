@@ -23,7 +23,6 @@ public class TaskCheckedBroadcast extends BroadcastReceiver {
                 //Check for tasklists in storage as precaution.
 
                 if(IOUtility.checkForTasklistsInStorage(context)) {
-                    Log.i(TAG, "onReceive: files in storage.");
                     ArrayList<UserTaskList> taskLists = IOUtility.loadTasklistsFromStorage(context);
                     UserTask userTask = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
                     updateTask(context, userTask, taskLists);
@@ -43,8 +42,7 @@ public class TaskCheckedBroadcast extends BroadcastReceiver {
     private void updateTask(Context _context, UserTask _userTask, ArrayList<UserTaskList> _taskLists) {
         _userTask.setTaskChecked(true);
 
-        //Have to find the task based off its name.
-        //IMPORTANT eventually i will have to convert the tasks to ID based.
+        //IMPORTANT eventually i will have to convert the tasks to be searchable by ID.
         for (int i = 0; i < _taskLists.size(); i++) {
             //Super Tasklist scope
             for (int j = 0; j < _taskLists.get(i).getTasks().size(); j++) {

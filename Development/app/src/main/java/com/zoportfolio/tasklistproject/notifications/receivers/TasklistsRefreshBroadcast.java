@@ -19,7 +19,6 @@ import com.zoportfolio.tasklistproject.R;
 import com.zoportfolio.tasklistproject.contracts.PublicContracts;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
-import com.zoportfolio.tasklistproject.utility.FileUtility;
 import com.zoportfolio.tasklistproject.utility.IOUtility;
 
 import java.util.ArrayList;
@@ -34,56 +33,21 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "onReceive: start time of receiver");
         if(intent != null) {
             if(intent.getAction() != null && intent.getAction().equals(PublicContracts.ACTION_RESET_TASKLISTS_BROADCAST)) {
-
-                //TODO: May have to turn this into a JobService i think, not sure which is the correct one.
 
                 mTaskLists = IOUtility.loadTasklistsFromStorage(context);
                 if(!mTaskLists.isEmpty()) {
                     resetAllTasksToUnchecked(context);
                     setAllTasksAlarm(context);
-                    createDebugNotification(context);
-                    Log.i(TAG, "onReceive: end time of receiver");
                 }
             }
         }
-    }
-
-    private ArrayList<UserTaskList> convertTasklistsObjectFromJSON(Object _obj) {
-        ArrayList<String> taskListJSONList = new ArrayList<>();
-        if(_obj instanceof ArrayList<?>) {
-            ArrayList<?> arrayList = (ArrayList<?>) _obj;
-            if(arrayList.size() > 0) {
-                for (int i = 0; i < arrayList.size(); i++) {
-                    Object o = arrayList.get(i);
-                    if(o instanceof String) {
-                        taskListJSONList.add((String) o);
-                    }
-                }
-            }
-        }
-
-        ArrayList<UserTaskList> taskLists = new ArrayList<>();
-        if(!taskListJSONList.isEmpty()) {
-            for (int i = 0; i < taskListJSONList.size(); i++) {
-                String taskListJSONString = taskListJSONList.get(i);
-                UserTaskList userTaskList = UserTaskList.fromJSONString(taskListJSONString);
-                if(userTaskList != null) {
-                    taskLists.add(userTaskList);
-                }
-            }
-        }
-        return taskLists;
     }
 
     private void resetAllTasksToUnchecked(Context _context) {
         for (int i = 0; i < mTaskLists.size(); i++) {
             //Tasklist scope
-            //TODO: This is super important to check that the tasklist that will be looped through ACTUALLY HAS TASKS.
-            // May have to place this in other positions in the app.
-            // Just a simple check to make sure the tasklist has tasks.
             if(!mTaskLists.get(i).getTasks().isEmpty()) {
                 for (int j = 0; j < mTaskLists.get(i).getTasks().size(); j++) {
                     //Task scope
@@ -144,33 +108,33 @@ public class TasklistsRefreshBroadcast extends BroadcastReceiver {
         }
     }
 
-    //TODO: This is only for testing and will be deleted after beta phase.
-    private void createDebugNotification(Context _context) {
-        //Create the string messages for the notification.
-
-        String bigTextMessage = "This is a test of the tasklistsrefreshBroadcast class, to see if it was activated on bootup or at 12 am midnight.";
-        String bigContentTitleMessage = "All tasks alarmManagers were reset successfully";
-        String summaryTextMessage = "TasklistsRefreshBroadcast class was activated";
-
-        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
-                .bigText(bigTextMessage)
-                .setBigContentTitle(bigContentTitleMessage)
-                .setSummaryText(summaryTextMessage);
-
-        Bitmap largeIcon = BitmapFactory.decodeResource(_context.getResources(), R.drawable.ic_task_notification_placeholder);
-        Notification notification = new NotificationCompat.Builder(_context, MainActivity.NOTIFICATION_CHANNELID_TASKREMINDER)
-                .setLargeIcon(largeIcon)
-                .setSmallIcon(R.drawable.ic_task_notification_placeholder)
-                .setContentTitle("DEBUG NOTIFICATION")
-                .setStyle(bigTextStyle)
-                .build();
-        int notificationId = UUID.randomUUID().hashCode();
-
-        NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if(notificationManager != null) {
-            notificationManager.notify(notificationId, notification);
-        }
-
-    }
+    //IMPORTANT This is only for testing and will be deleted after beta phase.
+//    private void createDebugNotification(Context _context) {
+//        //Create the string messages for the notification.
+//
+//        String bigTextMessage = "This is a test of the tasklistsrefreshBroadcast class, to see if it was activated on bootup or at 12 am midnight.";
+//        String bigContentTitleMessage = "All tasks alarmManagers were reset successfully";
+//        String summaryTextMessage = "TasklistsRefreshBroadcast class was activated";
+//
+//        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle()
+//                .bigText(bigTextMessage)
+//                .setBigContentTitle(bigContentTitleMessage)
+//                .setSummaryText(summaryTextMessage);
+//
+//        Bitmap largeIcon = BitmapFactory.decodeResource(_context.getResources(), R.drawable.ic_task_notification_placeholder);
+//        Notification notification = new NotificationCompat.Builder(_context, MainActivity.NOTIFICATION_CHANNELID_TASKREMINDER)
+//                .setLargeIcon(largeIcon)
+//                .setSmallIcon(R.drawable.ic_task_notification_placeholder)
+//                .setContentTitle("DEBUG NOTIFICATION")
+//                .setStyle(bigTextStyle)
+//                .build();
+//        int notificationId = UUID.randomUUID().hashCode();
+//
+//        NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
+//        if(notificationManager != null) {
+//            notificationManager.notify(notificationId, notification);
+//        }
+//
+//    }
 
 }

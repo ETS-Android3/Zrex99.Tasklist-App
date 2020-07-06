@@ -25,13 +25,11 @@ public class BootupBroadcast extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent != null) {
             if(intent.getAction() != null && intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-                //Run method to restart the tasks alarms and the tasklist refresh broadcast.
-                Log.i(TAG, "onReceive: Starting all work in BootupBroadcast");
+
                 ArrayList<UserTaskList> taskLists = IOUtility.loadTasklistsFromStorage(context);
                 setupTasklistsRefreshBroadcast(context, taskLists);
                 resetAllTasksToUnchecked(context, taskLists);
                 setAllTasksAlarm(context, taskLists);
-                Log.i(TAG, "onReceive: Completed all work in BootupBroadcast");
             }
         }
     }
@@ -54,23 +52,12 @@ public class BootupBroadcast extends BroadcastReceiver {
                 alarmTime.set(Calendar.MINUTE, 0);
                 alarmTime.set(Calendar.SECOND, 0);
 
-                //Testing alarmManager block
-//                alarmManager.set(AlarmManager.RTC,
-//                        alarmTime.getTimeInMillis(),
-//                        alarmIntent);
-
-//                alarmManager.setInexactRepeating(AlarmManager.RTC,
-//                        alarmTime.getTimeInMillis(),
-//                        AlarmManager.INTERVAL_DAY,
-//                        alarmIntent);
 
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                         alarmTime.getTimeInMillis(),
                         AlarmManager.INTERVAL_DAY,
                         alarmIntent);
 
-                //To keep from continually adding and setting this alarmManager whenever the main activity runs,
-                // utilize the shared preferences to check if it needs to be set.
                 saveTasklistRefreshBroadcastStateToSharedPreferences(_context, true);
             }
         }else {

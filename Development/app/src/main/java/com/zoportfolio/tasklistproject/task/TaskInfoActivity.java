@@ -48,7 +48,7 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     private ArrayList<UserTaskList> mTaskLists;
 
     private boolean mEdited = false;
-    private boolean mIsAlertUp = false;//TODO: NOTE: Since i have this variable i can use this as a way to disable buttons or views while the alert is up. Just check against this bool.
+    private boolean mIsAlertUp = false;
 
     /**
      * Lifecycle methods
@@ -67,15 +67,15 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         Intent intent = getIntent();
 
         if(intent.getAction() != null) {
-            if(intent.getAction().equals(TaskReminderBroadcast.ACTION_TASK_VIEW_NOTIFICATION)) {
-                //Start the activity from the notification.
+            if(intent.getAction().equals(TaskReminderBroadcast.ACTION_TASK_VIEW_NOTIFICATION)) {//Start the activity from the notification.
+
                 mTaskOriginal = convertUserTaskFromByteData(intent.getByteArrayExtra(PublicContracts.EXTRA_TASK_BYTEDATA));
                 mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
                 mTaskLists = IOUtility.loadTasklistsFromStorage(this);
                 mTaskListPosition = findTaskListPosition(mTaskOriginal, mTaskLists);
-            }else if(intent.getAction().equals(MainActivity.ACTION_TASK_VIEW_ACTIVITY)) {
-                //Start the activity the normal way.
-                //Need to grab the data from the intent.
+
+            }else if(intent.getAction().equals(MainActivity.ACTION_TASK_VIEW_ACTIVITY)) {//Start the activity the normal way.
+
                 mTaskOriginal = (UserTask) intent.getSerializableExtra(MainActivity.EXTRA_TASK);
                 mTaskEdited = createNewUserTaskForEditing(mTaskOriginal);
                 mTaskListPosition = intent.getIntExtra(MainActivity.EXTRA_TASKLISTPOSITION, -1);
@@ -98,19 +98,15 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         }
 
 
-        //TODO: Look into why the ripple is not working on this button,
-        // easy fix imo is to just use an image button potentially.
         Button backButton = findViewById(R.id.btn_Back);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Check that the original task is different or not from the edited task, and then send back the right result code based on that.
                 if(mTaskOriginal.equals(mTaskEdited)) {
-                    //No changes made.
                     setResult(MainActivity.RESULT_CODE_TASK_UNCHANGED);
                     finish();
                 }else {
-                    //Run the method to update the tasklists variable and then send it back as an intent.
                     updateTaskLists();
 
                     //Set the result intent so that the main activity can handle the changed data.
@@ -123,7 +119,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             }
         });
 
-        //Once all the data is gotten, load the taskInfoFragment.
         loadTaskInfoFragment();
     }
 
@@ -140,15 +135,10 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         mTaskEdited.setTaskDescription(updatedTask.getTaskDescription());
         mTaskEdited.setTaskNotificationTime(updatedTask.getTaskNotificationTime());
 
-        //May not need to reload the task info fragment in this . Will need to see.
-        //loadTaskInfoFragment();
-        //TODO: Need to add in a way to save the tasklists, copy the methods from the main activity.
         updateTaskLists();
         if(checkIfNotificationTimeIsAfterCurrentTime(mTaskEdited)) {
             updateAlarmForTask(getApplicationContext());
         }
-
-        //After updating the tasklists, update the alarmmanager for this task.
     }
 
     @Override
@@ -165,7 +155,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
 
     @Override
     public void cancelTappedEditTitle() {
-        Log.i(TAG, "cancelTappedEditTitle: closing alert");
         closeEditTaskTitleAlertFragment();
         KeyboardUtility.hideKeyboard(this);
     }
@@ -176,7 +165,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             mEdited = true;//If this was the first edit of the task, then set the edited bool to true.
             mTaskEdited.setTaskName(taskNameEdited);
             if(!mTaskEdited.getTaskName().equals(mTaskOriginal.getTaskName())) {
-                Log.i(TAG, "saveTappedEditTitle: Task name has been edited and is different.");
             }
             closeEditTaskTitleAlertFragment();
             loadTaskInfoFragment();
@@ -184,7 +172,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
             //Not sure why i am checking, will look for reasons in the morning.
             mTaskEdited.setTaskName(taskNameEdited);
             if(!mTaskEdited.getTaskName().equals(mTaskOriginal.getTaskName())) {
-                Log.i(TAG, "saveTappedEditTitle: Task name has been edited and is different.");
             }
             closeEditTaskTitleAlertFragment();
             loadTaskInfoFragment();
@@ -210,7 +197,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         }
         mTaskEdited.setTaskNotificationTime(taskNotificationTimeEdited);
         if(!mTaskEdited.getTaskNotificationTime().equals(mTaskOriginal.getTaskName())) {
-            Log.i(TAG, "saveTappedEditNotificationTime: Task notification time has been edited and is different.");
         }
         closeEditTaskNotificationTimeAlertFragment();
         loadTaskInfoFragment();
@@ -287,7 +273,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
     }
 
     private int findTaskListPosition(UserTask _userTask, ArrayList<UserTaskList> _taskLists) {
-        //TODO: Will need to test this to ensure it return the correct position.
         int position =  -1;
         for (int i = 0; i < _taskLists.size(); i++) {
             //Super Tasklist scope
@@ -326,7 +311,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         UserTaskList taskList = mTaskLists.get(mTaskListPosition);
         for (int i = 0; i < taskList.getTasks().size(); i++) {
             if(taskList.getTasks().get(i).getTaskName().equals(mTaskOriginal.getTaskName())) {
-                Log.i(TAG, "updateTaskLists: found the position of the task to change.");
                 //Found the position of the task to change.
                 updatedTaskPosition = i;
             }
@@ -356,12 +340,10 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         frameLayout.setVisibility(View.VISIBLE);
 
         if(mEdited) {//This is a good spot to use the edited bool, and load the fragment with the right instance of the task object.
-            Log.i(TAG, "loadTaskInfoFragment: Loading with edited task");
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskEdited), FRAGMENT_TASKINFO_TAG)
                     .commit();
         }else {
-            Log.i(TAG, "loadTaskInfoFragment: Loading with original task");
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_Container_Task, TaskInfoFragment.newInstance(mTaskOriginal), FRAGMENT_TASKINFO_TAG)
                     .commit();
@@ -374,7 +356,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
         if(mTaskLists != null && !mTaskLists.isEmpty()) {
             for (int i = 0; i < mTaskLists.get(mTaskListPosition).getTasks().size(); i++) {
                 taskNames.add(mTaskLists.get(mTaskListPosition).getTasks().get(i).getTaskName());
-                Log.i(TAG, "loadEditTaskTitleAlertFragment: TaskNames Array: " + taskNames.get(i).toString());
             }
         }
 
@@ -539,7 +520,6 @@ public class TaskInfoActivity extends AppCompatActivity implements TaskInfoFragm
      * Custom methods - FILE I/O
      */
 
-    //TODO: Convert these methods into a utility class for saving and loading.
     private ArrayList<UserTaskList> convertTasklistsFromIntentJSON(ArrayList<String> _taskListJSONList) {
         ArrayList<UserTaskList> taskLists = new ArrayList<>();
         if(!_taskListJSONList.isEmpty()) {

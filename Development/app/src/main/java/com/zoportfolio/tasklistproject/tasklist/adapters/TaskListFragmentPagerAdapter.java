@@ -23,7 +23,6 @@ public class TaskListFragmentPagerAdapter extends FragmentStatePagerAdapter {
         super(fm, behavior);
         mTaskLists = _taskLists;
         mViewsEnabled = _viewsEnabled;
-        Log.i(TAG, "TaskListFragmentPagerAdapter: Constructed");
     }
 
     @NonNull

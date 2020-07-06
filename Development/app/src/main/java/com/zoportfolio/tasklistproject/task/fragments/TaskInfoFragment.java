@@ -36,7 +36,6 @@ public class TaskInfoFragment extends Fragment {
     private EditText mEtDescription;
     private Button mBtnChangeNotificationTime;
     private ImageButton mIbEdit;
-    private ImageButton mIbTrash;
     private boolean mEditing = false;
 
     //DataModel
@@ -122,26 +121,18 @@ public class TaskInfoFragment extends Fragment {
                 mTvDescription.setText(getResources().getString(R.string.task_descriptionNoData));
             }
 
-            //Fill out the editing functionality.
+
             mIbEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Check the editing state, control flow from there
                     if(!mEditing) { //The task info is not being edited.
-                        //Set the fragment to be editing the list view.
                         mEditing = true;
-                        //Load the editing adapter.
 
-                        //All of the editing is done and handled now.
                         setUpDescriptionEditing();
-
                         setUpNotificationEditing(mUserTask.getTaskNotificationTime());
-
                         setUpTitleEditing();
 
                     }else {//The task info is in edit state.
-                        //Set the fragment back to its natural state.
-                        //Save the updated task data.
                         mEditing = false;
                         takeDownEditingState();
                         mListener.taskUpdated(mUserTask);
@@ -179,8 +170,6 @@ public class TaskInfoFragment extends Fragment {
             public void onClick(View v) {
                 if(mEditing) {
                     if(isAlertUp) {
-                        Log.i(TAG, "onClick: alert is already up");
-                        //TODO: Toast that an alert is already up and that they need to finish editing or close the alert.
                     }else {
                         //Interface to the activity to display the title change alert, only if the editing variable is true.
                         mListener.editTitle(mUserTask.getTaskName());
@@ -211,8 +200,6 @@ public class TaskInfoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(isAlertUp) {
-                    Log.i(TAG, "onClick: alert is already up");
-                    //TODO: Toast that an alert is already up and that they need to finish editing or close the alert.
                 }else {
                     mListener.editNotificationTime(notificationTime);
                 }
@@ -245,8 +232,6 @@ public class TaskInfoFragment extends Fragment {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if(count==250) {
-                Log.i(TAG, "onTextChanged: character limit hit");
-                //TODO: Need to test this
                 Toast toast = Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT);
                 toast.show();
             }

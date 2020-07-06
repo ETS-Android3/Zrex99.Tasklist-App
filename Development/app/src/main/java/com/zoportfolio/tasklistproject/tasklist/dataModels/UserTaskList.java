@@ -11,8 +11,6 @@ import java.util.ArrayList;
 
 public class UserTaskList implements Serializable {
 
-    //TODO: Would like to take a day to write unit tests for the two classes.
-
     private static final String TAG = "UserTaskList.TAG";
 
     /**
