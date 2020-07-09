@@ -1,14 +1,14 @@
 # *TaskMaster - Daily Habit Builder*
 
-Repo for my own unique Tasklist application
+Repo for my unique Tasklist application
 
-Version: 1.6
+Version: 1.7
 
 Platform: Android
 
-Goal of this application: To serve as my main portfolio piece and be an application that I can continually update and upgrade while learning and implementing new features.
+Goal of this application: To serve as a portfolio piece and be an application that I can continually update and upgrade while learning and implementing new features.
 
-Next goal: Release the app on the playstore and start converting it into Kotlin.
+Next goal: Start converting the source code into Kotlin, and update the app based on the feedback received from users.
 
 ## App Description
 
@@ -22,7 +22,7 @@ This app is designed with a nuemorphic look and style that is meant to showcase 
 
 Third tarty technologies used: Firebase analytics, Firebase Crashlytics, Google Play Services
 
-New Java tech learned for this project: AlarmManager, SharedPreferences, Notifications, BroadcastReceiver.
+New Java/Android tech learned for this project: AlarmManager, SharedPreferences, Notifications, BroadcastReceiver, and ViewPager.
 
 ## About/Contact me
 
