@@ -2,14 +2,14 @@ package com.zoportfolio.tasklistproject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
@@ -46,7 +47,6 @@ import com.zoportfolio.tasklistproject.notifications.receivers.TaskReminderBroad
 import com.zoportfolio.tasklistproject.notifications.receivers.TasklistsRefreshBroadcast;
 import com.zoportfolio.tasklistproject.settings.SettingsActivity;
 import com.zoportfolio.tasklistproject.task.TaskInfoActivity;
-import com.zoportfolio.tasklistproject.tasklist.adapters.PaginationDotsAdapter;
 import com.zoportfolio.tasklistproject.tasklist.adapters.TaskListFragmentPagerAdapter;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTask;
 import com.zoportfolio.tasklistproject.tasklist.dataModels.UserTaskList;
@@ -113,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
         if(getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        isStoragePermissionGranted();
 
         loadOnFreshAppOpen();
         //Yolo
@@ -873,6 +875,16 @@ public class MainActivity extends AppCompatActivity implements NewTaskListAlertF
     /**
      * Custom methods - FILE I/O
      */
+
+    private void isStoragePermissionGranted() {
+        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "isStoragePermissionGranted: permission not granted.");
+            //Request permission to use file storage.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 65);
+        }else {
+            Log.i(TAG, "isStoragePermissionGranted: permission granted.");
+        }
+    }
 
     private ArrayList<String> convertTasklistsForSaving() {
         ArrayList<String> taskListsJSON = new ArrayList<>();
