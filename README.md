@@ -32,7 +32,7 @@ This app is designed with a nuemorphic look and style that is meant to showcase 
 - Firebase Crashlytics
 - Google Play Services
 
-## About/Contact me
+# About/Contact me
 
 I am a Junior mobile developer from New York City. I have a goal of learning and staying up to date with the current and best trends in the mobile development world, and working for cool and awesome companies.
 
