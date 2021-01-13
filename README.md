@@ -6,9 +6,7 @@ Version: 1.7
 
 Platform: Android
 
-Goal of this application: To serve as a portfolio piece and be an application that I can continually update and upgrade while learning and implementing new features.
-
-Next goal: Start converting the source code into Kotlin, and update the app based on the feedback received from users.
+Goal of this application: To serve as a portfolio piece and be an application that I can continually update and upgrade while learning and implementing new features. 
 
 ## App Description
 
@@ -18,11 +16,21 @@ This app is a simple and unique take on a tasklist app. Use TaskMaster - Daily H
 
 This app is designed with a nuemorphic look and style that is meant to showcase the potential of what apps could look like in the near future. 
 
-## Look behind the scenes at what makes this app run
+# Tech
 
-Third tarty technologies used: Firebase analytics, Firebase Crashlytics, Google Play Services
+## Android Libraries
 
-New Java/Android tech learned for this project: AlarmManager, SharedPreferences, Notifications, BroadcastReceiver, and ViewPager.
+- AlarmManager
+- SharedPreferences
+- Notifications
+- BroadcastReceiver
+- ViewPager
+
+## Google Libraries
+
+- Firebase analytics
+- Firebase Crashlytics
+- Google Play Services
 
 ## About/Contact me
 
