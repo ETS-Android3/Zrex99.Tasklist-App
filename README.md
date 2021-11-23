@@ -34,7 +34,7 @@ This app is designed with a nuemorphic look and style that is meant to showcase 
 
 # About/Contact me
 
-I am a Junior mobile developer from New York City. I have a goal of learning and staying up to date with the current and best trends in the mobile development world, and working for cool and awesome companies.
+I am a mobile android developer from New York City. I have a goal of learning and staying up to date with the current and best trends in the mobile development world, and working for cool and awesome companies.
 
-Business inquiries: LegendaryDireDevelopment@gmail.com
+Business inquiries: ZOrtiz42@outlook.com
 
